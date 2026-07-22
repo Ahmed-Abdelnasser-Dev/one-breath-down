@@ -1,0 +1,16 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# Godot Mono/C# build artifacts (if/when C# is enabled)
+.mono/
+data_*/
+mono_crash.*.json
+*.pdb
+
+# OS-specific cruft
+.DS_Store
+Thumbs.db
+
+# Local Claude Code settings (per-developer, not project config)
+.claude/
