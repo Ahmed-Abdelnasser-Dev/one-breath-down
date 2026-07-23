@@ -1,4 +1,5 @@
 extends Node2D
+class_name RunManager
 ## Owns the run lifecycle: surface detection, breath toggling, banking, reset.
 ## Communicates only through Events / GameState — never reached into by others.
 
@@ -6,15 +7,18 @@ enum RunState { AT_SURFACE, SUBMERGED, RUN_OVER }
 
 const RESET_DELAY := 2.5   ## seconds RUN_OVER lingers before reset_run() — also
                             ## how long breath takes to visibly refill (see below)
+const PIXELS_PER_METRE := 20.0
 
 @onready var diver: Diver = $Diver
 @onready var breath: BreathComponent = $Diver/BreathComponent
 @onready var surface_line: Marker2D = $World/SurfaceLine
 
 var state: RunState = RunState.AT_SURFACE
+var _diver_start_position: Vector2
 
 
 func _ready() -> void:
+	_diver_start_position = diver.global_position
 	Events.breath_depleted.connect(_on_breath_depleted)
 
 
@@ -30,6 +34,11 @@ func _physics_process(_delta: float) -> void:
 
 func _is_submerged() -> bool:
 	return diver.global_position.y > surface_line.global_position.y
+
+
+## Current dive depth in metres. 0 at or above the surface line.
+func get_depth_meters() -> float:
+	return max(0.0, (diver.global_position.y - surface_line.global_position.y) / PIXELS_PER_METRE)
 
 
 func _enter_submerged() -> void:
@@ -60,9 +69,8 @@ func _enter_run_over(success: bool) -> void:
 
 
 func reset_run() -> void:
-	# No position/velocity reset — the diver stays wherever the player has taken
-	# them. Crossing the surface line just banks/loses the carry; it doesn't
-	# teleport you home.
+	diver.global_position = _diver_start_position
+	diver.velocity = Vector2.ZERO
 	diver.clear_carry()
 	breath.refill()   # closes the tiny gap if the refill tween hasn't quite hit max yet
 	state = RunState.AT_SURFACE

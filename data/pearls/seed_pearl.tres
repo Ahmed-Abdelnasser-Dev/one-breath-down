@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="PearlData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="PearlData" format=3 uid="uid://bjwu2p0m2wgam"]
 
 [ext_resource type="Script" uid="uid://dp5a8s2r2rjay" path="res://scripts/resources/PearlData.gd" id="1"]
 
@@ -6,6 +6,4 @@
 script = ExtResource("1")
 id = &"seed_pearl"
 display_name = "Seed Pearl"
-value = 1
-min_depth = 0.0
-carry_weight = 0.0
+carry_weight = 0.05

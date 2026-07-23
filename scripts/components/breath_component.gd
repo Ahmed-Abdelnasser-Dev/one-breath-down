@@ -9,6 +9,7 @@ const LOG_INTERVAL := 0.5   ## seconds between "still draining/refilling" log li
 @export var max_breath: float = 30.0        ## seconds of breath at rest
 @export var base_drain: float = 1.0         ## breath/sec while resting
 @export var exertion_bonus: float = 0.5     ## up to +50% drain at full speed
+@export var weight_drain: float = 1.0       ## extra breath/sec per unit of carried weight
 
 var current_breath: float
 var draining: bool = false
@@ -55,7 +56,7 @@ func _physics_process(delta: float) -> void:
 	if draining:
 		var speed_ratio := diver.velocity.length() / diver.max_speed
 		var exertion := 1.0 + speed_ratio * exertion_bonus
-		current_breath -= base_drain * exertion * delta
+		current_breath -= (base_drain * exertion + diver.carried_weight * weight_drain) * delta
 		Events.breath_changed.emit(current_breath, max_breath)
 
 		_drain_log_timer += delta

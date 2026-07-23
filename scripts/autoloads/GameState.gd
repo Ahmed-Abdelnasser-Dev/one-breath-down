@@ -3,6 +3,7 @@ extends Node
 
 var pearls: int = 0
 var owned_upgrades: Array[StringName] = []
+var best_depth: float = 0.0
 
 const SAVE_PATH := "user://save.cfg"
 
@@ -23,6 +24,7 @@ func save() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("progress", "pearls", pearls)
 	cfg.set_value("progress", "upgrades", owned_upgrades)
+	cfg.set_value("progress", "best_depth", best_depth)
 	cfg.save(SAVE_PATH)
 
 func load_game() -> void:
@@ -31,3 +33,4 @@ func load_game() -> void:
 		return
 	pearls = cfg.get_value("progress", "pearls", 0)
 	owned_upgrades = cfg.get_value("progress", "upgrades", [] as Array[StringName])
+	best_depth = cfg.get_value("progress", "best_depth", 0.0)
