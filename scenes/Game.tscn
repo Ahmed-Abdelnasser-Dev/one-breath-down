@@ -5,18 +5,14 @@
 [ext_resource type="PackedScene" uid="uid://di64q3xym1gbk" path="res://scenes/player/diver.tscn" id="2_rvslj"]
 [ext_resource type="PackedScene" uid="uid://0q3fl2w7su53" path="res://scenes/pearls/pearl.tscn" id="3_pearl"]
 [ext_resource type="PackedScene" uid="uid://dvnx1l5gxox82" path="res://scenes/hud/hud.tscn" id="5_s0nni"]
-
-[sub_resource type="CanvasTexture" id="CanvasTexture_s0nni"]
+[ext_resource type="PackedScene" uid="uid://dsjp7gthh1fkh" path="res://scenes/background/background.tscn" id="6_bg"]
 
 [node name="Game" type="Node2D" unique_id=1220390611]
 script = ExtResource("1_elqb8")
 
 [node name="World" type="Node2D" parent="." unique_id=868154501]
 
-[node name="Background" type="Sprite2D" parent="World" unique_id=1629878394]
-position = Vector2(959.99994, 2879.75)
-scale = Vector2(1920, 5758.08)
-texture = SubResource("CanvasTexture_s0nni")
+[node name="Background" parent="World" unique_id=1629878394 instance=ExtResource("6_bg")]
 
 [node name="Pearls" type="Node2D" parent="World" unique_id=1403299963]
 
@@ -37,11 +33,6 @@ position = Vector2(1436, 3390)
 
 [node name="Pearl6" parent="World/Pearls" unique_id=770767470 instance=ExtResource("3_pearl")]
 position = Vector2(501, 4870)
-
-[node name="Line2D" type="Line2D" parent="World" unique_id=1850276621]
-points = PackedVector2Array(2, 1, 1923, 1)
-width = 3.0
-default_color = Color(1, 0, 0, 1)
 
 [node name="SurfaceLine" type="Marker2D" parent="World" unique_id=439811065]
 position = Vector2(966, 0)

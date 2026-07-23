@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://bmh3fhrxdaf7w" path="res://visuals/hud/breath_bar_water.png" id="3_barwater"]
 
 [node name="Hud" type="CanvasLayer" unique_id=1625309647]
+layer = 10
 script = ExtResource("1_48c2t")
 
 [node name="TopLeftSection" type="Control" parent="." unique_id=1366072252]

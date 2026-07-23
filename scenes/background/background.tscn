@@ -1,0 +1,159 @@
+[gd_scene load_steps=15 format=3]
+
+[ext_resource type="Script" uid="uid://cbi45xoqp4dx2" path="res://scripts/background/background.gd" id="1_bg"]
+[ext_resource type="Texture2D" uid="uid://blv2o0i5wf51s" path="res://visuals/background/Back.png" id="2_back"]
+[ext_resource type="Texture2D" uid="uid://co7pwmtvojbs2" path="res://visuals/background/Clouds.png" id="3_clouds"]
+[ext_resource type="Shader" path="res://visuals/shaders/water_body.gdshader" id="4_waterbody"]
+[ext_resource type="Shader" path="res://visuals/shaders/caustics.gdshader" id="5_caustics"]
+[ext_resource type="Shader" uid="uid://dbjaw5acxf1a3" path="res://visuals/shaders/waterline.gdshader" id="7_waterline"]
+[ext_resource type="Shader" uid="uid://sdaxlfuvci6k" path="res://visuals/shaders/god_rays.gdshader" id="8_godrays"]
+[ext_resource type="Shader" uid="uid://bdnvefycx28q5" path="res://visuals/shaders/depth_vignette.gdshader" id="9_vignette"]
+
+[sub_resource type="ShaderMaterial" id="SM_waterbody"]
+shader = ExtResource("4_waterbody")
+
+[sub_resource type="ShaderMaterial" id="SM_caustics"]
+shader = ExtResource("5_caustics")
+
+[sub_resource type="ShaderMaterial" id="SM_godrays"]
+shader = ExtResource("8_godrays")
+
+[sub_resource type="ShaderMaterial" id="SM_waterline"]
+shader = ExtResource("7_waterline")
+
+[sub_resource type="ShaderMaterial" id="SM_vignette"]
+shader = ExtResource("9_vignette")
+shader_parameter/intensity = 0.0
+shader_parameter/vignette_color = Color(0, 0.02, 0.05, 1)
+
+[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+blend_mode = 1
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_bubbles"]
+emission_shape = 3
+emission_box_extents = Vector3(1000, 600, 0)
+direction = Vector3(0, -1, 0)
+spread = 12.0
+initial_velocity_min = 25.0
+initial_velocity_max = 55.0
+gravity = Vector3(0, -25, 0)
+scale_min = 0.4
+scale_max = 1.1
+color = Color(0.9, 0.97, 1, 0.4)
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_snow"]
+emission_shape = 3
+emission_box_extents = Vector3(1300, 700, 0)
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 2.0
+initial_velocity_max = 10.0
+gravity = Vector3(0, 4, 0)
+scale_min = 0.3
+scale_max = 0.7
+color = Color(0.85, 0.9, 0.95, 0.25)
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_flecks"]
+emission_shape = 3
+emission_box_extents = Vector3(1000, 600, 0)
+direction = Vector3(0, -1, 0)
+spread = 30.0
+initial_velocity_min = 5.0
+initial_velocity_max = 15.0
+gravity = Vector3(0, -3, 0)
+scale_min = 0.15
+scale_max = 0.4
+color = Color(1, 0.95, 0.8, 0.8)
+
+[node name="Background" type="Node2D" unique_id=985390379]
+script = ExtResource("1_bg")
+
+[node name="SkySprite" type="Sprite2D" parent="." unique_id=155049239]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-2688, -960)
+scale = Vector2(4, 4)
+texture = ExtResource("2_back")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1344, 240)
+
+[node name="CloudsSprite" type="Sprite2D" parent="." unique_id=1798192052]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-2560, -1160)
+scale = Vector2(4, 4)
+texture = ExtResource("3_clouds")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1280, 240)
+
+[node name="WaterBody" type="ColorRect" parent="." unique_id=2014066712]
+material = SubResource("SM_waterbody")
+offset_left = -234.0
+offset_top = -728.0
+offset_right = 2166.0
+offset_bottom = 672.0
+mouse_filter = 2
+
+[node name="Caustics" type="ColorRect" parent="." unique_id=1298877211]
+material = SubResource("SM_caustics")
+offset_left = -234.0
+offset_top = -728.0
+offset_right = 2166.0
+offset_bottom = 672.0
+mouse_filter = 2
+
+[node name="GodRays" type="ColorRect" parent="." unique_id=797688285]
+material = SubResource("SM_godrays")
+offset_left = -234.0
+offset_top = 0.0
+offset_right = 2166.0
+offset_bottom = 1600.0
+mouse_filter = 2
+
+[node name="Waterline" type="ColorRect" parent="." unique_id=3499555]
+material = SubResource("SM_waterline")
+offset_left = -234.0
+offset_top = -40.0
+offset_right = 2166.0
+offset_bottom = 40.0
+mouse_filter = 2
+
+[node name="AmbientFollow" type="Node2D" parent="." unique_id=1125503080]
+
+[node name="Bubbles" type="GPUParticles2D" parent="AmbientFollow" unique_id=1074194211]
+material = SubResource("CIM_add")
+amount = 24
+lifetime = 6.0
+preprocess = 6.0
+randomness = 0.5
+process_material = SubResource("PPM_bubbles")
+
+[node name="Particulate" type="GPUParticles2D" parent="AmbientFollow" unique_id=1822266790]
+amount = 60
+amount_ratio = 0.15
+lifetime = 10.0
+preprocess = 10.0
+randomness = 0.6
+process_material = SubResource("PPM_snow")
+
+[node name="LightFlecks" type="GPUParticles2D" parent="AmbientFollow" unique_id=630182204]
+material = SubResource("CIM_add")
+amount = 40
+amount_ratio = 1.0
+lifetime = 5.0
+preprocess = 5.0
+randomness = 0.7
+process_material = SubResource("PPM_flecks")
+
+[node name="VignetteLayer" type="CanvasLayer" parent="." unique_id=405861725]
+layer = 1
+
+[node name="Vignette" type="ColorRect" parent="VignetteLayer" unique_id=1594734698]
+material = SubResource("SM_vignette")
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
