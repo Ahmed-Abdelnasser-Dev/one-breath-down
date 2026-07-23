@@ -17,3 +17,10 @@ builds/
 
 # Local Claude Code settings (per-developer, not project config)
 .claude/
+
+# Godot MCP automation bridge (dev tooling, not game code)
+mcp_interaction_server.gd
+mcp_interaction_server.gd.uid
+
+# Per-developer editor config
+.vscode/

@@ -66,6 +66,16 @@ pause={
 2d_render/layer_3="hazard"
 2d_render/layer_4="wall"
 2d_render/layer_5="current"
+2d_physics/layer_1="player"
+2d_navigation/layer_1="player"
+2d_physics/layer_2="pearl"
+2d_navigation/layer_2="pearl"
+2d_physics/layer_3="hazard"
+2d_navigation/layer_3="hazard"
+2d_physics/layer_4="wall"
+2d_navigation/layer_4="wall"
+2d_physics/layer_5="current"
+2d_navigation/layer_5="current"
 
 [physics]
 
