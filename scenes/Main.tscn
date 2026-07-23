@@ -1,6 +1,21 @@
 [gd_scene format=3 uid="uid://vvtw5tmpvdfm"]
 
 [ext_resource type="Script" uid="uid://bag60gtvmiki5" path="res://scripts/scenes/main.gd" id="1_elqb8"]
+[ext_resource type="PackedScene" uid="uid://di64q3xym1gbk" path="res://scenes/diver.tscn" id="2_rvslj"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_jn2mr"]
 
 [node name="Main" type="Node2D" unique_id=1220390611]
 script = ExtResource("1_elqb8")
+
+[node name="World" type="Node2D" parent="." unique_id=868154501]
+
+[node name="Sprite2D" type="Sprite2D" parent="World" unique_id=1629878394]
+position = Vector2(967.9999, 540.25)
+scale = Vector2(1933.9999, 1081.5)
+texture = SubResource("PlaceholderTexture2D_jn2mr")
+
+[node name="Diver" parent="." unique_id=1614375176 instance=ExtResource("2_rvslj")]
+position = Vector2(966, 542)
+
+[node name="Hud" type="CanvasLayer" parent="." unique_id=942145267]

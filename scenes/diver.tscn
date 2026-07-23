@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://di64q3xym1gbk"]
+
+[ext_resource type="Script" uid="uid://cln6818e7n334" path="res://scripts/player/diver.gd" id="1_5hnfc"]
+[ext_resource type="Texture2D" uid="uid://ds30ysqp0h6ai" path="res://icon.svg" id="1_cgobh"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hml8q"]
+size = Vector2(126, 126)
+
+[node name="Diver" type="CharacterBody2D" unique_id=88714604]
+script = ExtResource("1_5hnfc")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=274794471]
+texture = ExtResource("1_cgobh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=496330896]
+shape = SubResource("RectangleShape2D_hml8q")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1346575931]
