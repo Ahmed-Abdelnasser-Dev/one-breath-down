@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://0q3fl2w7su53"]
 
 [ext_resource type="Script" uid="uid://bu5ehcgkll3pp" path="res://scripts/pearls/pearl.gd" id="1_7wc1e"]
+[ext_resource type="Resource" path="res://data/pearls/seed_pearl.tres" id="2_seedp"]
 
 [sub_resource type="CanvasTexture" id="CanvasTexture_jn2mr"]
 
@@ -9,7 +10,9 @@ size = Vector2(12, 12)
 
 [node name="Pearl" type="Area2D" unique_id=973286943]
 collision_layer = 2
+collision_mask = 1
 script = ExtResource("1_7wc1e")
+data = ExtResource("2_seedp")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=225457638]
 scale = Vector2(12, 12)
