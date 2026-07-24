@@ -1,30 +1,24 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" uid="uid://cbi45xoqp4dx2" path="res://scripts/background/background.gd" id="1_bg"]
 [ext_resource type="Texture2D" uid="uid://blv2o0i5wf51s" path="res://visuals/background/Back.png" id="2_back"]
 [ext_resource type="Texture2D" uid="uid://co7pwmtvojbs2" path="res://visuals/background/Clouds.png" id="3_clouds"]
 [ext_resource type="Shader" path="res://visuals/shaders/water_body.gdshader" id="4_waterbody"]
-[ext_resource type="Shader" path="res://visuals/shaders/caustics.gdshader" id="5_caustics"]
-[ext_resource type="Shader" uid="uid://dbjaw5acxf1a3" path="res://visuals/shaders/waterline.gdshader" id="7_waterline"]
-[ext_resource type="Shader" uid="uid://sdaxlfuvci6k" path="res://visuals/shaders/god_rays.gdshader" id="8_godrays"]
 [ext_resource type="Shader" uid="uid://bdnvefycx28q5" path="res://visuals/shaders/depth_vignette.gdshader" id="9_vignette"]
+[ext_resource type="Texture2D" uid="uid://6ykgtkykg712" path="res://visuals/background/far.png" id="10_far"]
+[ext_resource type="Texture2D" uid="uid://bxe80qe5dnnys" path="res://visuals/background/sand.png" id="11_sand"]
+[ext_resource type="Texture2D" uid="uid://cr2djdwrpinf" path="res://visuals/background/foreground-2.png" id="12_fg2"]
+[ext_resource type="Texture2D" uid="uid://qnv8ohu7m53t" path="res://visuals/background/foreground-1.png" id="13_fg1"]
+[ext_resource type="Texture2D" uid="uid://st07lal1kc6g" path="res://visuals/background/foregound-merged.png" id="14_merged"]
+[ext_resource type="Texture2D" path="res://visuals/background/deep_formations.png" id="15_deepform"]
 
 [sub_resource type="ShaderMaterial" id="SM_waterbody"]
 shader = ExtResource("4_waterbody")
 
-[sub_resource type="ShaderMaterial" id="SM_caustics"]
-shader = ExtResource("5_caustics")
-
-[sub_resource type="ShaderMaterial" id="SM_godrays"]
-shader = ExtResource("8_godrays")
-
-[sub_resource type="ShaderMaterial" id="SM_waterline"]
-shader = ExtResource("7_waterline")
-
 [sub_resource type="ShaderMaterial" id="SM_vignette"]
 shader = ExtResource("9_vignette")
 shader_parameter/intensity = 0.0
-shader_parameter/vignette_color = Color(0, 0.02, 0.05, 1)
+shader_parameter/vignette_color = Color(0.012, 0.02, 0.051, 1)
 
 [sub_resource type="CanvasItemMaterial" id="CIM_add"]
 blend_mode = 1
@@ -68,6 +62,14 @@ color = Color(1, 0.95, 0.8, 0.8)
 [node name="Background" type="Node2D" unique_id=985390379]
 script = ExtResource("1_bg")
 
+[node name="WaterBody" type="ColorRect" parent="." unique_id=2014066712]
+material = SubResource("SM_waterbody")
+offset_left = -234.0
+offset_top = -728.0
+offset_right = 2166.0
+offset_bottom = 672.0
+mouse_filter = 2
+
 [node name="SkySprite" type="Sprite2D" parent="." unique_id=155049239]
 texture_filter = 1
 texture_repeat = 2
@@ -88,37 +90,77 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1280, 240)
 
-[node name="WaterBody" type="ColorRect" parent="." unique_id=2014066712]
-material = SubResource("SM_waterbody")
-offset_left = -234.0
-offset_top = -728.0
-offset_right = 2166.0
-offset_bottom = 672.0
-mouse_filter = 2
+[node name="FarBand" type="Sprite2D" parent="." unique_id=2312450981]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-2048, 0)
+scale = Vector2(4, 4)
+texture = ExtResource("10_far")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1024, 5760)
 
-[node name="Caustics" type="ColorRect" parent="." unique_id=1298877211]
-material = SubResource("SM_caustics")
-offset_left = -234.0
-offset_top = -728.0
-offset_right = 2166.0
-offset_bottom = 672.0
-mouse_filter = 2
+[node name="DeepFormations" type="Sprite2D" parent="." unique_id=2312450982]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-4864, 0)
+scale = Vector2(4, 4)
+texture = ExtResource("15_deepform")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 2432, 7616)
 
-[node name="GodRays" type="ColorRect" parent="." unique_id=797688285]
-material = SubResource("SM_godrays")
-offset_left = -234.0
-offset_top = 0.0
-offset_right = 2166.0
-offset_bottom = 1600.0
-mouse_filter = 2
+[node name="ReefSand" type="Sprite2D" parent="." unique_id=3821004512]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-2048, -218)
+scale = Vector2(4, 4)
+texture = ExtResource("11_sand")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1024, 192)
 
-[node name="Waterline" type="ColorRect" parent="." unique_id=3499555]
-material = SubResource("SM_waterline")
-offset_left = -234.0
-offset_top = -40.0
-offset_right = 2166.0
-offset_bottom = 40.0
-mouse_filter = 2
+[node name="ReefMid" type="Sprite2D" parent="." unique_id=3821004513]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-2048, -148)
+scale = Vector2(4, 4)
+texture = ExtResource("12_fg2")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1024, 192)
+
+[node name="ReefNear" type="Sprite2D" parent="." unique_id=3821004514]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-2048, -88)
+scale = Vector2(4, 4)
+texture = ExtResource("13_fg1")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1024, 192)
+
+[node name="ReefFloor" type="Sprite2D" parent="." unique_id=3821004515]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-4096, -28)
+scale = Vector2(4, 4)
+texture = ExtResource("14_merged")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 2048, 192)
+
+[node name="AccentSpire" type="Sprite2D" parent="." unique_id=3821004516]
+texture_filter = 1
+scale = Vector2(3, 3)
+texture = ExtResource("13_fg1")
+centered = false
+
+[node name="AccentStatue" type="Sprite2D" parent="." unique_id=3821004517]
+texture_filter = 1
+scale = Vector2(3, 3)
+texture = ExtResource("12_fg2")
+centered = false
 
 [node name="AmbientFollow" type="Node2D" parent="." unique_id=1125503080]
 

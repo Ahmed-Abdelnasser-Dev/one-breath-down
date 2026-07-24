@@ -11,11 +11,13 @@ uniform float camera_y = 0.0;
 uniform float rect_height : hint_range(64.0, 4000.0) = 1400.0;
 uniform float posterize_steps : hint_range(4.0, 64.0) = 24.0;
 
-uniform vec4 color_sunlit : source_color = vec4(0.2, 0.6, 0.7, 1.0);
-uniform vec4 color_shallow : source_color = vec4(0.1, 0.4, 0.55, 1.0);
-uniform vec4 color_twilight_in : source_color = vec4(0.06, 0.22, 0.38, 1.0);
-uniform vec4 color_twilight_out : source_color = vec4(0.03, 0.1, 0.2, 1.0);
-uniform vec4 color_midnight : source_color = vec4(0.01, 0.02, 0.05, 1.0);
+// Stops match docs/visual-bible.md §2.3 — harmonized against the shipped reef/far-band art
+// rather than picked independently (sunlit used to be too teal at (0.2, 0.6, 0.7)).
+uniform vec4 color_sunlit : source_color = vec4(0.161, 0.420, 0.780, 1.0);
+uniform vec4 color_shallow : source_color = vec4(0.098, 0.278, 0.522, 1.0);
+uniform vec4 color_twilight_in : source_color = vec4(0.071, 0.169, 0.388, 1.0);
+uniform vec4 color_twilight_out : source_color = vec4(0.035, 0.090, 0.200, 1.0);
+uniform vec4 color_midnight : source_color = vec4(0.012, 0.020, 0.051, 1.0);
 
 // Absolute world-depth stops in px (PIXELS_PER_METRE=20, see run_manager.gd).
 const float STOP0 = 0.0;

@@ -6,6 +6,15 @@
 [ext_resource type="PackedScene" uid="uid://0q3fl2w7su53" path="res://scenes/pearls/pearl.tscn" id="3_pearl"]
 [ext_resource type="PackedScene" uid="uid://dvnx1l5gxox82" path="res://scenes/hud/hud.tscn" id="5_s0nni"]
 [ext_resource type="PackedScene" uid="uid://dsjp7gthh1fkh" path="res://scenes/background/background.tscn" id="6_bg"]
+[ext_resource type="Script" path="res://scripts/menus/menu_manager.gd" id="7_menumgr"]
+[ext_resource type="PackedScene" path="res://scenes/menus/options_screen.tscn" id="8_options"]
+[ext_resource type="PackedScene" path="res://scenes/menus/controls_screen.tscn" id="9_controls"]
+[ext_resource type="PackedScene" path="res://scenes/menus/about_screen.tscn" id="10_about"]
+[ext_resource type="PackedScene" path="res://scenes/menus/credits_screen.tscn" id="11_credits"]
+[ext_resource type="PackedScene" path="res://scenes/menus/pause_menu.tscn" id="12_pause"]
+[ext_resource type="PackedScene" path="res://scenes/menus/shop_screen.tscn" id="13_shop"]
+[ext_resource type="PackedScene" path="res://scenes/menus/inventory_screen.tscn" id="14_inventory"]
+[ext_resource type="PackedScene" path="res://scenes/menus/game_over_screen.tscn" id="15_gameover"]
 
 [node name="Game" type="Node2D" unique_id=1220390611]
 script = ExtResource("1_elqb8")
@@ -45,3 +54,34 @@ collision_layer = 8
 position = Vector2(966, -28)
 
 [node name="Hud" parent="." unique_id=1995843703 instance=ExtResource("5_s0nni")]
+
+[node name="MenuLayer" type="CanvasLayer" parent="."]
+layer = 20
+process_mode = 3
+
+[node name="Scrim" type="ColorRect" parent="MenuLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.65)
+
+[node name="MenuManager" type="Node" parent="MenuLayer"]
+script = ExtResource("7_menumgr")
+
+[node name="OptionsScreen" parent="MenuLayer" instance=ExtResource("8_options")]
+
+[node name="ControlsScreen" parent="MenuLayer" instance=ExtResource("9_controls")]
+
+[node name="AboutScreen" parent="MenuLayer" instance=ExtResource("10_about")]
+
+[node name="CreditsScreen" parent="MenuLayer" instance=ExtResource("11_credits")]
+
+[node name="PauseMenu" parent="MenuLayer" instance=ExtResource("12_pause")]
+
+[node name="ShopScreen" parent="MenuLayer" instance=ExtResource("13_shop")]
+
+[node name="InventoryScreen" parent="MenuLayer" instance=ExtResource("14_inventory")]
+
+[node name="GameOverScreen" parent="MenuLayer" instance=ExtResource("15_gameover")]

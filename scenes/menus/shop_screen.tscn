@@ -1,0 +1,97 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/menus/shop_screen.gd" id="1_script"]
+[ext_resource type="Theme" path="res://theme/menu_theme.tres" id="2_theme"]
+
+[node name="ShopScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -95.0
+offset_right = 160.0
+offset_bottom = 95.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Header" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Panel/Margin/VBox/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "THE MERCHANT"
+
+[node name="MoneyLabel" type="Label" parent="Panel/Margin/VBox/Header"]
+layout_mode = 2
+text = "⌾ 0"
+horizontal_alignment = 2
+
+[node name="HSeparator" type="HSeparator" parent="Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="Columns" type="HBoxContainer" parent="Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="ItemList" type="ItemList" parent="Panel/Margin/VBox/Columns"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Detail" type="VBoxContainer" parent="Panel/Margin/VBox/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 4
+
+[node name="NameLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "—"
+
+[node name="EffectLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
+text = ""
+
+[node name="CostLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
+layout_mode = 2
+text = "COST 0"
+
+[node name="CloseButton" type="Button" parent="Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Close"

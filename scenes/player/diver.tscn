@@ -1,23 +1,29 @@
 [gd_scene format=3 uid="uid://di64q3xym1gbk"]
 
 [ext_resource type="Script" uid="uid://cln6818e7n334" path="res://scripts/player/diver.gd" id="1_5hnfc"]
-[ext_resource type="Texture2D" uid="uid://ds30ysqp0h6ai" path="res://icon.svg" id="1_cgobh"]
+[ext_resource type="Script" path="res://scripts/player/diver_animator.gd" id="2_anim"]
+[ext_resource type="SpriteFrames" path="res://visuals/diver/diver_frames.tres" id="2_frames"]
 [ext_resource type="Script" uid="uid://ck3jjlm7a2atk" path="res://scripts/components/breath_component.gd" id="3_pxx4y"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hml8q"]
-size = Vector2(126, 126)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_diver"]
+radius = 32.0
+height = 110.0
 
 [node name="Diver" type="CharacterBody2D" unique_id=88714604]
 collision_mask = 12
 script = ExtResource("1_5hnfc")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=274794471]
-texture = ExtResource("1_cgobh")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=274794471]
+scale = Vector2(3, 3)
+sprite_frames = ExtResource("2_frames")
+animation = &"idle"
+script = ExtResource("2_anim")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=496330896]
-shape = SubResource("RectangleShape2D_hml8q")
+shape = SubResource("CapsuleShape2D_diver")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1346575931]
+zoom = Vector2(0.25, 0.25)
 
 [node name="BreathComponent" type="Node" parent="." unique_id=1437572770]
 script = ExtResource("3_pxx4y")

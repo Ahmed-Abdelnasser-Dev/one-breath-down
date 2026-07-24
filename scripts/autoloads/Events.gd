@@ -5,6 +5,7 @@ extends Node
 signal run_started
 signal player_surfaced(pearls_banked: int)
 signal player_died(cause: String)
+signal run_reset
 
 # Breath / countdown
 signal breath_changed(current: float, maximum: float)

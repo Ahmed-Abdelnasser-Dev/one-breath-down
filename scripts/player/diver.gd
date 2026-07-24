@@ -11,6 +11,8 @@ var carried_count: int = 0
 var carried_value: int = 0
 var carried_weight: float = 0.0
 
+@onready var _animator: DiverAnimator = $AnimatedSprite2D
+
 
 func _physics_process(delta: float) -> void:
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -31,4 +33,10 @@ func clear_carry() -> void:
 	carried_count = 0
 	carried_value = 0
 	carried_weight = 0.0
+
+
+## Single entry point for hazards to react against — forwards to the visual
+## state machine. Movement/health effects belong to whatever calls this.
+func take_hit() -> void:
+	_animator.trigger_hurt()
 

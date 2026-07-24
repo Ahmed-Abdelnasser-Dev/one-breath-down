@@ -11,27 +11,53 @@ config_version=5
 [application]
 
 config/name="One Breath Down"
-run/main_scene="uid://vvtw5tmpvdfm"
+run/main_scene="res://scenes/menus/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Settings="*res://scripts/autoloads/Settings.gd"
+
+
+
+
 
 Events="*uid://dhuykg56x45u"
 GameState="*uid://codqrkos6f4st"
 
 [display]
 
-window/size/viewport_width=1920
-window/size/viewport_height=1080
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
+window/size/viewport_width=480
+window/size/viewport_height=270
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
+window/stretch/scale_mode="integer"
 
 [gui]
 
 theme/custom="res://theme/default_theme.tres"
 
 [input]
+
+open_inventory={"deadzone": 0.5, "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":73,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)]}
+
+open_shop={"deadzone": 0.5, "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":70,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)]}
 
 move_up={
 "deadzone": 0.2,
@@ -83,9 +109,17 @@ pause={
 
 [physics]
 
+common/physics_interpolation=true
 3d/physics_engine="Jolt Physics"
 
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true
+
+
+[audio]
+
+buses/default_bus_layout="res://audio/default_bus_layout.tres"

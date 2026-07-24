@@ -61,11 +61,11 @@ func _enter_run_over(success: bool) -> void:
 		GameState.add_pearls(diver.carried_value)   # 0 until Step 4; emits pearls_banked
 		Events.player_surfaced.emit(diver.carried_value)
 		print("Surfaced — banked %d pearls (total %d)" % [diver.carried_value, GameState.pearls])
+		breath.begin_refill(RESET_DELAY)   # ticks up to full over the pause below
+		get_tree().create_timer(RESET_DELAY).timeout.connect(reset_run)
 	else:
-		Events.player_died.emit("drowned")           # carried pearls lost on reset
+		Events.player_died.emit("drowned")   # carried pearls lost; GameOverScreen drives the reset
 		print("Drowned — %d pearls lost" % diver.carried_value)
-	breath.begin_refill(RESET_DELAY)   # ticks up to full over the pause below
-	get_tree().create_timer(RESET_DELAY).timeout.connect(reset_run)
 
 
 func reset_run() -> void:
@@ -74,4 +74,5 @@ func reset_run() -> void:
 	diver.clear_carry()
 	breath.refill()   # closes the tiny gap if the refill tween hasn't quite hit max yet
 	state = RunState.AT_SURFACE
+	Events.run_reset.emit()
 	print("Run reset — carry cleared, breath at %.1f/%.1f" % [breath.current_breath, breath.max_breath])

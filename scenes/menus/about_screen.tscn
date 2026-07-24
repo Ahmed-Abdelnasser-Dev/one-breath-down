@@ -1,0 +1,79 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/menus/about_screen.gd" id="1_script"]
+[ext_resource type="Theme" path="res://theme/menu_theme.tres" id="2_theme"]
+
+[node name="AboutScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+script = ExtResource("1_script")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -100.0
+offset_right = 140.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TitleLabel" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "ONE BREATH DOWN"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PitchLabel" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+text = "Dive deep, grab the pearls, and make it back before you run out of breath."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="JamLabel" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+text = "GMTK Game Jam 2026 — Theme: Countdown"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="Panel/Margin/VBox"]
+layout_mode = 2
+
+[node name="FlavorLabel" type="Label" parent="Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "You dive into the flooded remains of a civilization the sea swallowed long ago — broken statues, drowned colonnades, coral-reclaimed stonework. The deeper you go, the older and stranger the ruins become, and the more valuable — and dangerous — the pearls they still guard.
+
+Every choice down there is measured against the one thing no upgrade can buy back: the breath you're already holding."
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="Panel/Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Back"

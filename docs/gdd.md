@@ -94,8 +94,12 @@ Keep shop small (5-6 items) for balance and scope sanity.
 ---
 
 ## 5. Art & Audio Direction (to be developed)
-- Cultural framing: Gulf pearl-diving heritage, rope-and-basket aesthetic, dhow boats at the surface, traditional pearl-diving song influence for ambient audio.
-- Suggested style: simple flat/vector shapes or light pixel art, needs to be scoped against solo 4-day art budget.
+- **Superseded:** the Gulf pearl-diving heritage framing below has been dropped in favor of a full
+  mystical sunken-ruins direction (statues, broken columns, coral-reclaimed stonework). See
+  `docs/visual-bible.md` for the current single source of truth on palette, composition, and
+  effects rules — check there before making any new visual decision, not this section.
+- ~~Cultural framing: Gulf pearl-diving heritage, rope-and-basket aesthetic, dhow boats at the surface, traditional pearl-diving song influence for ambient audio.~~
+- Suggested style: simple flat/vector shapes or light pixel art, needs to be scoped against solo 4-day art budget. **Decided:** 16-bit pixel art, confirmed in `docs/visual-bible.md`.
 - Key "juice" priorities: breath countdown tick/flash, heartbeat audio intensifying near zero, bubble trail particles, screen vignette tightening under low oxygen.
 
 ---
@@ -105,7 +109,7 @@ Keep shop small (5-6 items) for balance and scope sanity.
 - [ ] Exact depth-to-value curve for pearls, and spawn density per zone
 - [ ] Whether ascent hazards are simply mirrored or reactively escalate (scope-dependent)
 - [ ] Shop/hub scene presentation (between-run screen? boat deck?)
-- [ ] Final art style decision
+- [x] Final art style decision — 16-bit pixel art, mystical sunken-ruins direction; see `docs/visual-bible.md`
 - [ ] Godot project architecture (autoloads, scene structure, obstacle/pearl base classes)
 - [ ] Day-by-day build plan and cut list (what gets dropped first if behind schedule)
 

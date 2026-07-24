@@ -13,6 +13,7 @@ class_name Hud
 @onready var run_value_text: Label = $TopRightSection/VBoxContainer/RunValueText
 @onready var depth_text: Label = $BottomRightSection/VBoxContainer/DepthText
 @onready var best_depth_text: Label = $BottomRightSection/VBoxContainer/BestDepthText
+@onready var prompt_bar: Label = $PromptBar
 
 var carried_count: int = 0
 var carried_value: int = 0
@@ -36,6 +37,11 @@ func _ready() -> void:
 	best_depth_text.text = "BEST %d m" % int(GameState.best_depth)
 	_refresh_loot()
 
+	prompt_bar.text = "Press [%s] Shop     Press [%s] Inventory" % [
+		_bound_key_text("open_shop"), _bound_key_text("open_inventory")
+	]
+	prompt_bar.hide()
+
 
 func _process(_delta: float) -> void:
 	var depth: float = run_manager.get_depth_meters()
@@ -43,6 +49,8 @@ func _process(_delta: float) -> void:
 	if depth > GameState.best_depth:
 		GameState.best_depth = depth
 		best_depth_text.text = "BEST %d m" % int(depth)
+
+	prompt_bar.visible = run_manager.state == RunManager.RunState.AT_SURFACE
 
 
 func _on_breath_changed(current: float, max_breath: float) -> void:
@@ -82,3 +90,12 @@ func _format_breath(seconds: float) -> String:
 		var whole := int(s)
 		return "%d:%02d" % [whole / 60, whole % 60]
 	return "%.1f" % s
+
+
+## Reads the actual bound key from InputMap rather than hardcoding a letter,
+## so the prompt can't drift out of sync with project.godot (hud_ui.md §4).
+func _bound_key_text(action: StringName) -> String:
+	for event in InputMap.action_get_events(action):
+		if event is InputEventKey:
+			return event.as_text_physical_keycode()
+	return "?"
