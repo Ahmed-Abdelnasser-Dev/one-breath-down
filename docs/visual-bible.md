@@ -118,9 +118,8 @@ obvious repeat — this is cheaper than new art and reinforces "this world keeps
   between fixed-rate physics ticks instead of visibly stepping at the low internal resolution.
   If motion still reads choppy after this, the fallback is `Camera2D.position_smoothing_enabled`
   with a modest `position_smoothing_speed` (~15-20) — try interpolation alone first.
-- **Fonts**: `fonts/Pixellari.ttf.import` must keep `antialiasing=0`, `hinting=0`,
-  `subpixel_positioning=0` — crisp binary pixel glyphs, no grayscale/LCD softening. Use one
-  modular type scale across the HUD (base `8px`, emphasis `16px`); don't introduce one-off sizes.
+- **Fonts**: `fonts/Pixellari.ttf.import` uses MSDF (`multichannel_signed_distance_field=true`),
+  `antialiasing=1`, `hinting=1`, and `subpixel_positioning=1` for crisp, sharp vector-rendered pixel font glyphs at all resolutions. Use a consistent type scale across UI/HUD (base `12px`, header `16px`).
 
 ## 5. Effects Policy
 

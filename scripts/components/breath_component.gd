@@ -6,11 +6,12 @@ class_name BreathComponent
 
 const LOG_INTERVAL := 0.5   ## seconds between "still draining/refilling" log lines
 
-@export var max_breath: float = 30.0        ## seconds of breath at rest
+@export var base_max_breath: float = 30.0    ## seconds of breath at rest
 @export var base_drain: float = 1.0         ## breath/sec while resting
 @export var exertion_bonus: float = 0.5     ## up to +50% drain at full speed
 @export var weight_drain: float = 1.0       ## extra breath/sec per unit of carried weight
 
+var max_breath: float = 30.0
 var current_breath: float
 var draining: bool = false
 
@@ -25,6 +26,21 @@ var _refill_duration := 0.0
 
 
 func _ready() -> void:
+	Events.upgrade_purchased.connect(func(_id): _apply_upgrades())
+	Events.run_started.connect(_apply_upgrades)
+	Events.run_reset.connect(_apply_upgrades)
+	_apply_upgrades()
+
+
+func _apply_upgrades() -> void:
+	var lungs_level := GameState.get_upgrade_level("lungs_")
+	if lungs_level == 1:
+		max_breath = 45.0
+	elif lungs_level >= 2:
+		max_breath = 60.0
+	else:
+		max_breath = base_max_breath
+		
 	current_breath = max_breath
 	Events.breath_changed.emit(current_breath, max_breath)
 
@@ -42,8 +58,6 @@ func refill() -> void:
 	Events.breath_changed.emit(current_breath, max_breath)
 
 
-## Ticks current_breath up to max_breath over `duration` seconds instead of
-## snapping instantly.
 func begin_refill(duration: float) -> void:
 	_refilling = true
 	_refill_start = current_breath
@@ -54,9 +68,18 @@ func begin_refill(duration: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if draining:
-		var speed_ratio := diver.velocity.length() / diver.max_speed
-		var exertion := 1.0 + speed_ratio * exertion_bonus
-		current_breath -= (base_drain * exertion + diver.carried_weight * weight_drain) * delta
+		var speed_ratio: float = diver.velocity.length() / max(1.0, float(diver.max_speed))
+		var fins_level: int = GameState.get_upgrade_level("fins_")
+		var effective_exertion_bonus: float = exertion_bonus * (1.0 - float(fins_level) * 0.25)
+		
+		var exertion: float = 1.0 + speed_ratio * max(0.0, effective_exertion_bonus)
+		
+		var basket_level := GameState.get_upgrade_level("basket_")
+		var effective_weight := diver.carried_weight
+		if basket_level >= 1:
+			effective_weight = max(0.0, diver.carried_weight * 0.4)
+			
+		current_breath -= (base_drain * exertion + effective_weight * weight_drain) * delta
 		Events.breath_changed.emit(current_breath, max_breath)
 
 		_drain_log_timer += delta

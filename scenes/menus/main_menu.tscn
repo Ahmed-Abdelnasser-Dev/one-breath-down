@@ -1,5 +1,6 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
+[ext_resource type="PackedScene" path="res://scenes/background/background.tscn" id="1_bg_scene"]
 [ext_resource type="Script" path="res://scripts/menus/main_menu.gd" id="1_script"]
 [ext_resource type="Theme" path="res://theme/menu_theme.tres" id="2_theme"]
 [ext_resource type="PackedScene" path="res://scenes/menus/options_screen.tscn" id="3_options"]
@@ -17,14 +18,10 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_script")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.011765, 0.019608, 0.05098, 1)
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(240, 135)
+
+[node name="Background" parent="." instance=ExtResource("1_bg_scene")]
 
 [node name="TitleLabel" type="Label" parent="."]
 layout_mode = 1

@@ -6,4 +6,7 @@
 script = ExtResource("1")
 id = &"seed_pearl"
 display_name = "Seed Pearl"
+value = 1
+min_depth = 0.0
 carry_weight = 0.05
+color = Color(1, 1, 1, 1)

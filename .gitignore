@@ -17,6 +17,7 @@ builds/
 
 # Local Claude Code settings (per-developer, not project config)
 .claude/
+.agents/
 
 # Godot MCP automation bridge (dev tooling, not game code)
 mcp_interaction_server.gd

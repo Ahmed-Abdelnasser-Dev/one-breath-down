@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PearlData" format=3 uid="uid://c5r71lae0234a"]
+
+[ext_resource type="Script" uid="uid://dp5a8s2r2rjay" path="res://scripts/resources/PearlData.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"rose_pearl"
+display_name = "Rose Pearl"
+value = 3
+min_depth = 25.0
+carry_weight = 0.15
+color = Color(1, 0.7, 0.8, 1)
