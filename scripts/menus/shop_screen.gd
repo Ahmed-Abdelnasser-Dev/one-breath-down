@@ -7,14 +7,14 @@ const CATALOG: Array[Dictionary] = [
 	{
 		"id": &"lungs_1",
 		"name": "Bigger Lungs I",
-		"effect": "Increases base breath capacity from 30s to 45s.",
+		"effect": "Increases base breath capacity from 50s to 75s.",
 		"cost": 15,
 		"prereq": &""
 	},
 	{
 		"id": &"lungs_2",
 		"name": "Bigger Lungs II",
-		"effect": "Increases base breath capacity to 60s.",
+		"effect": "Increases base breath capacity to 100s.",
 		"cost": 40,
 		"prereq": &"lungs_1"
 	},

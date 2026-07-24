@@ -7,13 +7,13 @@ enum RunState { AT_SURFACE, SUBMERGED, RUN_OVER }
 
 const RESET_DELAY := 2.5   ## seconds RUN_OVER lingers before reset_run() — also
                             ## how long breath takes to visibly refill (see below)
-const PIXELS_PER_METRE := 20.0
 
 @onready var diver: Diver = $Diver
 @onready var breath: BreathComponent = $Diver/BreathComponent
 @onready var surface_line: Marker2D = $World/SurfaceLine
 
 var state: RunState = RunState.AT_SURFACE
+var depth_m: int = 0
 var _diver_start_position: Vector2
 
 
@@ -23,6 +23,9 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if diver == null or surface_line == null:
+		return
+	_update_depth()
 	match state:
 		RunState.AT_SURFACE:
 			if _is_submerged():
@@ -33,12 +36,23 @@ func _physics_process(_delta: float) -> void:
 
 
 func _is_submerged() -> bool:
+	if diver == null or surface_line == null:
+		return false
 	return diver.global_position.y > surface_line.global_position.y
 
 
-## Current dive depth in metres. 0 at or above the surface line.
-func get_depth_meters() -> float:
-	return max(0.0, (diver.global_position.y - surface_line.global_position.y) / PIXELS_PER_METRE)
+## Converts world-space Y to metres once, at the boundary — nothing
+## downstream ever sees a pixel coordinate. Only emits/reports on whole-metre
+## change, so this is a handful of events per second, not one per frame.
+func _update_depth() -> void:
+	if diver == null or surface_line == null:
+		return
+	var raw := (diver.global_position.y - surface_line.global_position.y) / GameState.PIXELS_PER_METRE
+	var m := maxi(0, int(raw))
+	if m != depth_m:
+		depth_m = m
+		Events.depth_changed.emit(m)
+		GameState.report_depth(m)
 
 
 func _enter_submerged() -> void:
@@ -58,7 +72,7 @@ func _enter_run_over(success: bool) -> void:
 	state = RunState.RUN_OVER
 	breath.set_draining(false)
 	if success:
-		GameState.add_pearls(diver.carried_value)   # 0 until Step 4; emits pearls_banked
+		GameState.add_pearls(diver.carried_value)   # 0 until Step 4; emits pearls_banked, saves
 		Events.player_surfaced.emit(diver.carried_value)
 		print("Surfaced — banked %d pearls (total %d)" % [diver.carried_value, GameState.pearls])
 		breath.begin_refill(RESET_DELAY)   # ticks up to full over the pause below
@@ -66,6 +80,7 @@ func _enter_run_over(success: bool) -> void:
 	else:
 		Events.player_died.emit("drowned")   # carried pearls lost; GameOverScreen drives the reset
 		print("Drowned — %d pearls lost" % diver.carried_value)
+		GameState.save()   # best depth this dive reached is still worth keeping
 
 
 func reset_run() -> void:

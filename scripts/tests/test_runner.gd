@@ -2,14 +2,15 @@ extends Node
 ## Test runner scene node for execution within Godot environment with full autoload support.
 
 func _ready() -> void:
-	print("--- Running One Breath Down Test Runner Scene ---")
+	print("--- Running One Breath Down Test Runner Scene (Phase 2) ---")
 	var failures: int = 0
 	
 	failures += _test_game_state()
-	failures += _test_depth_spawner()
+	failures += _test_zone_manager()
 	failures += _test_pearl_resources()
 	failures += _test_diver_upgrades()
-	
+	failures += _test_report_depth()
+
 	if failures == 0:
 		print("SUCCESS: All unit tests passed cleanly!")
 		get_tree().quit(0)
@@ -50,23 +51,29 @@ func _test_game_state() -> int:
 	return fails
 
 
-func _test_depth_spawner() -> int:
-	print("[Test] DepthSpawner Zone Lookup")
+func _test_zone_manager() -> int:
+	print("[Test] ZoneManager Depth Resolution")
 	var fails := 0
 	
-	if DepthSpawner.get_zone_name_for_depth(5.0) != "Sunlight Zone":
-		print("  FAIL: 5m should be Sunlight Zone")
+	var zm := ZoneManager.new()
+	zm._ready()
+
+	zm._on_depth_changed(0)
+	if zm.current_zone.id != &"sunlit":
+		print("  FAIL: 0m should be Sunlit zone, got %s" % zm.current_zone.id)
 		fails += 1
-	if DepthSpawner.get_zone_name_for_depth(30.0) != "Twilight Zone":
-		print("  FAIL: 30m should be Twilight Zone")
+
+	zm._on_depth_changed(60)
+	if zm.current_zone.id != &"twilight":
+		print("  FAIL: 60m should be Twilight zone, got %s" % zm.current_zone.id)
 		fails += 1
-	if DepthSpawner.get_zone_name_for_depth(75.0) != "Midnight Zone":
-		print("  FAIL: 75m should be Midnight Zone")
+
+	zm._on_depth_changed(160)
+	if zm.current_zone.id != &"midnight":
+		print("  FAIL: 160m should be Midnight zone, got %s" % zm.current_zone.id)
 		fails += 1
-	if DepthSpawner.get_zone_name_for_depth(150.0) != "The Abyss":
-		print("  FAIL: 150m should be The Abyss")
-		fails += 1
-		
+
+	zm.free()
 	return fails
 
 
@@ -85,8 +92,8 @@ func _test_pearl_resources() -> int:
 		print("  FAIL: Golden pearl value (%d) should be greater than seed pearl (%d)" % [gold_p.value, seed_p.value])
 		fails += 1
 		
-	if gold_p.min_depth <= seed_p.min_depth:
-		print("  FAIL: Golden pearl min depth (%.1fm) should be deeper than seed pearl (%.1fm)" % [gold_p.min_depth, seed_p.min_depth])
+	if gold_p.min_depth_m <= seed_p.min_depth_m:
+		print("  FAIL: Golden pearl min depth (%dm) should be deeper than seed pearl (%dm)" % [gold_p.min_depth_m, seed_p.min_depth_m])
 		fails += 1
 		
 	return fails
@@ -99,19 +106,45 @@ func _test_diver_upgrades() -> int:
 	var diver := Diver.new()
 	diver._ready()
 	
-	# Default base speed without fins
+	# Default base speed without fins (160.0)
 	GameState.owned_upgrades.clear()
 	diver.apply_upgrades()
-	if abs(diver.max_speed - 400.0) > 1.0:
-		print("  FAIL: Expected base max_speed 400.0, got %.1f" % diver.max_speed)
+	if abs(diver.max_speed - 160.0) > 1.0:
+		print("  FAIL: Expected base max_speed 160.0, got %.1f" % diver.max_speed)
 		fails += 1
-		
-	# Add Fins level 1
+
+	# Add Fins level 1 (192.0)
 	GameState.owned_upgrades.append(&"fins_1")
 	diver.apply_upgrades()
-	if abs(diver.max_speed - 500.0) > 1.0:
-		print("  FAIL: Expected Fins 1 max_speed 500.0, got %.1f" % diver.max_speed)
+	if abs(diver.max_speed - 192.0) > 1.0:
+		print("  FAIL: Expected Fins 1 max_speed 192.0, got %.1f" % diver.max_speed)
 		fails += 1
-		
+
 	diver.free()
+	return fails
+
+
+func _test_report_depth() -> int:
+	print("[Test] GameState.report_depth (best-depth persistence)")
+	var fails := 0
+
+	GameState.best_depth_m = 0
+
+	GameState.report_depth(10)
+	if GameState.best_depth_m != 10:
+		print("  FAIL: Expected best_depth_m 10 after first report, got %d" % GameState.best_depth_m)
+		fails += 1
+
+	# Lower depth than the record must be a no-op
+	GameState.report_depth(5)
+	if GameState.best_depth_m != 10:
+		print("  FAIL: report_depth(5) should not lower an existing record of 10, got %d" % GameState.best_depth_m)
+		fails += 1
+
+	# New record raises it
+	GameState.report_depth(25)
+	if GameState.best_depth_m != 25:
+		print("  FAIL: Expected best_depth_m 25 after new record, got %d" % GameState.best_depth_m)
+		fails += 1
+
 	return fails

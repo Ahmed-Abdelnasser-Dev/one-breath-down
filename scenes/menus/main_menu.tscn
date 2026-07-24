@@ -1,8 +1,8 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://sbd0428itv7v"]
 
 [ext_resource type="PackedScene" path="res://scenes/background/background.tscn" id="1_bg_scene"]
-[ext_resource type="Script" path="res://scripts/menus/main_menu.gd" id="1_script"]
-[ext_resource type="Theme" path="res://theme/menu_theme.tres" id="2_theme"]
+[ext_resource type="Script" uid="uid://brbbklyhgvv0v" path="res://scripts/menus/main_menu.gd" id="1_script"]
+[ext_resource type="Theme" uid="uid://prunik7k8003" path="res://theme/menu_theme.tres" id="2_theme"]
 [ext_resource type="PackedScene" path="res://scenes/menus/options_screen.tscn" id="3_options"]
 [ext_resource type="PackedScene" path="res://scenes/menus/controls_screen.tscn" id="4_controls"]
 [ext_resource type="PackedScene" path="res://scenes/menus/about_screen.tscn" id="5_about"]
@@ -23,50 +23,58 @@ position = Vector2(240, 135)
 
 [node name="Background" parent="." instance=ExtResource("1_bg_scene")]
 
-[node name="TitleLabel" type="Label" parent="."]
+[node name="TitleBox" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 30.0
+offset_top = 24.0
 offset_bottom = 60.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 16
+theme_override_constants/separation = 1
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 18
 text = "ONE BREATH DOWN"
 horizontal_alignment = 1
 
-[node name="ButtonsPanel" type="Panel" parent="."]
+[node name="SubTitleLabel" type="Label" parent="TitleBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.8, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 10
+text = "~ Hold your breath. Reach the deep. ~"
+horizontal_alignment = 1
+
+[node name="ButtonsPanel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(130, 0)
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 5
 anchor_left = 0.5
-anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -85.0
-offset_top = -55.0
-offset_right = 85.0
-offset_bottom = 75.0
+offset_top = 74.0
 grow_horizontal = 2
-grow_vertical = 2
 
 [node name="Margin" type="MarginContainer" parent="ButtonsPanel"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_bottom = 10
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
 
 [node name="VBox" type="VBoxContainer" parent="ButtonsPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 3
+alignment = 1
 
 [node name="StartButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
 layout_mode = 2
-text = "Start"
+text = "Start Dive"
 
 [node name="OptionsButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
 layout_mode = 2
@@ -89,13 +97,17 @@ layout_mode = 2
 text = "Exit"
 
 [node name="OptionsScreen" parent="." instance=ExtResource("3_options")]
+visible = false
 layout_mode = 1
 
 [node name="ControlsScreen" parent="." instance=ExtResource("4_controls")]
+visible = false
 layout_mode = 1
 
 [node name="AboutScreen" parent="." instance=ExtResource("5_about")]
+visible = false
 layout_mode = 1
 
 [node name="CreditsScreen" parent="." instance=ExtResource("6_credits")]
+visible = false
 layout_mode = 1

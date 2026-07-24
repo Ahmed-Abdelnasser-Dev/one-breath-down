@@ -1,12 +1,17 @@
 [gd_resource type="Resource" script_class="PearlData" format=3 uid="uid://7lfo323gycgk"]
 
 [ext_resource type="Script" uid="uid://dp5a8s2r2rjay" path="res://scripts/resources/PearlData.gd" id="1"]
+[ext_resource type="Texture2D" path="res://visuals/hud/icon_pearl.tres" id="2_sprite"]
 
 [resource]
 script = ExtResource("1")
 id = &"golden_pearl"
 display_name = "Golden Pearl"
-value = 25
-min_depth = 120.0
-carry_weight = 0.60
-color = Color(1, 0.85, 0.2, 1)
+value = 350
+carry_weight = 1.4
+min_depth_m = 150
+max_depth_m = 200
+spawn_weight = 6.0
+color = Color(1.0, 0.85, 0.2, 1)
+radius = 14.0
+sprite = ExtResource("2_sprite")

@@ -1,12 +1,12 @@
-[gd_scene load_steps=18 format=3 uid="uid://vvtw5tmpvdfm"]
+[gd_scene format=3 uid="uid://vvtw5tmpvdfm"]
 
 [ext_resource type="Script" uid="uid://bag60gtvmiki5" path="res://scripts/scenes/run_manager.gd" id="1_elqb8"]
 [ext_resource type="PackedScene" uid="uid://dat7k1624t8rl" path="res://scenes/barrier.tscn" id="2_0bbpv"]
 [ext_resource type="PackedScene" uid="uid://di64q3xym1gbk" path="res://scenes/player/diver.tscn" id="2_rvslj"]
 [ext_resource type="PackedScene" uid="uid://dvnx1l5gxox82" path="res://scenes/hud/hud.tscn" id="5_s0nni"]
 [ext_resource type="PackedScene" path="res://scenes/background/background.tscn" id="6_bg"]
-[ext_resource type="Script" path="res://scripts/menus/menu_manager.gd" id="7_menumgr"]
-[ext_resource type="PackedScene" path="res://scenes/menus/options_screen.tscn" id="8_options"]
+[ext_resource type="Script" uid="uid://dthp3oxc7we75" path="res://scripts/menus/menu_manager.gd" id="7_menumgr"]
+[ext_resource type="PackedScene" uid="uid://2riryyudi43r" path="res://scenes/menus/options_screen.tscn" id="8_options"]
 [ext_resource type="PackedScene" path="res://scenes/menus/controls_screen.tscn" id="9_controls"]
 [ext_resource type="PackedScene" path="res://scenes/menus/about_screen.tscn" id="10_about"]
 [ext_resource type="PackedScene" path="res://scenes/menus/credits_screen.tscn" id="11_credits"]
@@ -14,35 +14,98 @@
 [ext_resource type="PackedScene" path="res://scenes/menus/shop_screen.tscn" id="13_shop"]
 [ext_resource type="PackedScene" path="res://scenes/menus/inventory_screen.tscn" id="14_inventory"]
 [ext_resource type="PackedScene" path="res://scenes/menus/game_over_screen.tscn" id="15_gameover"]
-[ext_resource type="Script" path="res://scripts/world/depth_spawner.gd" id="16_spawner"]
+[ext_resource type="Script" uid="uid://4rwh5uc2s1de" path="res://scripts/world/DiveSpawner.gd" id="16_spawner"]
+[ext_resource type="Script" uid="uid://brti02f70gipk" path="res://scripts/world/ZoneManager.gd" id="17_zonemgr"]
+[ext_resource type="PackedScene" path="res://scenes/ui/ZoneBanner.tscn" id="18_banner"]
+[ext_resource type="PackedScene" path="res://scenes/ui/LootTable.tscn" id="19_loottable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DepthPanel.tscn" id="20_depthpanel"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DebugOverlay.tscn" id="21_debugoverlay"]
+[ext_resource type="PackedScene" path="res://scenes/ui/DepthRuler.tscn" id="22_depthruler"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_seabed"]
+size = Vector2(2000, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(40, 8000)
 
 [node name="Game" type="Node2D" unique_id=1220390611]
 script = ExtResource("1_elqb8")
 
 [node name="World" type="Node2D" parent="." unique_id=868154501]
 
+[node name="WaterBackground" type="ColorRect" parent="World" unique_id=677764444 groups=["water_background"]]
+z_index = -10
+offset_left = -400.0
+offset_top = -1000.0
+offset_right = 2100.0
+offset_bottom = 7400.0
+mouse_filter = 2
+color = Color(0.12, 0.55, 0.72, 1)
+
 [node name="Background" parent="World" unique_id=1629878394 instance=ExtResource("6_bg")]
 
-[node name="DepthSpawner" type="Node2D" parent="World" unique_id=1403299963]
+[node name="Pearls" type="Node2D" parent="World" unique_id=1767462403]
+
+[node name="DiveSpawner" type="Node2D" parent="World" unique_id=1403299963 groups=["spawner"]]
 script = ExtResource("16_spawner")
 
+[node name="ZoneManager" type="Node" parent="World" unique_id=1647606554]
+script = ExtResource("17_zonemgr")
+
 [node name="SurfaceLine" type="Marker2D" parent="World" unique_id=439811065]
-position = Vector2(966, 0)
+position = Vector2(800, 0)
 
 [node name="barrier" parent="World" unique_id=1461762361 instance=ExtResource("2_0bbpv")]
-position = Vector2(0, -108)
+position = Vector2(-2, -53)
 collision_layer = 8
 
+[node name="Seabed" type="StaticBody2D" parent="World" unique_id=1527107889]
+position = Vector2(800, 6400)
+collision_layer = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Seabed" unique_id=869747107]
+shape = SubResource("RectangleShape2D_seabed")
+
+[node name="WallLeft" type="StaticBody2D" parent="World" unique_id=1242990054]
+position = Vector2(0, 3000)
+collision_layer = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/WallLeft" unique_id=72181020]
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="WallRight" type="StaticBody2D" parent="World" unique_id=1169627203]
+position = Vector2(1600, 3000)
+collision_layer = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="World/WallRight" unique_id=85567419]
+shape = SubResource("RectangleShape2D_wall")
+
 [node name="Diver" parent="." unique_id=1614375176 instance=ExtResource("2_rvslj")]
-position = Vector2(966, -28)
+position = Vector2(800, -28)
+
+[node name="DarkOverlay" type="CanvasLayer" parent="." unique_id=1764245830]
+layer = 5
+
+[node name="ColorRect" type="ColorRect" parent="DarkOverlay" unique_id=997043167 groups=["dark_overlay"]]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0)
 
 [node name="Hud" parent="." unique_id=1995843703 instance=ExtResource("5_s0nni")]
 
-[node name="MenuLayer" type="CanvasLayer" parent="."]
-layer = 20
-process_mode = 3
+[node name="ZoneBanner" parent="Hud" unique_id=566248221 instance=ExtResource("18_banner")]
 
-[node name="Scrim" type="ColorRect" parent="MenuLayer"]
+[node name="DebugOverlay" parent="Hud" unique_id=1185768575 instance=ExtResource("21_debugoverlay")]
+
+[node name="MenuLayer" type="CanvasLayer" parent="." unique_id=1356874906]
+process_mode = 3
+layer = 20
+
+[node name="Scrim" type="ColorRect" parent="MenuLayer" unique_id=1199069412]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -50,21 +113,21 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.65)
 
-[node name="MenuManager" type="Node" parent="MenuLayer"]
+[node name="MenuManager" type="Node" parent="MenuLayer" unique_id=1747456925]
 script = ExtResource("7_menumgr")
 
-[node name="OptionsScreen" parent="MenuLayer" instance=ExtResource("8_options")]
+[node name="OptionsScreen" parent="MenuLayer" unique_id=1767202369 instance=ExtResource("8_options")]
 
-[node name="ControlsScreen" parent="MenuLayer" instance=ExtResource("9_controls")]
+[node name="ControlsScreen" parent="MenuLayer" unique_id=1688281315 instance=ExtResource("9_controls")]
 
-[node name="AboutScreen" parent="MenuLayer" instance=ExtResource("10_about")]
+[node name="AboutScreen" parent="MenuLayer" unique_id=283645179 instance=ExtResource("10_about")]
 
-[node name="CreditsScreen" parent="MenuLayer" instance=ExtResource("11_credits")]
+[node name="CreditsScreen" parent="MenuLayer" unique_id=1428716272 instance=ExtResource("11_credits")]
 
-[node name="PauseMenu" parent="MenuLayer" instance=ExtResource("12_pause")]
+[node name="PauseMenu" parent="MenuLayer" unique_id=124394786 instance=ExtResource("12_pause")]
 
-[node name="ShopScreen" parent="MenuLayer" instance=ExtResource("13_shop")]
+[node name="ShopScreen" parent="MenuLayer" unique_id=581010312 instance=ExtResource("13_shop")]
 
-[node name="InventoryScreen" parent="MenuLayer" instance=ExtResource("14_inventory")]
+[node name="InventoryScreen" parent="MenuLayer" unique_id=1335388893 instance=ExtResource("14_inventory")]
 
-[node name="GameOverScreen" parent="MenuLayer" instance=ExtResource("15_gameover")]
+[node name="GameOverScreen" parent="MenuLayer" unique_id=1745493818 instance=ExtResource("15_gameover")]

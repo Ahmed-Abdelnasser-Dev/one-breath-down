@@ -1,29 +1,76 @@
-[gd_scene format=3 uid="uid://di64q3xym1gbk"]
+[gd_scene load_steps=10 format=3 uid="uid://di64q3xym1gbk"]
 
 [ext_resource type="Script" uid="uid://cln6818e7n334" path="res://scripts/player/diver.gd" id="1_5hnfc"]
-[ext_resource type="Script" path="res://scripts/player/diver_animator.gd" id="2_anim"]
-[ext_resource type="SpriteFrames" path="res://visuals/diver/diver_frames.tres" id="2_frames"]
+[ext_resource type="Script" uid="uid://clrcsd63bvjl3" path="res://scripts/player/diver_animator.gd" id="2_anim"]
+[ext_resource type="SpriteFrames" uid="uid://blgxg3dxya72g" path="res://visuals/diver/diver_frames.tres" id="2_frames"]
 [ext_resource type="Script" uid="uid://ck3jjlm7a2atk" path="res://scripts/components/breath_component.gd" id="3_pxx4y"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_diver"]
-radius = 32.0
-height = 110.0
+radius = 10.0
+height = 32.0
+
+[sub_resource type="CanvasItemMaterial" id="CIM_diver_add"]
+blend_mode = 1
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_diver_bubbles"]
+emission_shape = 1
+emission_sphere_radius = 4.0
+direction = Vector3(0, -1, 0)
+spread = 25.0
+initial_velocity_min = 15.0
+initial_velocity_max = 35.0
+gravity = Vector3(0, -30, 0)
+scale_min = 0.4
+scale_max = 0.9
+color = Color(0.85, 0.95, 1, 0.6)
+
+[sub_resource type="ParticleProcessMaterial" id="PPM_diver_splash"]
+emission_shape = 1
+emission_sphere_radius = 8.0
+direction = Vector3(0, -1, 0)
+spread = 60.0
+initial_velocity_min = 40.0
+initial_velocity_max = 90.0
+gravity = Vector3(0, 120, 0)
+scale_min = 0.5
+scale_max = 1.2
+color = Color(0.9, 0.97, 1, 0.85)
 
 [node name="Diver" type="CharacterBody2D" unique_id=88714604]
 collision_mask = 12
 script = ExtResource("1_5hnfc")
 
+[node name="BubbleTrail" type="GPUParticles2D" parent="." unique_id=1074194299]
+material = SubResource("CIM_diver_add")
+amount = 16
+lifetime = 1.2
+process_material = SubResource("PPM_diver_bubbles")
+emitting = false
+
+[node name="SplashParticles" type="GPUParticles2D" parent="." unique_id=1074194300]
+material = SubResource("CIM_diver_add")
+amount = 12
+lifetime = 0.6
+one_shot = true
+explosiveness = 0.9
+process_material = SubResource("PPM_diver_splash")
+emitting = false
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=274794471]
-scale = Vector2(3, 3)
+texture_filter = 1
 sprite_frames = ExtResource("2_frames")
 animation = &"idle"
 script = ExtResource("2_anim")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=496330896]
+position = Vector2(0, 2)
+rotation = 1.5708
 shape = SubResource("CapsuleShape2D_diver")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1346575931]
-zoom = Vector2(0.25, 0.25)
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
 
 [node name="BreathComponent" type="Node" parent="." unique_id=1437572770]
 script = ExtResource("3_pxx4y")
+

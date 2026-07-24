@@ -1,15 +1,25 @@
 extends Node
 ## Persistent progression: banked currency + owned upgrades.
 
+## Canonical world-space -> metres conversion. Every other script that needs
+## depth in metres reads this constant rather than keeping its own copy.
+const PIXELS_PER_METRE := 32.0
+
 var pearls: int = 0
 var owned_upgrades: Array[StringName] = []
-var best_depth: float = 0.0
+var best_depth_m: int = 0
+var weight_capacity: float = 3.0
 
 const SAVE_PATH := "user://save.cfg"
 
 
 func _ready() -> void:
 	load_game()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		save()
 
 
 func has_upgrade(id: StringName) -> bool:
@@ -53,9 +63,13 @@ func get_upgrade_level(prefix: String) -> int:
 	return level
 
 
-func update_best_depth(depth: float) -> void:
-	if depth > best_depth:
-		best_depth = depth
+## Reports the current dive depth (whole metres). Only updates/saves/emits
+## when it's a new record — called every time depth_changed fires, so this
+## must stay cheap on the non-record path.
+func report_depth(m: int) -> void:
+	if m > best_depth_m:
+		best_depth_m = m
+		Events.new_best_depth.emit(best_depth_m)
 		save()
 
 
@@ -63,7 +77,7 @@ func save() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("progress", "pearls", pearls)
 	cfg.set_value("progress", "upgrades", owned_upgrades)
-	cfg.set_value("progress", "best_depth", best_depth)
+	cfg.set_value("progress", "best_depth_m", best_depth_m)
 	cfg.save(SAVE_PATH)
 
 
@@ -73,4 +87,4 @@ func load_game() -> void:
 		return
 	pearls = cfg.get_value("progress", "pearls", 0)
 	owned_upgrades = cfg.get_value("progress", "upgrades", [] as Array[StringName])
-	best_depth = cfg.get_value("progress", "best_depth", 0.0)
+	best_depth_m = cfg.get_value("progress", "best_depth_m", 0)

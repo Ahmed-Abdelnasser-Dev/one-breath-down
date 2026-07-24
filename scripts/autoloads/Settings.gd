@@ -1,20 +1,23 @@
 extends Node
-## Persistent display/audio settings. Applies itself in _ready(), before the
-## first frame renders, so the player never sees a flash of the wrong mode.
+## Persistent display/audio settings autoload.
+## Controls Fullscreen vs Windowed modes, 16:9 pixel viewport resolutions,
+## VSync, and audio bus volumes. Applies settings in _ready() before the first frame.
 
 const SAVE_PATH := "user://settings.cfg"
 
 const RESOLUTIONS: Array[Vector2i] = [
-	Vector2i(1280, 720),
-	Vector2i(1600, 900),
-	Vector2i(1920, 1080),
-	Vector2i(2560, 1440),
+	Vector2i(960, 540),    ## 2x pixel scale
+	Vector2i(1280, 720),   ## 720p HD
+	Vector2i(1600, 900),   ## 900p HD+
+	Vector2i(1920, 1080),  ## 1080p Full HD
+	Vector2i(2560, 1440),  ## 1440p QHD
+	Vector2i(3840, 2160),  ## 4K UHD
 ]
 
 const BUS_NAMES: Array[String] = ["Master", "Music", "SFX"]
 
-var fullscreen: bool = true
-var resolution: Vector2i = Vector2i(1920, 1080)
+var fullscreen: bool = false
+var resolution: Vector2i = Vector2i(1280, 720)
 var vsync: bool = true
 var bus_volumes: Dictionary = {"Master": 1.0, "Music": 1.0, "SFX": 1.0}
 
@@ -35,7 +38,7 @@ func apply_all() -> void:
 func set_fullscreen(enabled: bool) -> void:
 	fullscreen = enabled
 	_apply_window_mode()
-	_apply_resolution()   # windowed size only takes effect once out of fullscreen
+	_apply_resolution()
 	save()
 
 
@@ -51,10 +54,24 @@ func set_vsync(enabled: bool) -> void:
 	save()
 
 
-## value is linear 0..1; converted to dB at the point of application.
 func set_bus_volume(bus_name: String, value: float) -> void:
 	bus_volumes[bus_name] = clampf(value, 0.0, 1.0)
 	_apply_bus_volume(bus_name)
+	save()
+
+
+func apply_display_and_audio(
+	new_fullscreen: bool,
+	new_resolution: Vector2i,
+	new_vsync: bool,
+	new_volumes: Dictionary
+) -> void:
+	fullscreen = new_fullscreen
+	resolution = new_resolution
+	vsync = new_vsync
+	for bus_name in BUS_NAMES:
+		bus_volumes[bus_name] = clampf(new_volumes.get(bus_name, 1.0), 0.0, 1.0)
+	apply_all()
 	save()
 
 
@@ -62,17 +79,32 @@ func get_bus_volume(bus_name: String) -> float:
 	return bus_volumes.get(bus_name, 1.0)
 
 
+func _is_window_embedded() -> bool:
+	if DisplayServer.get_name() == "headless":
+		return true
+	if get_tree() and get_tree().root and get_tree().root.gui_embed_subwindows:
+		return true
+	return false
+
+
 func _apply_window_mode() -> void:
+	if _is_window_embedded():
+		return
 	var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
-	DisplayServer.window_set_mode(mode)
+	if DisplayServer.window_get_mode() != mode:
+		DisplayServer.window_set_mode(mode)
 
 
 func _apply_resolution() -> void:
-	if fullscreen:
+	if fullscreen or _is_window_embedded():
 		return
-	DisplayServer.window_set_size(resolution)
-	var screen_size := DisplayServer.screen_get_size()
-	DisplayServer.window_set_position((screen_size - resolution) / 2 as Vector2i)
+	if DisplayServer.window_get_size() != resolution:
+		DisplayServer.window_set_size(resolution)
+		var current_screen := DisplayServer.window_get_current_screen()
+		var screen_size := DisplayServer.screen_get_size(current_screen)
+		var screen_pos := DisplayServer.screen_get_position(current_screen)
+		var centered_pos := screen_pos + (screen_size - resolution) / 2
+		DisplayServer.window_set_position(centered_pos)
 
 
 func _apply_vsync() -> void:
@@ -80,8 +112,6 @@ func _apply_vsync() -> void:
 	DisplayServer.window_set_vsync_mode(mode)
 
 
-## Godot audio buses are decibels; a 0..1 slider is linear. Floor near-zero to
-## a hard mute instead of a very quiet -80 dB (the standard trap, see hud_ui.md).
 func _apply_bus_volume(bus_name: String) -> void:
 	var bus_index := AudioServer.get_bus_index(bus_name)
 	if bus_index == -1:

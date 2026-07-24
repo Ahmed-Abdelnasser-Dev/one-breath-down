@@ -1,15 +1,16 @@
 extends SceneTree
-## Command-line test runner for One Breath Down core game logic.
+## Command-line test runner for One Breath Down Phase 2 logic.
 
 const GameStateScript = preload("res://scripts/autoloads/GameState.gd")
-const DepthSpawnerScript = preload("res://scripts/world/depth_spawner.gd")
+const ZoneManagerScript = preload("res://scripts/world/ZoneManager.gd")
+const ZoneDataScript = preload("res://scripts/resources/ZoneData.gd")
 
 var game_state: Node
-var depth_spawner: Node
+var zone_manager: Node
 
 
 func _init() -> void:
-	print("--- Running One Breath Down Core Test Suite ---")
+	print("--- Running One Breath Down Core Test Suite (Phase 2) ---")
 	
 	if root.has_node("GameState"):
 		game_state = root.get_node("GameState")
@@ -17,20 +18,21 @@ func _init() -> void:
 		game_state = GameStateScript.new()
 		root.add_child(game_state)
 		
-	if root.has_node("DepthSpawner"):
-		depth_spawner = root.get_node("DepthSpawner")
+	if root.has_node("ZoneManager"):
+		zone_manager = root.get_node("ZoneManager")
 	else:
-		depth_spawner = DepthSpawnerScript.new()
-		root.add_child(depth_spawner)
+		zone_manager = ZoneManagerScript.new()
+		root.add_child(zone_manager)
 
 	var failures: int = 0
 	failures += _test_game_state()
-	failures += _test_depth_spawner()
+	failures += _test_zone_manager()
 	failures += _test_pearl_generation()
-	failures += _test_diver_upgrades()
-	
+	failures += _test_diver_upgrades_and_weight()
+	failures += _test_report_depth()
+
 	if failures == 0:
-		print("SUCCESS: All tests passed cleanly!")
+		print("SUCCESS: All Phase 2 tests passed cleanly!")
 	else:
 		print("FAILURE: %d test(s) failed." % failures)
 		
@@ -69,23 +71,25 @@ func _test_game_state() -> int:
 	return fails
 
 
-func _test_depth_spawner() -> int:
-	print("[Test] DepthSpawner Zone Lookup")
+func _test_zone_manager() -> int:
+	print("[Test] ZoneManager Depth Resolution")
 	var fails := 0
 	
-	if depth_spawner.get_zone_name_for_depth(5.0) != "Sunlight Zone":
-		print("  FAIL: 5m should be Sunlight Zone")
+	zone_manager._on_depth_changed(0)
+	if zone_manager.current_zone.id != &"sunlit":
+		print("  FAIL: 0m should be Sunlit zone, got %s" % zone_manager.current_zone.id)
 		fails += 1
-	if depth_spawner.get_zone_name_for_depth(30.0) != "Twilight Zone":
-		print("  FAIL: 30m should be Twilight Zone")
+
+	zone_manager._on_depth_changed(60)
+	if zone_manager.current_zone.id != &"twilight":
+		print("  FAIL: 60m should be Twilight zone, got %s" % zone_manager.current_zone.id)
 		fails += 1
-	if depth_spawner.get_zone_name_for_depth(75.0) != "Midnight Zone":
-		print("  FAIL: 75m should be Midnight Zone")
+
+	zone_manager._on_depth_changed(160)
+	if zone_manager.current_zone.id != &"midnight":
+		print("  FAIL: 160m should be Midnight zone, got %s" % zone_manager.current_zone.id)
 		fails += 1
-	if depth_spawner.get_zone_name_for_depth(150.0) != "The Abyss":
-		print("  FAIL: 150m should be The Abyss")
-		fails += 1
-		
+
 	return fails
 
 
@@ -104,33 +108,68 @@ func _test_pearl_generation() -> int:
 		print("  FAIL: Golden pearl value (%d) should be greater than seed pearl (%d)" % [gold_p.value, seed_p.value])
 		fails += 1
 		
-	if gold_p.depth_min <= seed_p.depth_min:
-		print("  FAIL: Golden pearl depth min (%.1fm) should be deeper than seed pearl (%.1fm)" % [gold_p.depth_min, seed_p.depth_min])
+	if gold_p.min_depth_m <= seed_p.min_depth_m:
+		print("  FAIL: Golden pearl min depth (%dm) should be deeper than seed pearl (%dm)" % [gold_p.min_depth_m, seed_p.min_depth_m])
 		fails += 1
-		
+
 	return fails
 
 
-func _test_diver_upgrades() -> int:
+func _test_diver_upgrades_and_weight() -> int:
 	print("[Test] Diver & Weight Speed Calculation")
 	var fails := 0
-	
+
 	var diver := Diver.new()
 	diver._ready()
-	
-	# Default base speed without fins
+
+	# Default base speed without fins (base_max_speed = 160.0)
 	game_state.owned_upgrades.clear()
 	diver.apply_upgrades()
-	if abs(diver.max_speed - 400.0) > 1.0:
-		print("  FAIL: Expected base max_speed 400.0, got %.1f" % diver.max_speed)
+	if abs(diver.max_speed - 160.0) > 1.0:
+		print("  FAIL: Expected base max_speed 160.0, got %.1f" % diver.max_speed)
 		fails += 1
-		
-	# Add Fins level 1
+
+	# Add Fins level 1 (192.0)
 	game_state.owned_upgrades.append(&"fins_1")
 	diver.apply_upgrades()
-	if abs(diver.max_speed - 500.0) > 1.0:
-		print("  FAIL: Expected Fins 1 max_speed 500.0, got %.1f" % diver.max_speed)
+	if abs(diver.max_speed - 192.0) > 1.0:
+		print("  FAIL: Expected Fins 1 max_speed 192.0, got %.1f" % diver.max_speed)
 		fails += 1
-		
+
+	# Test weight penalty formula
+	diver.carried_weight = GameState.weight_capacity + 2.0
+	diver.apply_upgrades()
+	# over = 2.0 -> mult = 1 / (1 + 2.0 * 0.18) = 1 / 1.36 ~= 0.735 -> speed ~ 141.1
+	var expected_speed := 192.0 / (1.0 + 2.0 * 0.18)
+	if abs(diver.max_speed - expected_speed) > 1.0:
+		print("  FAIL: Expected overweight max_speed %.1f, got %.1f" % [expected_speed, diver.max_speed])
+		fails += 1
+
 	diver.free()
+	return fails
+
+
+func _test_report_depth() -> int:
+	print("[Test] GameState.report_depth (best-depth persistence)")
+	var fails := 0
+
+	game_state.best_depth_m = 0
+
+	game_state.report_depth(10)
+	if game_state.best_depth_m != 10:
+		print("  FAIL: Expected best_depth_m 10 after first report, got %d" % game_state.best_depth_m)
+		fails += 1
+
+	# Lower depth than the record must be a no-op
+	game_state.report_depth(5)
+	if game_state.best_depth_m != 10:
+		print("  FAIL: report_depth(5) should not lower an existing record of 10, got %d" % game_state.best_depth_m)
+		fails += 1
+
+	# New record raises it
+	game_state.report_depth(25)
+	if game_state.best_depth_m != 25:
+		print("  FAIL: Expected best_depth_m 25 after new record, got %d" % game_state.best_depth_m)
+		fails += 1
+
 	return fails

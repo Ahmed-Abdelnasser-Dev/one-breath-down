@@ -33,7 +33,7 @@ class_name Background
 ## All colors here are pulled from docs/visual-bible.md §2 — don't hand-pick
 ## a new color for a new layer without adding it there first.
 ##
-## Depth thresholds mirror RunManager's PIXELS_PER_METRE=20 and the GDD's
+## Depth thresholds mirror GameState.PIXELS_PER_METRE=20 and the GDD's
 ## zone bands (Sunlit 0-50m, Twilight 50-150m, Midnight 150m+). There is no
 ## "world bottom" constant on purpose — the dive has no floor.
 
@@ -170,6 +170,9 @@ func _process(delta: float) -> void:
 	# rect just needs to keep covering the viewport.
 	water_body.position = center - water_body.size * 0.5
 	water_body.material.set_shader_parameter("camera_y", center.y)
+	water_body.material.set_shader_parameter("camera_x", center.x)
+
+	ambient_follow.position = center
 
 	# Sky/clouds read as "above the surface" — fade them out once the diver
 	# has descended a little way rather than relying only on them scrolling

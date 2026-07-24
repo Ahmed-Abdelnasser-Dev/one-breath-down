@@ -11,7 +11,7 @@ const PANEL_FADE_DURATION := 0.4
 
 @onready var run_manager: RunManager = get_parent().get_parent()
 @onready var darken: ColorRect = $Darken
-@onready var panel: Panel = $Panel
+@onready var panel: PanelContainer = $Panel
 @onready var lost_label: Label = $Panel/Margin/VBox/LostLabel
 @onready var new_run_button: Button = $Panel/Margin/VBox/NewRunButton
 @onready var exit_button: Button = $Panel/Margin/VBox/ExitButton

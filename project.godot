@@ -24,6 +24,7 @@ buses/default_bus_layout="res://audio/default_bus_layout.tres"
 Settings="*res://scripts/autoloads/Settings.gd"
 Events="*uid://dhuykg56x45u"
 GameState="*uid://codqrkos6f4st"
+McpInteractionServer="*res://mcp_interaction_server.gd"
 
 [display]
 

@@ -1,12 +1,11 @@
-[gd_scene format=3 uid="uid://0q3fl2w7su53"]
+[gd_scene load_steps=5 format=3 uid="uid://0q3fl2w7su53"]
 
 [ext_resource type="Script" uid="uid://bu5ehcgkll3pp" path="res://scripts/pearls/pearl.gd" id="1_7wc1e"]
 [ext_resource type="Resource" uid="uid://bjwu2p0m2wgam" path="res://data/pearls/seed_pearl.tres" id="2_seedp"]
+[ext_resource type="Texture2D" path="res://visuals/hud/icon_pearl.tres" id="3_texture"]
 
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_iw6ye"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_jo3fh"]
-size = Vector2(12, 12)
+[sub_resource type="CircleShape2D" id="CircleShape2D_pearl"]
+radius = 8.0
 
 [node name="Pearl" type="Area2D" unique_id=973286943]
 collision_layer = 2
@@ -14,8 +13,9 @@ script = ExtResource("1_7wc1e")
 data = ExtResource("2_seedp")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=225457638]
-scale = Vector2(12, 12)
-texture = SubResource("PlaceholderTexture2D_iw6ye")
+texture_filter = 1
+scale = Vector2(1, 1)
+texture = ExtResource("3_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2044526161]
-shape = SubResource("RectangleShape2D_jo3fh")
+shape = SubResource("CircleShape2D_pearl")

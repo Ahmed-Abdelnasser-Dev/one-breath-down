@@ -3,7 +3,6 @@ class_name DepthSpawner
 ## Dynamically spawns pearls, reef formations, and hazards based on dive depth.
 ## Cleans up offscreen nodes above the camera and resets on new runs.
 
-const PIXELS_PER_METRE := 20.0
 const CHUNK_HEIGHT := 200.0        ## Height of each procedural chunk in pixels (10m)
 const SPAWN_AHEAD_DISTANCE := 1600.0 ## How far below camera to pre-generate
 const DESPAWN_BEHIND_DISTANCE := 1200.0 ## How far above camera to queue_free
@@ -55,7 +54,7 @@ func _process(_delta: float) -> void:
 
 
 func _generate_chunk(chunk_y: float) -> void:
-	var depth_m: float = max(0.0, chunk_y / PIXELS_PER_METRE)
+	var depth_m: float = max(0.0, chunk_y / GameState.PIXELS_PER_METRE)
 	var pearl_count := randi_range(1, 3)
 	
 	for i in range(pearl_count):

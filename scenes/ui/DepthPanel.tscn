@@ -1,0 +1,43 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/DepthPanel.gd" id="1_depth"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_depth_panel"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 6.0
+content_margin_bottom = 4.0
+bg_color = Color(0.05, 0.09, 0.14, 0.88)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22, 0.35, 0.48, 0.9)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="DepthPanel" type="PanelContainer"]
+theme_override_styles/panel = SubResource("StyleBoxFlat_depth_panel")
+script = ExtResource("1_depth")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="DepthText" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.88, 0.95, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 11
+text = "DEPTH: 0 m"
+horizontal_alignment = 2
+
+[node name="BestDepthText" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
+theme_override_font_sizes/font_size = 10
+text = "BEST: 0 m"
+horizontal_alignment = 2

@@ -5,65 +5,99 @@ class_name Hud
 
 @onready var run_manager: RunManager = get_parent()
 
-@onready var breath_bar: TextureProgressBar = $TopLeftSection/VBoxContainer/HBoxContainer/BreathBar
-@onready var breath_counter_text: Label = $TopLeftSection/VBoxContainer/HBoxContainer/BreathCounterText
-@onready var money_text: Label = $TopLeftSection/VBoxContainer/MoneyText
-@onready var weight_text: Label = $TopLeftSection/VBoxContainer/WeightText
+@onready var breath_bar: ProgressBar = $TopLeftSection/VBoxContainer/BreathRow/BreathBar
+@onready var breath_counter_text: Label = $TopLeftSection/VBoxContainer/BreathRow/BreathCounterText
+@onready var money_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/MoneyRow/MoneyText
+@onready var weight_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/WeightRow/WeightText
 @onready var loot_text: Label = $TopRightSection/VBoxContainer/LootText
-@onready var run_value_text: Label = $TopRightSection/VBoxContainer/RunValueText
-@onready var depth_text: Label = $BottomRightSection/VBoxContainer/DepthText
-@onready var best_depth_text: Label = $BottomRightSection/VBoxContainer/BestDepthText
-@onready var prompt_bar: Label = $PromptBar
+@onready var depth_text: Label = $DepthSection/DepthText
+@onready var best_depth_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/BestRow/BestDepthText
+@onready var prompt_bar_panel: PanelContainer = $PromptBarPanel
+@onready var prompt_bar: Label = $PromptBarPanel/PromptBar
 
 var carried_count: int = 0
 var carried_value: int = 0
 
+var _pulse_time: float = 0.0
+var _current_ratio: float = 1.0
+var _fill_stylebox: StyleBoxFlat
+
 
 func _ready() -> void:
+	# Duplicate stylebox so we can modulate fill color per-instance
+	var sb := breath_bar.get_theme_stylebox("fill")
+	if sb is StyleBoxFlat:
+		_fill_stylebox = sb.duplicate()
+		breath_bar.add_theme_stylebox_override("fill", _fill_stylebox)
+
 	Events.breath_changed.connect(_on_breath_changed)
 	Events.pearl_collected.connect(_on_pearl_collected)
 	Events.pearls_banked.connect(_on_pearls_banked)
 	Events.player_surfaced.connect(_on_run_ended)
 	Events.player_died.connect(_on_run_ended)
+	Events.depth_changed.connect(_on_depth_changed)
+	Events.new_best_depth.connect(_on_new_best_depth)
 
-	# Read the breath state directly rather than through run_manager's own
-	# @onready vars — Hud is a sibling of Diver, so it readies before Game
-	# does, and the initial breath_changed emit (fired from BreathComponent's
-	# own _ready) happens before this listener is even connected.
-	var breath: BreathComponent = get_node("../Diver/BreathComponent")
-	_on_breath_changed(breath.current_breath, breath.max_breath)
+	var breath := get_node_or_null("../Diver/BreathComponent") as BreathComponent
+	if breath != null:
+		_on_breath_changed(breath.current_breath, breath.max_breath)
 
 	money_text.text = "%d" % GameState.pearls
-	best_depth_text.text = "BEST %d m" % int(GameState.best_depth)
+	weight_text.text = "0.00 kg"
+	depth_text.text = "DEPTH: 0 m"
+	best_depth_text.text = "BEST: %d m" % GameState.best_depth_m
 	_refresh_loot()
 
-	prompt_bar.text = "Press [%s] Shop     Press [%s] Inventory" % [
+	prompt_bar.text = "Press [%s] Shop    Press [%s] Inventory" % [
 		_bound_key_text("open_shop"), _bound_key_text("open_inventory")
 	]
-	prompt_bar.hide()
+	prompt_bar_panel.hide()
 
 
-func _process(_delta: float) -> void:
-	var depth: float = run_manager.get_depth_meters()
-	depth_text.text = "DEPTH %d m" % int(depth)
-	if depth > GameState.best_depth:
-		GameState.best_depth = depth
-		best_depth_text.text = "BEST %d m" % int(depth)
+func _process(delta: float) -> void:
+	prompt_bar_panel.visible = run_manager.state == RunManager.RunState.AT_SURFACE
 
-	prompt_bar.visible = run_manager.state == RunManager.RunState.AT_SURFACE
+	# Low breath visual warning pulse
+	if _current_ratio < 0.25:
+		_pulse_time += delta * 6.0
+		var pulse := (sin(_pulse_time) + 1.0) * 0.5   # 0.0..1.0
+		var danger_red := Color(1.0, 0.2 + pulse * 0.3, 0.2, 1.0)
+		if _fill_stylebox:
+			_fill_stylebox.bg_color = danger_red
+		breath_counter_text.add_theme_color_override("font_color", danger_red)
+	else:
+		_pulse_time = 0.0
+
+
+func _on_depth_changed(metres: int) -> void:
+	depth_text.text = "DEPTH: %d m" % metres
+
+
+func _on_new_best_depth(metres: int) -> void:
+	best_depth_text.text = "BEST: %d m" % metres
 
 
 func _on_breath_changed(current: float, max_breath: float) -> void:
 	breath_bar.max_value = max_breath
-	breath_bar.value = current
+	breath_bar.value = clamp(current, 0.0, max_breath)
 	breath_counter_text.text = _format_breath(current)
 
+	_current_ratio = current / max_breath if max_breath > 0 else 0.0
+
+	# Dynamic color transitions matching dive urgency
+	if _fill_stylebox:
+		if _current_ratio >= 0.5:
+			_fill_stylebox.bg_color = Color(0.23, 0.82, 0.92, 1.0)   # Ocean Cyan
+			breath_counter_text.add_theme_color_override("font_color", Color(0.9, 0.95, 1.0, 1.0))
+		elif _current_ratio >= 0.25:
+			_fill_stylebox.bg_color = Color(0.98, 0.72, 0.2, 1.0)    # Amber Warning
+			breath_counter_text.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4, 1.0))
 
 
 func _on_pearl_collected(data: PearlData) -> void:
 	carried_count += 1
 	carried_value += data.value
-	weight_text.text = "%.2f" % run_manager.diver.carried_weight
+	weight_text.text = "%.2f kg" % run_manager.diver.carried_weight
 	_refresh_loot()
 
 
@@ -74,16 +108,15 @@ func _on_pearls_banked(_amount: int) -> void:
 func _on_run_ended(_arg) -> void:
 	carried_count = 0
 	carried_value = 0
-	weight_text.text = "0.00"
+	weight_text.text = "0.00 kg"
 	_refresh_loot()
 
 
 func _refresh_loot() -> void:
-	loot_text.text = "Seed x%d" % carried_count
-	run_value_text.text = "RUN VALUE %d" % carried_value
+	loot_text.text = "Pearls x%d" % carried_count
 
 
-## Above 10s: "M:SS". Below 10s: one decimal, so the last stretch reads faster.
+## Above 10s: "M:SS". Below 10s: "S.s".
 func _format_breath(seconds: float) -> String:
 	var s: float = max(seconds, 0.0)
 	if s >= 10.0:
@@ -92,8 +125,6 @@ func _format_breath(seconds: float) -> String:
 	return "%.1f" % s
 
 
-## Reads the actual bound key from InputMap rather than hardcoding a letter,
-## so the prompt can't drift out of sync with project.godot (hud_ui.md §4).
 func _bound_key_text(action: StringName) -> String:
 	for event in InputMap.action_get_events(action):
 		if event is InputEventKey:

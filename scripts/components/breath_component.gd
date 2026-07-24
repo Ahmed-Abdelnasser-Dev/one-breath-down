@@ -6,12 +6,12 @@ class_name BreathComponent
 
 const LOG_INTERVAL := 0.5   ## seconds between "still draining/refilling" log lines
 
-@export var base_max_breath: float = 30.0    ## seconds of breath at rest
+@export var base_max_breath: float = 50.0    ## seconds of breath at rest
 @export var base_drain: float = 1.0         ## breath/sec while resting
 @export var exertion_bonus: float = 0.5     ## up to +50% drain at full speed
 @export var weight_drain: float = 1.0       ## extra breath/sec per unit of carried weight
 
-var max_breath: float = 30.0
+var max_breath: float = 50.0
 var current_breath: float
 var draining: bool = false
 
@@ -35,9 +35,9 @@ func _ready() -> void:
 func _apply_upgrades() -> void:
 	var lungs_level := GameState.get_upgrade_level("lungs_")
 	if lungs_level == 1:
-		max_breath = 45.0
+		max_breath = 75.0
 	elif lungs_level >= 2:
-		max_breath = 60.0
+		max_breath = 100.0
 	else:
 		max_breath = base_max_breath
 		
@@ -66,26 +66,29 @@ func begin_refill(duration: float) -> void:
 	_refill_log_timer = 0.0
 
 
+const MAX_DRAIN_MULT := 2.5
+const DRAIN_PENALTY_PER_UNIT := 0.15
+
+
+func _current_multiplier() -> float:
+	var speed_ratio: float = float(diver.velocity.length()) / maxf(1.0, float(diver.max_speed))
+	var exertion: float = 1.0 + speed_ratio * exertion_bonus
+	var over: float = maxf(0.0, diver.carried_weight - GameState.weight_capacity)
+	var strain: float = 1.0 + over * DRAIN_PENALTY_PER_UNIT
+	var zone_mult: float = ZoneManager.instance.current_drain_multiplier if ZoneManager.instance != null else 1.0
+	return minf(exertion * strain * zone_mult, MAX_DRAIN_MULT)
+
+
 func _physics_process(delta: float) -> void:
 	if draining:
-		var speed_ratio: float = diver.velocity.length() / max(1.0, float(diver.max_speed))
-		var fins_level: int = GameState.get_upgrade_level("fins_")
-		var effective_exertion_bonus: float = exertion_bonus * (1.0 - float(fins_level) * 0.25)
-		
-		var exertion: float = 1.0 + speed_ratio * max(0.0, effective_exertion_bonus)
-		
-		var basket_level := GameState.get_upgrade_level("basket_")
-		var effective_weight := diver.carried_weight
-		if basket_level >= 1:
-			effective_weight = max(0.0, diver.carried_weight * 0.4)
-			
-		current_breath -= (base_drain * exertion + effective_weight * weight_drain) * delta
+		var mult := _current_multiplier()
+		current_breath -= base_drain * mult * delta
 		Events.breath_changed.emit(current_breath, max_breath)
 
 		_drain_log_timer += delta
 		if _drain_log_timer >= LOG_INTERVAL:
 			_drain_log_timer = 0.0
-			print("Breath: %.1f/%.1f (exertion x%.2f)" % [current_breath, max_breath, exertion])
+			print("Breath: %.1f/%.1f (drain x%.2f)" % [current_breath, max_breath, mult])
 
 		if current_breath <= 0.0:
 			current_breath = 0.0
