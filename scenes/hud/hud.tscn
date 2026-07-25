@@ -75,7 +75,7 @@ size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 8
 text = "AIR"
 
 [node name="BreathBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/BreathRow"]
@@ -93,7 +93,7 @@ size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.04, 0.06, 0.1, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 8
 text = "0:00"
 
 [node name="StatusSubRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
@@ -117,7 +117,7 @@ stretch_mode = 5
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 text = "0"
 
 [node name="WeightRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow"]
@@ -137,7 +137,7 @@ stretch_mode = 5
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.75, 0.85, 0.95, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 text = "0.00 kg"
 
 [node name="BestRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow"]
@@ -150,7 +150,7 @@ size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 text = "BEST: 0m"
 
 [node name="DepthSection" type="PanelContainer" parent="."]
@@ -169,7 +169,7 @@ size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.4, 0.88, 0.95, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 text = "DEPTH: 0 m"
 
 [node name="TopRightSection" type="PanelContainer" parent="."]
@@ -208,14 +208,14 @@ size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 text = "LOOT"
 horizontal_alignment = 2
 
 [node name="LootText" type="Label" parent="TopRightSection/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.93, 0.96, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 8
 text = "Pearls x0"
 horizontal_alignment = 2
 
@@ -236,6 +236,6 @@ grow_vertical = 0
 [node name="PromptBar" type="Label" parent="PromptBarPanel"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.97, 0.93, 0.84, 1)
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 text = "[F] Shop    [I] Inventory"

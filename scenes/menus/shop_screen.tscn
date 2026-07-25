@@ -54,7 +54,7 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.9, 0.6, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 11
 text = "THE MERCHANT"
 
 [node name="MoneyLabel" type="Label" parent="Panel/Margin/VBox/Header"]
@@ -85,20 +85,20 @@ theme_override_constants/separation = 3
 [node name="NameLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 10
 text = "—"
 
 [node name="EffectLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.8, 0.88, 0.95, 1)
-theme_override_font_sizes/font_size = 10
+theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
 text = ""
 
 [node name="CostLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 9
 text = "COST: 0"
 
 [node name="BuyButton" type="Button" parent="Panel/Margin/VBox/Columns/Detail"]

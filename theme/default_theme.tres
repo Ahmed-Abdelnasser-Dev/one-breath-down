@@ -1,7 +1,7 @@
 [gd_resource type="Theme" format=3 uid="uid://cljc12arpklf4"]
 
-[ext_resource type="FontFile" uid="uid://vunivli41bpj" path="res://fonts/Pixellari.ttf" id="1_font"]
+[ext_resource type="FontVariation" uid="uid://c8p8w6qkr8h4x" path="res://theme/pixellari_variation.tres" id="1_font"]
 
 [resource]
 default_font = ExtResource("1_font")
-default_font_size = 12
+default_font_size = 10
