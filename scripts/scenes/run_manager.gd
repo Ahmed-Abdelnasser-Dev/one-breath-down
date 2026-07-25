@@ -17,28 +17,57 @@ var depth_m: int = 0
 var _diver_start_position: Vector2
 
 
+@onready var ship_hub: ShipHub = $World/ShipHub
+
+
 func _ready() -> void:
 	_diver_start_position = diver.global_position
 	Events.breath_depleted.connect(_on_breath_depleted)
+	Events.health_depleted.connect(_on_health_depleted)
+	if ship_hub != null:
+		ship_hub.diver_docked.connect(_on_diver_docked)
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if diver == null or surface_line == null:
 		return
 	_update_depth()
+
+	# Breath refills at any point on the surface (Y <= 0)
+	if not _is_submerged():
+		if breath.draining:
+			breath.set_draining(false)
+		breath.refill_step(delta * 40.0)
+
 	match state:
 		RunState.AT_SURFACE:
 			if _is_submerged():
 				_enter_submerged()
 		RunState.SUBMERGED:
-			if not _is_submerged():
-				_enter_run_over(true)   # surfaced alive → success
+			if _is_submerged():
+				if not breath.draining:
+					breath.set_draining(true)
+			else:
+				# At surface: check if diver reached the ship to bank pearls
+				if _is_at_ship():
+					_enter_run_over(true)
 
 
 func _is_submerged() -> bool:
 	if diver == null or surface_line == null:
 		return false
 	return diver.global_position.y > surface_line.global_position.y
+
+
+func _is_at_ship() -> bool:
+	if ship_hub != null:
+		return ship_hub.is_diver_at_ship
+	return not _is_submerged()
+
+
+func _on_diver_docked() -> void:
+	if state == RunState.SUBMERGED or (diver != null and diver.carried_value > 0):
+		_enter_run_over(true)
 
 
 ## Converts world-space Y to metres once, at the boundary — nothing
@@ -65,10 +94,16 @@ func _enter_submerged() -> void:
 func _on_breath_depleted() -> void:
 	print("Breath depleted")
 	if state == RunState.SUBMERGED:
-		_enter_run_over(false)   # drowned
+		_enter_run_over(false, "drowned")
 
 
-func _enter_run_over(success: bool) -> void:
+func _on_health_depleted() -> void:
+	print("Health depleted")
+	if state == RunState.SUBMERGED:
+		_enter_run_over(false, "killed")
+
+
+func _enter_run_over(success: bool, cause: String = "drowned") -> void:
 	state = RunState.RUN_OVER
 	breath.set_draining(false)
 	if success:
@@ -78,8 +113,8 @@ func _enter_run_over(success: bool) -> void:
 		breath.begin_refill(RESET_DELAY)   # ticks up to full over the pause below
 		get_tree().create_timer(RESET_DELAY).timeout.connect(reset_run)
 	else:
-		Events.player_died.emit("drowned")   # carried pearls lost; GameOverScreen drives the reset
-		print("Drowned — %d pearls lost" % diver.carried_value)
+		Events.player_died.emit(cause)   # carried pearls lost; GameOverScreen drives the reset
+		print("%s — %d pearls lost" % [cause.capitalize(), diver.carried_value])
 		GameState.save()   # best depth this dive reached is still worth keeping
 
 

@@ -37,9 +37,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		_handle_pause()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("open_shop"):
-		_toggle_surface_screen("../ShopScreen")
+		open_shop()
 	elif event.is_action_pressed("open_inventory"):
-		_toggle_surface_screen("../InventoryScreen")
+		open_inventory()
+
+
+func open_shop() -> void:
+	_toggle_surface_screen("../ShopScreen")
+
+
+func open_inventory() -> void:
+	_toggle_surface_screen("../InventoryScreen")
+
 
 
 func push(screen: Control) -> void:
@@ -86,6 +95,6 @@ func _toggle_surface_screen(relative_path: String) -> void:
 	if _stack.size() == 1 and _stack.back() == screen:
 		pop()
 		get_viewport().set_input_as_handled()
-	elif _stack.is_empty() and run_manager.state == RunManager.RunState.AT_SURFACE:
+	elif _stack.is_empty() and run_manager.state == RunManager.RunState.AT_SURFACE and run_manager._is_at_ship():
 		push(screen)
 		get_viewport().set_input_as_handled()

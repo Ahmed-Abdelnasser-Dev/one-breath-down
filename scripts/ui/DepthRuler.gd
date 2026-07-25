@@ -7,7 +7,7 @@ class_name DepthRuler
 @export var zone_line_color: Color = Color(0.2, 0.8, 1.0, 0.9)
 
 const PIXEL_FONT: Font = preload("res://fonts/Pixellari.ttf")
-const TOP_MARGIN: float = 44.0  ## Starts below the top-left HUD (Y=8..38)
+const TOP_MARGIN: float = 68.0  ## Starts below the top-left HUD (Y=8..62, AIR/HP/STA rows)
 
 var _diver: Diver
 

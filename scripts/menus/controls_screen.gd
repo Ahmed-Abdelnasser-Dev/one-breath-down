@@ -11,6 +11,7 @@ const DISPLAY_ACTIONS: Array = [
 	["move_down", "Swim Down"],
 	["move_left", "Swim Left"],
 	["move_right", "Swim Right"],
+	["attack", "Attack"],
 	["open_shop", "Open Shop"],
 	["open_inventory", "Open Inventory"],
 	["pause", "Pause"],

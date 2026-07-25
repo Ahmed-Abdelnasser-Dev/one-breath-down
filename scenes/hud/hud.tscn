@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dvnx1l5gxox82"]
+[gd_scene load_steps=11 format=3 uid="uid://dvnx1l5gxox82"]
 
 [ext_resource type="Script" uid="uid://dvfrawbyxn2y" path="res://scripts/ui/hud.gd" id="1_48c2t"]
 [ext_resource type="Theme" uid="uid://prunik7k8003" path="res://theme/menu_theme.tres" id="4_theme"]
@@ -42,6 +42,20 @@ corner_radius_bottom_left = 2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_breath_fill"]
 bg_color = Color(0.23, 0.82, 0.92, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_fill"]
+bg_color = Color(0.85, 0.28, 0.3, 1)
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stamina_fill"]
+bg_color = Color(0.45, 0.8, 0.42, 1)
 corner_radius_top_left = 1
 corner_radius_top_right = 1
 corner_radius_bottom_right = 1
@@ -95,6 +109,48 @@ theme_override_colors/font_outline_color = Color(0.04, 0.06, 0.1, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "0:00"
+
+[node name="HealthRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="HealthText" type="Label" parent="TopLeftSection/VBoxContainer/HealthRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.95, 0.4, 0.42, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 8
+text = "HP"
+
+[node name="HealthBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/HealthRow"]
+custom_minimum_size = Vector2(60, 9)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_breath_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_health_fill")
+show_percentage = false
+
+[node name="StaminaRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="StaminaText" type="Label" parent="TopLeftSection/VBoxContainer/StaminaRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.55, 0.9, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 8
+text = "STA"
+
+[node name="StaminaBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/StaminaRow"]
+custom_minimum_size = Vector2(60, 9)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/background = SubResource("StyleBoxFlat_breath_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_stamina_fill")
+show_percentage = false
 
 [node name="StatusSubRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
 layout_mode = 2
@@ -159,7 +215,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
 layout_mode = 3
 anchors_preset = 0
 offset_left = 8.0
-offset_top = 44.0
+offset_top = 68.0
 grow_horizontal = 1
 grow_vertical = 1
 

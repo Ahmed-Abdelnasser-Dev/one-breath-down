@@ -8,11 +8,17 @@ var _breath: BreathComponent
 var _spawner: DiveSpawner
 
 var is_active: bool = false
+var _kills: int = 0
 
 
 func _ready() -> void:
 	visible = false
 	_cache_nodes()
+	Events.enemy_killed.connect(_on_enemy_killed)
+
+
+func _on_enemy_killed(_id: StringName, _at: Vector2) -> void:
+	_kills += 1
 
 
 func _cache_nodes() -> void:
@@ -63,6 +69,7 @@ Speed: %.1f px/s (mult x%.2f)
 Weight: %.2f / %.2f kg
 Drain Mult: x%.2f [Exertion: x%.2f | Strain: x%.2f | Zone: x%.2f]
 RNG Seed: %d
+Enemies Killed: %d
 --------------------------------
 POINT OF NO RETURN:
 Reachable Ascent: %.1f m (Current Depth: %d m)
@@ -78,6 +85,7 @@ Margin: %s%.1f m
 		strain,
 		zone_mult,
 		seed_val,
+		_kills,
 		reachable_m,
 		depth_m,
 		"+" if reachable_m >= depth_m else "-",

@@ -1,12 +1,9 @@
-[gd_resource type="Resource" script_class="ZoneData" format=3]
+[gd_resource type="Resource" script_class="ZoneData" format=3 uid="uid://djof3rqs8s05y"]
 
-[ext_resource type="Script" path="res://scripts/resources/ZoneData.gd" id="1"]
+[ext_resource type="Script" uid="uid://bcj86l2iatbfg" path="res://scripts/resources/ZoneData.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
 id = &"sunlit"
 display_name = "Sunlit Zone"
-start_depth_m = 0
 water_color = Color(0.12, 0.55, 0.72, 1)
-darkness = 0.0
-drain_multiplier = 1.0

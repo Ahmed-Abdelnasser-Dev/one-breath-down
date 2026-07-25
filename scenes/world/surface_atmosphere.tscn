@@ -1,0 +1,82 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/surface_atmosphere.gd" id="1_atmosphere"]
+[ext_resource type="Texture2D" path="res://visuals/general assets/Water.png" id="2_water"]
+[ext_resource type="Texture2D" path="res://visuals/water particle effectd/impact_water_sheet.png" id="3_splash"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
+blend_mode = 1
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_foam"]
+emission_shape = 3
+emission_box_extents = Vector3(1200, 10, 0)
+direction = Vector3(0, -1, 0)
+spread = 20.0
+initial_velocity_min = 5.0
+initial_velocity_max = 18.0
+gravity = Vector3(0, 10, 0)
+scale_min = 0.5
+scale_max = 1.2
+color = Color(0.85, 0.95, 1, 0.6)
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_spray"]
+emission_shape = 3
+emission_box_extents = Vector3(200, 5, 0)
+direction = Vector3(0, -1, 0)
+spread = 45.0
+initial_velocity_min = 12.0
+initial_velocity_max = 35.0
+gravity = Vector3(0, 30, 0)
+scale_min = 0.4
+scale_max = 1.0
+color = Color(0.9, 0.97, 1, 0.7)
+
+[node name="SurfaceAtmosphere" type="Node2D"]
+script = ExtResource("1_atmosphere")
+
+[node name="WaterSurfaceTile" type="Sprite2D" parent="."]
+texture_filter = 1
+texture_repeat = 2
+position = Vector2(-400, -10)
+scale = Vector2(28, 0.35)
+texture = ExtResource("2_water")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 1920, 96)
+
+[node name="SplashSprite" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(800, -8)
+scale = Vector2(2.5, 1.8)
+texture = ExtResource("3_splash")
+hframes = 8
+
+[node name="SunGlow" type="Polygon2D" parent="."]
+z_index = -5
+position = Vector2(1350, -600)
+color = Color(1, 0.9, 0.5, 0.25)
+polygon = PackedVector2Array(-80, 0, -56, -56, 0, -80, 56, -56, 80, 0, 56, 56, 0, 80, -56, 56)
+
+[node name="SunCore" type="Polygon2D" parent="."]
+z_index = -5
+position = Vector2(1350, -600)
+color = Color(1, 0.95, 0.75, 0.9)
+polygon = PackedVector2Array(-40, 0, -28, -28, 0, -40, 28, -28, 40, 0, 28, 28, 0, 40, -28, 28)
+
+[node name="SurfaceFoam" type="GPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_add")
+position = Vector2(800, 0)
+amount = 48
+lifetime = 3.0
+preprocess = 3.0
+randomness = 0.5
+process_material = SubResource("ParticleProcessMaterial_foam")
+
+[node name="SeaSpray" type="GPUParticles2D" parent="."]
+material = SubResource("CanvasItemMaterial_add")
+position = Vector2(800, -5)
+amount = 24
+lifetime = 2.0
+preprocess = 2.0
+randomness = 0.6
+process_material = SubResource("ParticleProcessMaterial_spray")

@@ -1,6 +1,6 @@
-[gd_resource type="Resource" script_class="ZoneData" format=3]
+[gd_resource type="Resource" script_class="ZoneData" format=3 uid="uid://bqjpxv7ujdpdc"]
 
-[ext_resource type="Script" path="res://scripts/resources/ZoneData.gd" id="1"]
+[ext_resource type="Script" uid="uid://bcj86l2iatbfg" path="res://scripts/resources/ZoneData.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
@@ -10,3 +10,4 @@ start_depth_m = 150
 water_color = Color(0.02, 0.08, 0.18, 1)
 darkness = 0.75
 drain_multiplier = 1.35
+max_live_enemies = 7

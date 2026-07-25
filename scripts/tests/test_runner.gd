@@ -10,6 +10,8 @@ func _ready() -> void:
 	failures += _test_pearl_resources()
 	failures += _test_diver_upgrades()
 	failures += _test_report_depth()
+	failures += _test_enemy_band_selection()
+	failures += _test_health_and_stamina()
 
 	if failures == 0:
 		print("SUCCESS: All unit tests passed cleanly!")
@@ -147,4 +149,93 @@ func _test_report_depth() -> int:
 		print("  FAIL: Expected best_depth_m 25 after new record, got %d" % GameState.best_depth_m)
 		fails += 1
 
+	return fails
+
+
+func _test_enemy_band_selection() -> int:
+	print("[Test] EnemySpawner Depth-Band Selection")
+	var fails := 0
+
+	var shallow: EnemyData = load("res://data/enemies/turtle.tres")     # band 0-55m
+	var deep: EnemyData = load("res://data/enemies/octopus.tres")      # band 140-200m
+
+	if shallow == null or deep == null:
+		print("  FAIL: Enemy data resources could not be loaded")
+		return fails + 1
+
+	var spawner := EnemySpawner.new()
+	spawner.enemy_types = [shallow, deep]
+	spawner.rng.seed = 1
+
+	var pick_shallow := spawner._pick_type_for_depth(20)
+	if pick_shallow == null or pick_shallow.id != shallow.id:
+		print("  FAIL: Depth 20m should only match turtle, got %s" % [pick_shallow.id if pick_shallow else "null"])
+		fails += 1
+
+	var pick_deep := spawner._pick_type_for_depth(180)
+	if pick_deep == null or pick_deep.id != deep.id:
+		print("  FAIL: Depth 180m should only match octopus, got %s" % [pick_deep.id if pick_deep else "null"])
+		fails += 1
+
+	var pick_none := spawner._pick_type_for_depth(100)
+	if pick_none != null:
+		print("  FAIL: Depth 100m matches neither band, expected null, got %s" % pick_none.id)
+		fails += 1
+
+	spawner.free()
+	return fails
+
+
+func _test_health_and_stamina() -> int:
+	print("[Test] HealthComponent & StaminaComponent")
+	var fails := 0
+
+	var health := HealthComponent.new()
+	health._ready()
+
+	if abs(health.current_hp - health.max_hp) > 0.01:
+		print("  FAIL: HealthComponent should start at full HP")
+		fails += 1
+	if not health.can_be_hit():
+		print("  FAIL: HealthComponent should start hittable (no i-frames yet)")
+		fails += 1
+
+	health.apply_damage(30.0)
+	if abs(health.current_hp - (health.max_hp - 30.0)) > 0.01:
+		print("  FAIL: Expected HP %.1f after 30 damage, got %.1f" % [health.max_hp - 30.0, health.current_hp])
+		fails += 1
+	if health.can_be_hit():
+		print("  FAIL: HealthComponent should be invulnerable immediately after taking damage")
+		fails += 1
+
+	# A second hit during the i-frame window must be a no-op.
+	health.apply_damage(30.0)
+	if abs(health.current_hp - (health.max_hp - 30.0)) > 0.01:
+		print("  FAIL: A hit during i-frames should not apply additional damage")
+		fails += 1
+
+	health.free()
+
+	var stamina := StaminaComponent.new()
+	stamina._ready()
+
+	if not stamina.can_spend():
+		print("  FAIL: StaminaComponent should start able to afford an attack")
+		fails += 1
+
+	if not stamina.spend():
+		print("  FAIL: First spend() should succeed")
+		fails += 1
+	var expected_after_spend := stamina.max_stamina - stamina.attack_cost
+	if abs(stamina.current_stamina - expected_after_spend) > 0.01:
+		print("  FAIL: Expected stamina %.1f after spend, got %.1f" % [expected_after_spend, stamina.current_stamina])
+		fails += 1
+
+	# Draining the pool below one more attack_cost must make spend() refuse cleanly.
+	stamina.current_stamina = stamina.attack_cost - 1.0
+	if stamina.spend():
+		print("  FAIL: spend() should refuse when stamina is insufficient")
+		fails += 1
+
+	stamina.free()
 	return fails

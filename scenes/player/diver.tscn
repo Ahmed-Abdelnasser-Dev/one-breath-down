@@ -1,13 +1,18 @@
-[gd_scene load_steps=10 format=3 uid="uid://di64q3xym1gbk"]
+[gd_scene load_steps=11 format=3 uid="uid://di64q3xym1gbk"]
 
 [ext_resource type="Script" uid="uid://cln6818e7n334" path="res://scripts/player/diver.gd" id="1_5hnfc"]
 [ext_resource type="Script" uid="uid://clrcsd63bvjl3" path="res://scripts/player/diver_animator.gd" id="2_anim"]
 [ext_resource type="SpriteFrames" uid="uid://blgxg3dxya72g" path="res://visuals/diver/diver_frames.tres" id="2_frames"]
 [ext_resource type="Script" uid="uid://ck3jjlm7a2atk" path="res://scripts/components/breath_component.gd" id="3_pxx4y"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="4_health"]
+[ext_resource type="Script" path="res://scripts/components/stamina_component.gd" id="5_stamina"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_diver"]
-radius = 10.0
-height = 32.0
+radius = 6.0
+height = 24.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_attack_hitbox"]
+radius = 28.0
 
 [sub_resource type="CanvasItemMaterial" id="CIM_diver_add"]
 blend_mode = 1
@@ -74,3 +79,22 @@ position_smoothing_speed = 8.0
 [node name="BreathComponent" type="Node" parent="." unique_id=1437572770]
 script = ExtResource("3_pxx4y")
 
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("4_health")
+
+[node name="StaminaComponent" type="Node" parent="."]
+script = ExtResource("5_stamina")
+
+[node name="AttackHitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 32
+monitoring = true
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
+shape = SubResource("CircleShape2D_attack_hitbox")
+
+[node name="SlashVisual" type="Polygon2D" parent="AttackHitbox"]
+visible = false
+color = Color(0.9, 0.95, 1, 0.8)
+polygon = PackedVector2Array(-8, -16, 12, -8, 16, 0, 12, 8, -8, 16, 0, 0)

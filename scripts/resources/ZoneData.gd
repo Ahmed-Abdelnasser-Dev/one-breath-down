@@ -7,3 +7,4 @@ extends Resource
 @export var water_color: Color
 @export var darkness: float            # 0..1 alpha on DarkOverlay
 @export var drain_multiplier: float = 1.0
+@export var max_live_enemies: int = 3

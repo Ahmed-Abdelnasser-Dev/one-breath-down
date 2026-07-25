@@ -7,6 +7,8 @@ class_name Hud
 
 @onready var breath_bar: ProgressBar = $TopLeftSection/VBoxContainer/BreathRow/BreathBar
 @onready var breath_counter_text: Label = $TopLeftSection/VBoxContainer/BreathRow/BreathCounterText
+@onready var health_bar: ProgressBar = $TopLeftSection/VBoxContainer/HealthRow/HealthBar
+@onready var stamina_bar: ProgressBar = $TopLeftSection/VBoxContainer/StaminaRow/StaminaBar
 @onready var money_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/MoneyRow/MoneyText
 @onready var weight_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/WeightRow/WeightText
 @onready var loot_text: Label = $TopRightSection/VBoxContainer/LootText
@@ -21,16 +23,31 @@ var carried_value: int = 0
 var _pulse_time: float = 0.0
 var _current_ratio: float = 1.0
 var _fill_stylebox: StyleBoxFlat
+var _health_fill_stylebox: StyleBoxFlat
+var _stamina_fill_stylebox: StyleBoxFlat
 
 
 func _ready() -> void:
-	# Duplicate stylebox so we can modulate fill color per-instance
+	# Duplicate styleboxes so each bar's fill color can be modulated per-instance
+	# without the three bars fighting over one shared StyleBoxFlat resource.
 	var sb := breath_bar.get_theme_stylebox("fill")
 	if sb is StyleBoxFlat:
 		_fill_stylebox = sb.duplicate()
 		breath_bar.add_theme_stylebox_override("fill", _fill_stylebox)
 
+	var health_sb := health_bar.get_theme_stylebox("fill")
+	if health_sb is StyleBoxFlat:
+		_health_fill_stylebox = health_sb.duplicate()
+		health_bar.add_theme_stylebox_override("fill", _health_fill_stylebox)
+
+	var stamina_sb := stamina_bar.get_theme_stylebox("fill")
+	if stamina_sb is StyleBoxFlat:
+		_stamina_fill_stylebox = stamina_sb.duplicate()
+		stamina_bar.add_theme_stylebox_override("fill", _stamina_fill_stylebox)
+
 	Events.breath_changed.connect(_on_breath_changed)
+	Events.health_changed.connect(_on_health_changed)
+	Events.stamina_changed.connect(_on_stamina_changed)
 	Events.pearl_collected.connect(_on_pearl_collected)
 	Events.pearls_banked.connect(_on_pearls_banked)
 	Events.player_surfaced.connect(_on_run_ended)
@@ -41,6 +58,14 @@ func _ready() -> void:
 	var breath := get_node_or_null("../Diver/BreathComponent") as BreathComponent
 	if breath != null:
 		_on_breath_changed(breath.current_breath, breath.max_breath)
+
+	var health := get_node_or_null("../Diver/HealthComponent") as HealthComponent
+	if health != null:
+		_on_health_changed(health.current_hp, health.max_hp)
+
+	var stamina := get_node_or_null("../Diver/StaminaComponent") as StaminaComponent
+	if stamina != null:
+		_on_stamina_changed(stamina.current_stamina, stamina.max_stamina)
 
 	money_text.text = "%d" % GameState.pearls
 	weight_text.text = "0.00 kg"
@@ -92,6 +117,16 @@ func _on_breath_changed(current: float, max_breath: float) -> void:
 		elif _current_ratio >= 0.25:
 			_fill_stylebox.bg_color = Color(0.98, 0.72, 0.2, 1.0)    # Amber Warning
 			breath_counter_text.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4, 1.0))
+
+
+func _on_health_changed(current: float, max_hp: float) -> void:
+	health_bar.max_value = max_hp
+	health_bar.value = clamp(current, 0.0, max_hp)
+
+
+func _on_stamina_changed(current: float, max_stamina: float) -> void:
+	stamina_bar.max_value = max_stamina
+	stamina_bar.value = clamp(current, 0.0, max_stamina)
 
 
 func _on_pearl_collected(data: PearlData) -> void:

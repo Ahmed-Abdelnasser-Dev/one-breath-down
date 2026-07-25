@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/EnemyData.gd" id="1"]
+[ext_resource type="SpriteFrames" path="res://visuals/enemies/jellyfish/jellyfish_frames.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/drifter_aura.tscn" id="3_behavior"]
+
+[resource]
+script = ExtResource("1")
+id = &"jellyfish"
+display_name = "Jellyfish"
+behavior_scene = ExtResource("3_behavior")
+max_hp = 15
+contact_damage = 6
+contact_damage_requires_attack = false
+hit_knockback_speed = 400.0
+stun_on_hit = 0.35
+player_knockback = 110.0
+move_speed = 22.0
+accel = 60.0
+patrol_range = 90.0
+telegraph_time = 0.7
+cycle_period = 2.4
+cycle_active_ratio = 0.25
+aura_radius = 46.0
+aura_damage = 12
+aura_color = Color(0.45, 0.9, 1.0, 1.0)
+min_depth_m = 0
+max_depth_m = 110
+spawn_weight = 100.0
+max_concurrent = 0
+frames = ExtResource("2_frames")
+faces_left = false
+sprite_scale = 1.0
+hitbox_radius = 12.0

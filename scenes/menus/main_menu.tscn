@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/menus/controls_screen.tscn" id="4_controls"]
 [ext_resource type="PackedScene" path="res://scenes/menus/about_screen.tscn" id="5_about"]
 [ext_resource type="PackedScene" path="res://scenes/menus/credits_screen.tscn" id="6_credits"]
+[ext_resource type="Texture2D" path="res://visuals/GMTK Game Jam 2026/GMTK Game Jam 2026 G Logo.png" id="7_jam_logo"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -22,6 +23,23 @@ script = ExtResource("1_script")
 position = Vector2(240, 135)
 
 [node name="Background" parent="." instance=ExtResource("1_bg_scene")]
+
+[node name="JamLogo" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -30.0
+offset_top = -34.0
+offset_right = -6.0
+offset_bottom = -6.0
+grow_horizontal = 0
+grow_vertical = 0
+texture = ExtResource("7_jam_logo")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TitleBox" type="VBoxContainer" parent="."]
 layout_mode = 1

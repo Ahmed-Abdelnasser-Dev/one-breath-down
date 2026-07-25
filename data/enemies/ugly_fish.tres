@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/EnemyData.gd" id="1"]
+[ext_resource type="SpriteFrames" path="res://visuals/enemies/ugly-fish/ugly_fish_frames.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/patroller.tscn" id="3_behavior"]
+
+[resource]
+script = ExtResource("1")
+id = &"ugly_fish"
+display_name = "Ugly Fish"
+behavior_scene = ExtResource("3_behavior")
+max_hp = 20
+contact_damage = 8
+contact_damage_requires_attack = false
+hit_knockback_speed = 360.0
+stun_on_hit = 0.35
+player_knockback = 90.0
+move_speed = 55.0
+burst_speed = 0.0
+accel = 220.0
+patrol_range = 85.0
+min_depth_m = 15
+max_depth_m = 130
+spawn_weight = 100.0
+max_concurrent = 0
+frames = ExtResource("2_frames")
+faces_left = false
+sprite_scale = 1.0
+hitbox_radius = 12.0

@@ -1,0 +1,77 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/ship_hub.gd" id="1_shiphub"]
+[ext_resource type="Texture2D" path="res://visuals/ship/spr_fishing_boat_5_strip9.png" id="2_boat_strip"]
+[ext_resource type="Texture2D" path="res://visuals/general assets/Fishbarrel1.png" id="6_fb1"]
+[ext_resource type="Texture2D" path="res://visuals/general assets/Fishbarrel2.png" id="7_fb2"]
+[ext_resource type="Texture2D" path="res://visuals/general assets/Catch/Chest.png" id="8_chest"]
+[ext_resource type="Texture2D" path="res://visuals/general assets/Catch/Box.png" id="9_box"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
+size = Vector2(380, 110)
+
+[node name="ShipHub" type="Node2D"]
+script = ExtResource("1_shiphub")
+
+[node name="Boat" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(800, -28)
+scale = Vector2(3.5, 3.5)
+texture = ExtResource("2_boat_strip")
+hframes = 9
+
+[node name="CargoProps" type="Node2D" parent="Boat"]
+
+[node name="Fishbarrel1" type="Sprite2D" parent="Boat/CargoProps"]
+texture_filter = 1
+position = Vector2(-12, 4)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("6_fb1")
+
+[node name="Fishbarrel2" type="Sprite2D" parent="Boat/CargoProps"]
+texture_filter = 1
+position = Vector2(10, 4)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("7_fb2")
+
+[node name="Chest" type="Sprite2D" parent="Boat/CargoProps"]
+texture_filter = 1
+position = Vector2(-4, 5)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("8_chest")
+
+[node name="Box" type="Sprite2D" parent="Boat/CargoProps"]
+texture_filter = 1
+position = Vector2(4, 5)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("9_box")
+
+[node name="ShipDockArea" type="Area2D" parent="."]
+position = Vector2(800, -20)
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShipDockArea"]
+shape = SubResource("RectangleShape2D_dock")
+
+[node name="PromptLabel" type="Label" parent="."]
+visible = false
+z_index = 10
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 680.0
+offset_top = -140.0
+offset_right = 920.0
+offset_bottom = -110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.95, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 16
+text = "[E] Shop   |   [I] Inventory"
+horizontal_alignment = 1
+vertical_alignment = 1

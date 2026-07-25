@@ -4,7 +4,7 @@ class_name DiverAnimator
 ## Manages movement states (idle, swim up, swim down, horizontal swim, dive, hurt, death),
 ## pixel-snapped pitch rotations, dynamic stroke speed, and integer buoyancy bobbing.
 
-enum State { IDLE, SWIM_HORIZONTAL, SWIM_UP, SWIM_DOWN, DIVE, HURT, DEATH }
+enum State { IDLE, SWIM_HORIZONTAL, SWIM_UP, SWIM_DOWN, DIVE, ATTACK, HURT, DEATH }
 
 const MOVE_THRESHOLD := 15.0         ## px/sec below which the diver counts as "idle"
 const FACING_THRESHOLD := 10.0       ## px/sec of horizontal speed needed to flip facing
@@ -44,6 +44,10 @@ func _process(delta: float) -> void:
 	_update_buoyancy(delta)
 
 
+func is_facing_right() -> bool:
+	return _facing_right
+
+
 func trigger_hurt() -> void:
 	if state == State.DEATH:
 		return
@@ -51,8 +55,22 @@ func trigger_hurt() -> void:
 	play("hurt")
 
 
+## Cycles attack/attack2/attack3 each swing so repeated presses don't look
+## robotic. Called by Diver on a successful (stamina-gated) attack press.
+func trigger_attack() -> void:
+	if state in [State.DEATH, State.HURT]:
+		return
+	state = State.ATTACK
+	var anim_names := ["attack", "attack2", "attack3"]
+	play(anim_names[_attack_combo_index])
+	_attack_combo_index = (_attack_combo_index + 1) % anim_names.size()
+
+
+var _attack_combo_index: int = 0
+
+
 func _update_state(delta: float) -> void:
-	if state in [State.DIVE, State.HURT, State.DEATH]:
+	if state in [State.DIVE, State.ATTACK, State.HURT, State.DEATH]:
 		return
 
 	var speed := diver.velocity.length()
@@ -106,7 +124,7 @@ func _update_facing(delta: float) -> void:
 
 
 func _update_pitch(delta: float) -> void:
-	if state in [State.HURT, State.DEATH]:
+	if state in [State.ATTACK, State.HURT, State.DEATH]:
 		_target_pitch_deg = 0.0
 	else:
 		var speed_y := diver.velocity.y
@@ -135,7 +153,7 @@ func _update_buoyancy(delta: float) -> void:
 
 func _on_animation_finished() -> void:
 	match state:
-		State.DIVE, State.HURT:
+		State.DIVE, State.ATTACK, State.HURT:
 			var moving := diver.velocity.length() > MOVE_THRESHOLD
 			if moving:
 				_enter_movement_state(State.SWIM_UP if diver.velocity.y < -VERTICAL_THRESHOLD else State.SWIM_HORIZONTAL)

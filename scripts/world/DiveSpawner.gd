@@ -16,34 +16,47 @@ const MIN_PEARL_SEPARATION := 40.0
 ]
 
 @export var pearls_container_path: NodePath = "../Pearls"
+@export var cave_wall_generator_path: NodePath = "../CaveWallGenerator"
 
 var rng := RandomNumberGenerator.new()
 var current_seed: int = 0
 
 var _pearls_container: Node2D
+var _cave_wall_generator: CaveWallGenerator
 
 
 func _ready() -> void:
 	Events.run_reset.connect(_on_run_reset)
 	Events.run_started.connect(_on_run_started)
-	_cache_container()
+	_cache_references()
 	_on_run_reset()
 
 
-func _cache_container() -> void:
+func _cache_references() -> void:
 	_pearls_container = get_node_or_null(pearls_container_path) as Node2D
 	if _pearls_container == null:
 		_pearls_container = self
+	_cave_wall_generator = get_node_or_null(cave_wall_generator_path) as CaveWallGenerator
+	if _cave_wall_generator == null and get_parent() != null:
+		_cave_wall_generator = get_parent().get_node_or_null("CaveWallGenerator") as CaveWallGenerator
+
+
+func _cache_container() -> void:
+	_cache_references()
 
 
 func set_seed(new_seed: int) -> void:
 	current_seed = new_seed
 	rng.seed = current_seed
+	if _cave_wall_generator != null:
+		_cave_wall_generator.set_seed(new_seed)
 
 
 func randomize_seed() -> void:
 	current_seed = randi()
 	rng.seed = current_seed
+	if _cave_wall_generator != null:
+		_cave_wall_generator.set_seed(current_seed)
 
 
 func _on_run_started() -> void:
@@ -58,7 +71,7 @@ func _on_run_reset() -> void:
 
 func spawn_column() -> void:
 	_clear_pearls()
-	_cache_container()
+	_cache_references()
 
 	for band_top in range(0, MAX_DEPTH_M, BAND_M):
 		var t := float(band_top) / float(MAX_DEPTH_M)
@@ -79,9 +92,15 @@ func spawn_column() -> void:
 			var attempts := 0
 			var valid := false
 
+			var min_x := PLAY_WIDTH_MIN
+			var max_x := PLAY_WIDTH_MAX
+			if _cave_wall_generator != null:
+				min_x = _cave_wall_generator.get_left_wall_x(depth_y) + 30.0
+				max_x = _cave_wall_generator.get_right_wall_x(depth_y) - 30.0
+
 			while attempts < 10 and not valid:
 				attempts += 1
-				var spawn_x := rng.randf_range(PLAY_WIDTH_MIN, PLAY_WIDTH_MAX)
+				var spawn_x := rng.randf_range(min_x, max_x)
 				var spawn_y := depth_y + rng.randf_range(-10.0, 10.0)
 				spawn_pos = Vector2(spawn_x, spawn_y)
 

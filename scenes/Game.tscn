@@ -4,8 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://dat7k1624t8rl" path="res://scenes/barrier.tscn" id="2_0bbpv"]
 [ext_resource type="PackedScene" uid="uid://di64q3xym1gbk" path="res://scenes/player/diver.tscn" id="2_rvslj"]
 [ext_resource type="PackedScene" uid="uid://dvnx1l5gxox82" path="res://scenes/hud/hud.tscn" id="5_s0nni"]
-[ext_resource type="PackedScene" path="res://scenes/background/background.tscn" id="6_bg"]
+[ext_resource type="PackedScene" uid="uid://dd32cjngs632q" path="res://scenes/background/background.tscn" id="6_bg"]
 [ext_resource type="Script" uid="uid://dthp3oxc7we75" path="res://scripts/menus/menu_manager.gd" id="7_menumgr"]
+[ext_resource type="Script" uid="uid://45hby1hdpf5x" path="res://scripts/resources/EnemyData.gd" id="8_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://2riryyudi43r" path="res://scenes/menus/options_screen.tscn" id="8_options"]
 [ext_resource type="PackedScene" path="res://scenes/menus/controls_screen.tscn" id="9_controls"]
 [ext_resource type="PackedScene" path="res://scenes/menus/about_screen.tscn" id="10_about"]
@@ -17,16 +18,20 @@
 [ext_resource type="Script" uid="uid://4rwh5uc2s1de" path="res://scripts/world/DiveSpawner.gd" id="16_spawner"]
 [ext_resource type="Script" uid="uid://brti02f70gipk" path="res://scripts/world/ZoneManager.gd" id="17_zonemgr"]
 [ext_resource type="PackedScene" path="res://scenes/ui/ZoneBanner.tscn" id="18_banner"]
-[ext_resource type="PackedScene" path="res://scenes/ui/LootTable.tscn" id="19_loottable"]
-[ext_resource type="PackedScene" path="res://scenes/ui/DepthPanel.tscn" id="20_depthpanel"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DebugOverlay.tscn" id="21_debugoverlay"]
-[ext_resource type="PackedScene" path="res://scenes/ui/DepthRuler.tscn" id="22_depthruler"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_seabed"]
-size = Vector2(2000, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
-size = Vector2(40, 8000)
+[ext_resource type="Resource" path="res://data/enemies/ugly_fish.tres" id="24_uglyfish_data"]
+[ext_resource type="Script" uid="uid://bqg1cxjuvk7l3" path="res://scripts/world/cave_wall_generator.gd" id="25_cavewall"]
+[ext_resource type="Script" uid="uid://chqv5sew6rrsp" path="res://scripts/world/EnemySpawner.gd" id="26_enemyspawner"]
+[ext_resource type="Resource" path="res://data/enemies/turtle.tres" id="27_turtle_data"]
+[ext_resource type="Resource" path="res://data/enemies/jellyfish.tres" id="28_jellyfish_data"]
+[ext_resource type="Resource" path="res://data/enemies/sowrd_fish.tres" id="29_sowrdfish_data"]
+[ext_resource type="Resource" path="res://data/enemies/sea_snake.tres" id="30_seasnake_data"]
+[ext_resource type="Resource" path="res://data/enemies/octopus.tres" id="31_octopus_data"]
+[ext_resource type="PackedScene" path="res://scenes/world/ship_hub.tscn" id="32_shiphub"]
+[ext_resource type="PackedScene" path="res://scenes/world/surface_atmosphere.tscn" id="33_atmosphere"]
+[ext_resource type="Resource" path="res://data/enemies/shark.tres" id="34_shark_data"]
+[ext_resource type="Resource" path="res://data/enemies/tiger_shark.tres" id="35_tigershark_data"]
+[ext_resource type="Resource" path="res://data/enemies/hammerhead_shark.tres" id="36_hammerhead_data"]
 
 [node name="Game" type="Node2D" unique_id=1220390611]
 script = ExtResource("1_elqb8")
@@ -36,18 +41,31 @@ script = ExtResource("1_elqb8")
 [node name="WaterBackground" type="ColorRect" parent="World" unique_id=677764444 groups=["water_background"]]
 z_index = -10
 offset_left = -400.0
-offset_top = -1000.0
-offset_right = 2100.0
-offset_bottom = 7400.0
+offset_top = -3000.0
+offset_right = 2000.0
+offset_bottom = 7000.0
 mouse_filter = 2
 color = Color(0.12, 0.55, 0.72, 1)
 
 [node name="Background" parent="World" unique_id=1629878394 instance=ExtResource("6_bg")]
 
+[node name="SurfaceAtmosphere" parent="World" unique_id=1069534349 instance=ExtResource("33_atmosphere")]
+
+[node name="ShipHub" parent="World" unique_id=1895724059 instance=ExtResource("32_shiphub")]
+
 [node name="Pearls" type="Node2D" parent="World" unique_id=1767462403]
+
+[node name="CaveWallGenerator" type="Node2D" parent="World" unique_id=293847192]
+script = ExtResource("25_cavewall")
 
 [node name="DiveSpawner" type="Node2D" parent="World" unique_id=1403299963 groups=["spawner"]]
 script = ExtResource("16_spawner")
+
+[node name="Enemies" type="Node2D" parent="World" unique_id=152398220]
+
+[node name="EnemySpawner" type="Node2D" parent="World" unique_id=1168280314 groups=["enemy_spawner"]]
+script = ExtResource("26_enemyspawner")
+enemy_types = Array[ExtResource("8_1gdd5")]([ExtResource("24_uglyfish_data"), ExtResource("27_turtle_data"), ExtResource("28_jellyfish_data"), ExtResource("29_sowrdfish_data"), ExtResource("30_seasnake_data"), ExtResource("31_octopus_data"), ExtResource("34_shark_data"), ExtResource("35_tigershark_data"), ExtResource("36_hammerhead_data")])
 
 [node name="ZoneManager" type="Node" parent="World" unique_id=1647606554]
 script = ExtResource("17_zonemgr")
@@ -56,32 +74,11 @@ script = ExtResource("17_zonemgr")
 position = Vector2(800, 0)
 
 [node name="barrier" parent="World" unique_id=1461762361 instance=ExtResource("2_0bbpv")]
-position = Vector2(-2, -53)
+position = Vector2(-4, -27)
 collision_layer = 8
-
-[node name="Seabed" type="StaticBody2D" parent="World" unique_id=1527107889]
-position = Vector2(800, 6400)
-collision_layer = 8
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/Seabed" unique_id=869747107]
-shape = SubResource("RectangleShape2D_seabed")
-
-[node name="WallLeft" type="StaticBody2D" parent="World" unique_id=1242990054]
-position = Vector2(0, 3000)
-collision_layer = 8
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/WallLeft" unique_id=72181020]
-shape = SubResource("RectangleShape2D_wall")
-
-[node name="WallRight" type="StaticBody2D" parent="World" unique_id=1169627203]
-position = Vector2(1600, 3000)
-collision_layer = 8
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="World/WallRight" unique_id=85567419]
-shape = SubResource("RectangleShape2D_wall")
 
 [node name="Diver" parent="." unique_id=1614375176 instance=ExtResource("2_rvslj")]
-position = Vector2(800, -28)
+position = Vector2(803, -6)
 
 [node name="DarkOverlay" type="CanvasLayer" parent="." unique_id=1764245830]
 layer = 5

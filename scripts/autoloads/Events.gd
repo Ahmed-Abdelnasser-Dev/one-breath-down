@@ -21,3 +21,12 @@ signal pearl_collected(data: PearlData)
 signal carry_weight_changed(current: float, capacity: float)
 signal pearls_banked(amount: int)
 signal upgrade_purchased(id: StringName)
+
+# Combat / vitals
+signal health_changed(current: float, maximum: float)
+signal health_depleted
+signal stamina_changed(current: float, maximum: float)
+signal player_damaged(amount: int, source_id: StringName)
+signal player_attacked
+signal enemy_damaged(id: StringName, amount: int)
+signal enemy_killed(id: StringName, at: Vector2)

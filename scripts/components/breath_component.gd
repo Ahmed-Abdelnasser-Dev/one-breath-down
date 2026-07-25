@@ -58,6 +58,12 @@ func refill() -> void:
 	Events.breath_changed.emit(current_breath, max_breath)
 
 
+func refill_step(amount: float) -> void:
+	if current_breath < max_breath:
+		current_breath = minf(current_breath + amount, max_breath)
+		Events.breath_changed.emit(current_breath, max_breath)
+
+
 func begin_refill(duration: float) -> void:
 	_refilling = true
 	_refill_start = current_breath

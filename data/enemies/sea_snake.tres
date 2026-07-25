@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/EnemyData.gd" id="1"]
+[ext_resource type="SpriteFrames" path="res://visuals/enemies/sea-snake/sea_snake_frames.tres" id="2_frames"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/charger.tscn" id="3_behavior"]
+
+[resource]
+script = ExtResource("1")
+id = &"sea_snake"
+display_name = "Sea Snake"
+behavior_scene = ExtResource("3_behavior")
+max_hp = 30
+contact_damage = 12
+contact_damage_requires_attack = true
+hit_knockback_speed = 360.0
+stun_on_hit = 0.3
+player_knockback = 130.0
+move_speed = 42.0
+burst_speed = 250.0
+accel = 800.0
+detect_radius = 165.0
+attack_radius = 165.0
+lose_radius = 260.0
+telegraph_time = 0.4
+attack_time = 0.45
+recover_time = 0.8
+min_depth_m = 90
+max_depth_m = 200
+spawn_weight = 100.0
+max_concurrent = 0
+frames = ExtResource("2_frames")
+faces_left = false
+sprite_scale = 1.0
+hitbox_radius = 12.0
