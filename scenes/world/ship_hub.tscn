@@ -8,14 +8,14 @@
 [ext_resource type="Texture2D" uid="uid://s018gt2mj610" path="res://visuals/general assets/Catch/Box.png" id="9_box"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
-size = Vector2(380, 110)
+size = Vector2(180, 96)
 
 [node name="ShipHub" type="Node2D" unique_id=638589252]
 script = ExtResource("1_shiphub")
 
 [node name="Boat" type="Sprite2D" parent="." unique_id=478310907]
 texture_filter = 1
-position = Vector2(800, -28)
+position = Vector2(800, -22)
 scale = Vector2(3.5, 3.5)
 texture = ExtResource("2_boat_strip")
 hframes = 9

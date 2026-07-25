@@ -37,13 +37,23 @@ script = ExtResource("1_atmosphere")
 
 [node name="WaterSurfaceTile" type="Sprite2D" parent="."]
 texture_filter = 1
-texture_repeat = 2
-position = Vector2(-400, -10)
-scale = Vector2(28, 0.35)
+texture_repeat = 1
+position = Vector2(-400, -20)
 texture = ExtResource("2_water")
 centered = false
 region_enabled = true
-region_rect = Rect2(0, 0, 1920, 96)
+region_rect = Rect2(0, 0, 2400, 32)
+
+[node name="WaterSurfaceFront" type="Sprite2D" parent="."]
+z_index = 5
+texture_filter = 1
+texture_repeat = 1
+position = Vector2(-400, -4)
+modulate = Color(0.55, 0.78, 1, 0.45)
+texture = ExtResource("2_water")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 2400, 26)
 
 [node name="SplashSprite" type="Sprite2D" parent="."]
 texture_filter = 1

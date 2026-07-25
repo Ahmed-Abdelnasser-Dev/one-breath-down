@@ -25,12 +25,12 @@ var ruin_textures: Array[Texture2D] = [
 	preload("res://visuals/background/foreground-2.png"),
 ]
 
+## Deliberately excludes Catch/4 and Catch/6 — both are shark silhouettes, and
+## harmless background fish must never share a shape with an actual threat.
 var fish_textures: Array[Texture2D] = [
 	preload("res://visuals/general assets/Catch/1.png"),
 	preload("res://visuals/general assets/Catch/2.png"),
 	preload("res://visuals/general assets/Catch/3.png"),
-	preload("res://visuals/general assets/Catch/4.png"),
-	preload("res://visuals/general assets/Catch/6.png"),
 	preload("res://visuals/general assets/Catch/7.png"),
 ]
 
@@ -80,7 +80,7 @@ func _spawn_ruins() -> void:
 		spr.scale = Vector2(s, s)
 		var xr := _wall_range(y)
 		spr.position = Vector2(_rng.randf_range(xr.x + 80.0, xr.y - 80.0), y)
-		spr.modulate = _prop_tint(y, 0.6)
+		spr.modulate = _prop_tint(y, 0.5)
 		add_child(spr)
 		y += _rng.randf_range(520.0, 900.0)
 
@@ -101,7 +101,7 @@ func _spawn_cargo() -> void:
 			spr.scale = Vector2(s, s)
 			var xr := _wall_range(y)
 			spr.position = Vector2(_rng.randf_range(xr.x, xr.y), y + _rng.randf_range(-80.0, 80.0))
-			spr.modulate = _prop_tint(y, 0.9)
+			spr.modulate = _prop_tint(y, 0.62)
 			add_child(spr)
 		y += _rng.randf_range(160.0, 260.0)
 
@@ -124,7 +124,7 @@ func _spawn_fish() -> void:
 				var s := _rng.randf_range(1.0, 1.8)
 				spr.scale = Vector2(s, s)
 				spr.position = Vector2(base_x + _rng.randf_range(-50.0, 50.0), y + _rng.randf_range(-30.0, 30.0))
-				spr.modulate = _prop_tint(y, 0.9)
+				spr.modulate = _prop_tint(y, 0.62)
 				spr.flip_h = speed < 0.0
 				add_child(spr)
 				_fish.append(spr)
@@ -153,10 +153,18 @@ func _depth_tint(depth: float) -> Color:
 	return Color(1.0, 1.0, 1.0).lerp(TWILIGHT_TINT, twilight_t).lerp(MIDNIGHT_TINT, midnight_t)
 
 
+## Blue haze wash. Props must read as *background* at a glance — anything that
+## keeps its native brown/green sits in the same visual layer as enemies and
+## pearls, and the player ends up dodging scenery. Multiplying by a blue-
+## dominant color drops the warm channels, which is what atmospheric distance
+## does in the shipped art (visual-bible §2.2 reef ramp).
+const BACKGROUND_WASH := Color(0.34, 0.52, 0.92)
+
+
 ## Props only lean partway toward the depth tint — the CanvasModulate darkness
 ## already darkens the whole world, so a full tint would double-darken them
 ## into the water color (which is exactly what made the first pass invisible).
 func _prop_tint(depth: float, alpha: float) -> Color:
-	var c := Color.WHITE.lerp(_depth_tint(depth), 0.45)
+	var c := BACKGROUND_WASH * Color.WHITE.lerp(_depth_tint(depth), 0.45)
 	c.a = alpha
 	return c
