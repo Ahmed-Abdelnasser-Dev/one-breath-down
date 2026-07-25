@@ -80,17 +80,7 @@ collision_layer = 8
 [node name="Diver" parent="." unique_id=1614375176 instance=ExtResource("2_rvslj")]
 position = Vector2(803, -6)
 
-[node name="DarkOverlay" type="CanvasLayer" parent="." unique_id=1764245830]
-layer = 5
-
-[node name="ColorRect" type="ColorRect" parent="DarkOverlay" unique_id=997043167 groups=["dark_overlay"]]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0, 0, 0, 0)
+[node name="DepthDarkness" type="CanvasModulate" parent="." groups=["depth_darkness"]]
 
 [node name="Hud" parent="." unique_id=1995843703 instance=ExtResource("5_s0nni")]
 

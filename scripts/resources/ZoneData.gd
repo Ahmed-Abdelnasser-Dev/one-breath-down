@@ -5,6 +5,6 @@ extends Resource
 @export var display_name: String       # "TWILIGHT"
 @export var start_depth_m: int
 @export var water_color: Color
-@export var darkness: float            # 0..1 alpha on DarkOverlay
+@export var darkness: float            # 0..1 blend toward ZoneManager.DARKNESS_TINT (CanvasModulate)
 @export var drain_multiplier: float = 1.0
 @export var max_live_enemies: int = 3

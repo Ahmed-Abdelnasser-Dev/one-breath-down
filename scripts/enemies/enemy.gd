@@ -25,11 +25,36 @@ var _diver: Diver
 @onready var body_shape: CollisionShape2D = get_node_or_null("CollisionShape2D") as CollisionShape2D
 @onready var contact_hitbox: Area2D = get_node_or_null("ContactHitbox") as Area2D
 
+static var _glow_texture: Texture2D = preload("res://visuals/lights/light_radial_stepped.tres")
+var _glow: PointLight2D
+
 
 func _ready() -> void:
 	_home = global_position
 	if data != null:
 		_apply_data()
+	_setup_glow()
+
+
+## Faint self-light so a threat in Twilight/Midnight reads as a silhouette
+## instead of an invisible hitbox. Scales with zone darkness — zero in Sunlit.
+func _setup_glow() -> void:
+	_glow = PointLight2D.new()
+	_glow.texture = _glow_texture
+	_glow.texture_scale = 0.6
+	_glow.energy = 0.0
+	add_child(_glow)
+	Events.zone_changed.connect(func(_zone): _update_glow())
+	_update_glow()
+
+
+func _update_glow() -> void:
+	if _glow == null:
+		return
+	var darkness := 0.0
+	if ZoneManager.instance != null and ZoneManager.instance.current_zone != null:
+		darkness = ZoneManager.instance.current_zone.darkness
+	_glow.energy = darkness * 0.7
 
 
 func setup(d: EnemyData) -> void:

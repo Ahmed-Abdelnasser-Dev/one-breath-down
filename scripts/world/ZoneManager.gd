@@ -10,13 +10,17 @@ static var instance: ZoneManager
 ]
 
 @export var water_background_path: NodePath = "../WaterBackground"
-@export var dark_overlay_rect_path: NodePath = "../../DarkOverlay/ColorRect"
+@export var depth_darkness_path: NodePath = "../../DepthDarkness"
+
+## What full darkness multiplies the world toward — a deep navy, not pure
+## black, so silhouettes stay barely readable even unlit (visual-bible §2.3).
+const DARKNESS_TINT := Color(0.16, 0.20, 0.30)
 
 var current_zone: ZoneData
 var current_drain_multiplier: float = 1.0
 
 var _water_bg: ColorRect
-var _dark_overlay_rect: ColorRect
+var _depth_darkness: CanvasModulate
 
 
 func _enter_tree() -> void:
@@ -42,9 +46,9 @@ func _cache_nodes() -> void:
 	if _water_bg == null:
 		_water_bg = get_tree().get_first_node_in_group("water_background") as ColorRect
 
-	_dark_overlay_rect = get_node_or_null(dark_overlay_rect_path) as ColorRect
-	if _dark_overlay_rect == null:
-		_dark_overlay_rect = get_tree().get_first_node_in_group("dark_overlay") as ColorRect
+	_depth_darkness = get_node_or_null(depth_darkness_path) as CanvasModulate
+	if _depth_darkness == null:
+		_depth_darkness = get_tree().get_first_node_in_group("depth_darkness") as CanvasModulate
 
 
 func _on_run_reset() -> void:
@@ -71,7 +75,9 @@ func _process(delta: float) -> void:
 	if _water_bg != null:
 		_water_bg.color = _water_bg.color.lerp(current_zone.water_color, delta * 2.0)
 
-	# Smoothly transition dark overlay alpha
-	if _dark_overlay_rect != null:
-		var target_color := Color(0, 0, 0, current_zone.darkness)
-		_dark_overlay_rect.color = _dark_overlay_rect.color.lerp(target_color, delta * 2.0)
+	# Smoothly transition world darkness. CanvasModulate (instead of an
+	# overlay ColorRect on a higher CanvasLayer) so PointLight2D halos can
+	# actually punch through the dark — the overlay drew on top of lights.
+	if _depth_darkness != null:
+		var target_color := Color.WHITE.lerp(DARKNESS_TINT, current_zone.darkness)
+		_depth_darkness.color = _depth_darkness.color.lerp(target_color, delta * 2.0)

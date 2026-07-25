@@ -33,6 +33,7 @@ var _hit_this_swing: Array[int] = []
 @onready var bubble_particles: GPUParticles2D = get_node_or_null("BubbleTrail") as GPUParticles2D
 @onready var splash_particles: GPUParticles2D = get_node_or_null("SplashParticles") as GPUParticles2D
 @onready var attack_hitbox: Area2D = get_node_or_null("AttackHitbox") as Area2D
+@onready var dive_light: PointLight2D = get_node_or_null("DiveLight") as PointLight2D
 
 
 func _ready() -> void:
@@ -50,6 +51,7 @@ func _ready() -> void:
 	Events.run_started.connect(apply_upgrades)
 	Events.run_reset.connect(apply_upgrades)
 	Events.upgrade_purchased.connect(func(_id): apply_upgrades())
+	Events.zone_changed.connect(func(_zone): _update_light())
 	apply_upgrades()
 
 
@@ -68,6 +70,26 @@ func apply_upgrades() -> void:
 		
 	unweighted_max_speed = speed
 	max_speed = speed * _speed_multiplier()
+	_update_light()
+
+
+## The halo earns its keep only where it's dark: energy scales with the
+## current zone's darkness (0 in Sunlit, so no daylight glow ring). The
+## lantern upgrade is what the shop always claimed it was — a wider,
+## brighter radius.
+func _update_light() -> void:
+	if dive_light == null:
+		return
+	var darkness := 0.0
+	if ZoneManager.instance != null and ZoneManager.instance.current_zone != null:
+		darkness = ZoneManager.instance.current_zone.darkness
+	var has_lantern := GameState.has_upgrade("lantern_1")
+	var target_energy := darkness * (1.8 if has_lantern else 1.1)
+	var target_scale := 2.8 if has_lantern else 1.6
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(dive_light, "energy", target_energy, 0.8)
+	tween.tween_property(dive_light, "texture_scale", target_scale, 0.8)
 
 
 func _physics_process(delta: float) -> void:
