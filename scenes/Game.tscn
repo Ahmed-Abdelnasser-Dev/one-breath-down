@@ -22,6 +22,7 @@
 [ext_resource type="Resource" path="res://data/enemies/ugly_fish.tres" id="24_uglyfish_data"]
 [ext_resource type="Script" uid="uid://bqg1cxjuvk7l3" path="res://scripts/world/cave_wall_generator.gd" id="25_cavewall"]
 [ext_resource type="Script" uid="uid://chqv5sew6rrsp" path="res://scripts/world/EnemySpawner.gd" id="26_enemyspawner"]
+[ext_resource type="Script" path="res://scripts/world/prop_spawner.gd" id="22_propspawner"]
 [ext_resource type="Resource" path="res://data/enemies/turtle.tres" id="27_turtle_data"]
 [ext_resource type="Resource" path="res://data/enemies/jellyfish.tres" id="28_jellyfish_data"]
 [ext_resource type="Resource" path="res://data/enemies/sowrd_fish.tres" id="29_sowrdfish_data"]
@@ -52,6 +53,9 @@ color = Color(0.12, 0.55, 0.72, 1)
 [node name="SurfaceAtmosphere" parent="World" unique_id=1069534349 instance=ExtResource("33_atmosphere")]
 
 [node name="ShipHub" parent="World" unique_id=1895724059 instance=ExtResource("32_shiphub")]
+
+[node name="PropSpawner" type="Node2D" parent="World"]
+script = ExtResource("22_propspawner")
 
 [node name="Pearls" type="Node2D" parent="World" unique_id=1767462403]
 

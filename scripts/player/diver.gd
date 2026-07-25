@@ -84,8 +84,8 @@ func _update_light() -> void:
 	if ZoneManager.instance != null and ZoneManager.instance.current_zone != null:
 		darkness = ZoneManager.instance.current_zone.darkness
 	var has_lantern := GameState.has_upgrade("lantern_1")
-	var target_energy := darkness * (1.8 if has_lantern else 1.1)
-	var target_scale := 2.8 if has_lantern else 1.6
+	var target_energy := darkness * (1.7 if has_lantern else 1.0)
+	var target_scale := 1.9 if has_lantern else 1.1
 	var tween := create_tween()
 	tween.set_parallel(true)
 	tween.tween_property(dive_light, "energy", target_energy, 0.8)

@@ -197,7 +197,14 @@ func _process(delta: float) -> void:
 	var deepform_color := _depth_tint(depth)
 	deepform_color.a = lerpf(0.85, 0.25, clampf(depth / TWILIGHT_END, 0.0, 1.0))
 	if deep_formations != null: deep_formations.modulate = deepform_color
-	if rock_arches != null: rock_arches.modulate = deepform_color
+
+	# Ocean2 is a ~78%-opaque strip; at full alpha its top edge hard-cuts the
+	# DeepFormations pattern behind it (the "seam" at ~65m). Kept translucent
+	# so it reads as a mid-depth band, not a wall.
+	if rock_arches != null:
+		var arches_color := deepform_color
+		arches_color.a = deepform_color.a * 0.4
+		rock_arches.modulate = arches_color
 
 	# Particle & Vignette Scaling
 	if particulate != null: particulate.amount_ratio = clampf(depth / TWILIGHT_END, 0.15, 1.0)

@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/world/surface_atmosphere.gd" id="1_atmosphere"]
 [ext_resource type="Texture2D" path="res://visuals/general assets/Water.png" id="2_water"]
 [ext_resource type="Texture2D" path="res://visuals/water particle effectd/impact_water_sheet.png" id="3_splash"]
+[ext_resource type="Texture2D" path="res://visuals/birds flying/spr_fishing_boat_1_strip9.png" id="4_distant_boat"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
@@ -52,16 +53,24 @@ texture = ExtResource("3_splash")
 hframes = 8
 
 [node name="SunGlow" type="Polygon2D" parent="."]
-z_index = -5
-position = Vector2(1350, -600)
+position = Vector2(963, -46)
+scale = Vector2(0.4, 0.4)
 color = Color(1, 0.9, 0.5, 0.25)
 polygon = PackedVector2Array(-80, 0, -56, -56, 0, -80, 56, -56, 80, 0, 56, 56, 0, 80, -56, 56)
 
 [node name="SunCore" type="Polygon2D" parent="."]
-z_index = -5
-position = Vector2(1350, -600)
+position = Vector2(963, -46)
+scale = Vector2(0.4, 0.4)
 color = Color(1, 0.95, 0.75, 0.9)
 polygon = PackedVector2Array(-40, 0, -28, -28, 0, -40, 28, -28, 40, 0, 28, 28, 0, 40, -28, 28)
+
+[node name="DistantBoat" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(600, -26)
+scale = Vector2(1.1, 1.1)
+texture = ExtResource("4_distant_boat")
+hframes = 9
+modulate = Color(0.5, 0.62, 0.78, 1)
 
 [node name="SurfaceFoam" type="GPUParticles2D" parent="."]
 material = SubResource("CanvasItemMaterial_add")

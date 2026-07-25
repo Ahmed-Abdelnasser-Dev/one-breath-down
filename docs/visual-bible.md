@@ -101,13 +101,16 @@ obvious repeat — this is cheaper than new art and reinforces "this world keeps
 ## 4. Pixel-Perfect Technical Contract
 
 - **Internal resolution**: 480×270, integer-scaled to the window (`window/stretch/scale_mode=
-  "integer"`, `aspect="keep"`). Never change this without re-deriving the camera zoom below.
-- **Camera zoom**: Diver's `Camera2D.zoom = (0.25, 0.25)` — keeps the visible world region at
-  1920×1080 world-units so no gameplay coordinate (speed, `PIXELS_PER_METRE=20`, pearl/hazard
-  positions) needs to change. Render:world ratio is 4, which is why every tiled background sprite
-  uses `scale = 4` and its tiling period is `native_texture_width * 4`.
-  A ratio other than 4 will silently break every parallax layer's periods below and must be
-  re-derived project-wide.
+  "integer"`, `aspect="keep"`). Never change this without re-deriving the layer periods below.
+- **Camera & units (canonical, matches shipped code)**: Diver's `Camera2D` runs at **zoom 1.0**
+  — the visible world region is 480×270 world px. `GameState.PIXELS_PER_METRE = 32`. Gameplay
+  sprites (diver 48px frames, enemies, pearls) therefore render 1 texture pixel : 1 internal
+  pixel. Background layers use `scale = 4` (1 bg texture pixel : 4 internal pixels) — the
+  deliberately chunkier grain is the depth cue separating "world you touch" from "world behind."
+  Every tiled background sprite's tiling period is `native_texture_width * 4`; changing either
+  the camera zoom or the ×4 background scale silently breaks every parallax period and must be
+  re-derived project-wide. (An earlier draft of this section described a zoom-0.25 / PPM-20
+  contract that never shipped — this paragraph documents the code as it actually runs.)
 - **Texture filter**: nearest everywhere (`textures/canvas_textures/default_texture_filter=0`
   project-wide; explicit `texture_filter=1` on every background `Sprite2D` regardless, since it
   must never depend on inherited defaults).
