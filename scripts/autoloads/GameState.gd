@@ -73,6 +73,19 @@ func report_depth(m: int) -> void:
 		save()
 
 
+func has_save() -> bool:
+	return FileAccess.file_exists(SAVE_PATH)
+
+
+## Wipes progression and the save file — backs the main menu's "New Game".
+func reset_progress() -> void:
+	pearls = 0
+	owned_upgrades = []
+	best_depth_m = 0
+	if has_save():
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
+
+
 func save() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("progress", "pearls", pearls)

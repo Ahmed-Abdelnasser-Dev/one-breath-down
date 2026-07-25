@@ -95,6 +95,6 @@ func _toggle_surface_screen(relative_path: String) -> void:
 	if _stack.size() == 1 and _stack.back() == screen:
 		pop()
 		get_viewport().set_input_as_handled()
-	elif _stack.is_empty() and run_manager.state == RunManager.RunState.AT_SURFACE and run_manager._is_at_ship():
+	elif _stack.is_empty() and run_manager.state == RunManager.RunState.AT_SURFACE and run_manager.is_at_ship():
 		push(screen)
 		get_viewport().set_input_as_handled()

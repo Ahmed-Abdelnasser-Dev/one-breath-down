@@ -23,23 +23,25 @@ const VIGNETTE_RAMP_RANGE := 1500.0
 
 var noise := FastNoiseLite.new()
 
-@onready var left_body: StaticBody2D = $LeftWallBody
-@onready var right_body: StaticBody2D = $RightWallBody
-@onready var seabed_body: StaticBody2D = $SeabedBody
+# All of these are created on demand by _ensure_nodes(); the scene ships this
+# node childless, so $-path lookups here would just error at ready time.
+var left_body: StaticBody2D
+var right_body: StaticBody2D
+var seabed_body: StaticBody2D
 
-@onready var left_poly: Polygon2D = $LeftWallPoly
-@onready var right_poly: Polygon2D = $RightWallPoly
-@onready var seabed_poly: Polygon2D = $SeabedPoly
+var left_poly: Polygon2D
+var right_poly: Polygon2D
+var seabed_poly: Polygon2D
 
-@onready var left_line: Line2D = $LeftWallLine
-@onready var right_line: Line2D = $RightWallLine
-@onready var seabed_line: Line2D = $SeabedLine
+var left_line: Line2D
+var right_line: Line2D
+var seabed_line: Line2D
 
-@onready var left_col: CollisionPolygon2D = $LeftWallBody/CollisionPolygon2D
-@onready var right_col: CollisionPolygon2D = $RightWallBody/CollisionPolygon2D
-@onready var seabed_col: CollisionPolygon2D = $SeabedBody/CollisionPolygon2D
+var left_col: CollisionPolygon2D
+var right_col: CollisionPolygon2D
+var seabed_col: CollisionPolygon2D
 
-@onready var flora_container: Node2D = $FloraContainer
+var flora_container: Node2D
 
 var _base_fill_color := Color("122c64")
 var _base_edge_color := Color("185b99")
@@ -57,9 +59,13 @@ var _flora_sprites: Array[Sprite2D] = []
 
 func _ready() -> void:
 	_init_noise()
-	if Events.has_signal("run_reset"):
-		Events.run_reset.connect(_on_run_reset)
-	generate_walls()
+	# DiveSpawner (group "spawner") drives set_seed() -> generate_walls() at
+	# startup and on every run_reset. Only self-drive when no spawner exists,
+	# otherwise every reset would rebuild the walls twice.
+	if get_tree().get_first_node_in_group("spawner") == null:
+		if Events.has_signal("run_reset"):
+			Events.run_reset.connect(_on_run_reset)
+		generate_walls()
 
 
 func _init_noise() -> void:

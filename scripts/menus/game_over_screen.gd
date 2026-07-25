@@ -12,6 +12,7 @@ const PANEL_FADE_DURATION := 0.4
 @onready var run_manager: RunManager = get_parent().get_parent()
 @onready var darken: ColorRect = $Darken
 @onready var panel: PanelContainer = $Panel
+@onready var title_label: Label = $Panel/Margin/VBox/TitleLabel
 @onready var lost_label: Label = $Panel/Margin/VBox/LostLabel
 @onready var new_run_button: Button = $Panel/Margin/VBox/NewRunButton
 @onready var exit_button: Button = $Panel/Margin/VBox/ExitButton
@@ -28,8 +29,14 @@ func _ready() -> void:
 	exit_button.pressed.connect(func() -> void: get_tree().quit())
 
 
-func _on_player_died(_cause: String) -> void:
-	lost_label.text = "%d pearls lost" % run_manager.diver.carried_value
+func _on_player_died(cause: String) -> void:
+	title_label.text = "KILLED" if cause == "killed" else "DROWNED"
+	var count: int = run_manager.diver.carried_count
+	var value: int = run_manager.diver.carried_value
+	if count == 0:
+		lost_label.text = "No pearls lost"
+	else:
+		lost_label.text = "Lost %d pearl%s (worth %d)" % [count, "" if count == 1 else "s", value]
 	show()
 	get_tree().paused = true
 

@@ -103,6 +103,7 @@ func _apply_resolution() -> void:
 		var current_screen := DisplayServer.window_get_current_screen()
 		var screen_size := DisplayServer.screen_get_size(current_screen)
 		var screen_pos := DisplayServer.screen_get_position(current_screen)
+		@warning_ignore("integer_division")
 		var centered_pos := screen_pos + (screen_size - resolution) / 2
 		DisplayServer.window_set_position(centered_pos)
 

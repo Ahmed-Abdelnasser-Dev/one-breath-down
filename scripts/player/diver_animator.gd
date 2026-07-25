@@ -69,7 +69,7 @@ func trigger_attack() -> void:
 var _attack_combo_index: int = 0
 
 
-func _update_state(delta: float) -> void:
+func _update_state(_delta: float) -> void:
 	if state in [State.DIVE, State.ATTACK, State.HURT, State.DEATH]:
 		return
 

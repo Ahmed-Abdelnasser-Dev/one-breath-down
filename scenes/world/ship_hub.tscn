@@ -1,60 +1,61 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene format=3 uid="uid://cilxelonxt56j"]
 
-[ext_resource type="Script" path="res://scripts/world/ship_hub.gd" id="1_shiphub"]
-[ext_resource type="Texture2D" path="res://visuals/ship/spr_fishing_boat_5_strip9.png" id="2_boat_strip"]
-[ext_resource type="Texture2D" path="res://visuals/general assets/Fishbarrel1.png" id="6_fb1"]
-[ext_resource type="Texture2D" path="res://visuals/general assets/Fishbarrel2.png" id="7_fb2"]
-[ext_resource type="Texture2D" path="res://visuals/general assets/Catch/Chest.png" id="8_chest"]
-[ext_resource type="Texture2D" path="res://visuals/general assets/Catch/Box.png" id="9_box"]
+[ext_resource type="Script" uid="uid://ddyo2xno26cjv" path="res://scripts/world/ship_hub.gd" id="1_shiphub"]
+[ext_resource type="Texture2D" uid="uid://d07k1kdd0vfel" path="res://visuals/ship/spr_fishing_boat_5_strip9.png" id="2_boat_strip"]
+[ext_resource type="Texture2D" uid="uid://uqvjk25pjbra" path="res://visuals/general assets/Fishbarrel1.png" id="6_fb1"]
+[ext_resource type="Texture2D" uid="uid://cedblqnmxa4s5" path="res://visuals/general assets/Fishbarrel2.png" id="7_fb2"]
+[ext_resource type="Texture2D" uid="uid://dhvcypgb5014a" path="res://visuals/general assets/Catch/Chest.png" id="8_chest"]
+[ext_resource type="Texture2D" uid="uid://s018gt2mj610" path="res://visuals/general assets/Catch/Box.png" id="9_box"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dock"]
 size = Vector2(380, 110)
 
-[node name="ShipHub" type="Node2D"]
+[node name="ShipHub" type="Node2D" unique_id=638589252]
 script = ExtResource("1_shiphub")
 
-[node name="Boat" type="Sprite2D" parent="."]
+[node name="Boat" type="Sprite2D" parent="." unique_id=478310907]
 texture_filter = 1
 position = Vector2(800, -28)
 scale = Vector2(3.5, 3.5)
 texture = ExtResource("2_boat_strip")
 hframes = 9
 
-[node name="CargoProps" type="Node2D" parent="Boat"]
+[node name="CargoProps" type="Node2D" parent="Boat" unique_id=1321233108]
+visible = false
 
-[node name="Fishbarrel1" type="Sprite2D" parent="Boat/CargoProps"]
+[node name="Fishbarrel1" type="Sprite2D" parent="Boat/CargoProps" unique_id=681029210]
 texture_filter = 1
 position = Vector2(-12, 4)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("6_fb1")
 
-[node name="Fishbarrel2" type="Sprite2D" parent="Boat/CargoProps"]
+[node name="Fishbarrel2" type="Sprite2D" parent="Boat/CargoProps" unique_id=1253166282]
 texture_filter = 1
 position = Vector2(10, 4)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("7_fb2")
 
-[node name="Chest" type="Sprite2D" parent="Boat/CargoProps"]
+[node name="Chest" type="Sprite2D" parent="Boat/CargoProps" unique_id=896098811]
 texture_filter = 1
 position = Vector2(-4, 5)
 scale = Vector2(0.45, 0.45)
 texture = ExtResource("8_chest")
 
-[node name="Box" type="Sprite2D" parent="Boat/CargoProps"]
+[node name="Box" type="Sprite2D" parent="Boat/CargoProps" unique_id=258569332]
 texture_filter = 1
 position = Vector2(4, 5)
 scale = Vector2(0.45, 0.45)
 texture = ExtResource("9_box")
 
-[node name="ShipDockArea" type="Area2D" parent="."]
+[node name="ShipDockArea" type="Area2D" parent="." unique_id=1724220541]
 position = Vector2(800, -20)
 collision_layer = 0
-collision_mask = 2
+collision_mask = 1
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ShipDockArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShipDockArea" unique_id=1212035416]
 shape = SubResource("RectangleShape2D_dock")
 
-[node name="PromptLabel" type="Label" parent="."]
+[node name="PromptLabel" type="Label" parent="." unique_id=1137318217]
 visible = false
 z_index = 10
 anchors_preset = 8

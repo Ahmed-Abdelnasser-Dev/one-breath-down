@@ -6,7 +6,7 @@ class_name RunManager
 enum RunState { AT_SURFACE, SUBMERGED, RUN_OVER }
 
 const RESET_DELAY := 2.5   ## seconds RUN_OVER lingers before reset_run() — also
-                            ## how long breath takes to visibly refill (see below)
+							## how long breath takes to visibly refill (see below)
 
 @onready var diver: Diver = $Diver
 @onready var breath: BreathComponent = $Diver/BreathComponent
@@ -33,11 +33,13 @@ func _physics_process(delta: float) -> void:
 		return
 	_update_depth()
 
-	# Breath refills at any point on the surface (Y <= 0)
+	# Surfacing stops the drain, but only the ship refills you properly —
+	# an open-water gasp trickles just enough to limp home. A full refill
+	# anywhere on the surface would make the countdown opt-in.
 	if not _is_submerged():
 		if breath.draining:
 			breath.set_draining(false)
-		breath.refill_step(delta * 40.0)
+		breath.refill_step(delta * (40.0 if is_at_ship() else 4.0))
 
 	match state:
 		RunState.AT_SURFACE:
@@ -49,7 +51,7 @@ func _physics_process(delta: float) -> void:
 					breath.set_draining(true)
 			else:
 				# At surface: check if diver reached the ship to bank pearls
-				if _is_at_ship():
+				if is_at_ship():
 					_enter_run_over(true)
 
 
@@ -59,7 +61,7 @@ func _is_submerged() -> bool:
 	return diver.global_position.y > surface_line.global_position.y
 
 
-func _is_at_ship() -> bool:
+func is_at_ship() -> bool:
 	if ship_hub != null:
 		return ship_hub.is_diver_at_ship
 	return not _is_submerged()

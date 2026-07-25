@@ -80,7 +80,11 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	prompt_bar_panel.visible = run_manager.state == RunManager.RunState.AT_SURFACE
+	# Only advertise F/I where MenuManager will actually honor them: at the
+	# surface AND docked at the ship.
+	prompt_bar_panel.visible = (
+		run_manager.state == RunManager.RunState.AT_SURFACE and run_manager.is_at_ship()
+	)
 
 	# Low breath visual warning pulse
 	if _current_ratio < 0.25:
@@ -156,6 +160,7 @@ func _format_breath(seconds: float) -> String:
 	var s: float = max(seconds, 0.0)
 	if s >= 10.0:
 		var whole := int(s)
+		@warning_ignore("integer_division")
 		return "%d:%02d" % [whole / 60, whole % 60]
 	return "%.1f" % s
 

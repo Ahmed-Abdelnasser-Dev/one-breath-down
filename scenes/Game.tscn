@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dat7k1624t8rl" path="res://scenes/barrier.tscn" id="2_0bbpv"]
 [ext_resource type="PackedScene" uid="uid://di64q3xym1gbk" path="res://scenes/player/diver.tscn" id="2_rvslj"]
 [ext_resource type="PackedScene" uid="uid://dvnx1l5gxox82" path="res://scenes/hud/hud.tscn" id="5_s0nni"]
-[ext_resource type="PackedScene" uid="uid://dd32cjngs632q" path="res://scenes/background/background.tscn" id="6_bg"]
+[ext_resource type="PackedScene" uid="uid://boaxbmixijqow" path="res://scenes/background/background.tscn" id="6_bg"]
 [ext_resource type="Script" uid="uid://dthp3oxc7we75" path="res://scripts/menus/menu_manager.gd" id="7_menumgr"]
 [ext_resource type="Script" uid="uid://45hby1hdpf5x" path="res://scripts/resources/EnemyData.gd" id="8_1gdd5"]
 [ext_resource type="PackedScene" uid="uid://2riryyudi43r" path="res://scenes/menus/options_screen.tscn" id="8_options"]

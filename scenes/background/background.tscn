@@ -1,29 +1,35 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene format=3 uid="uid://boaxbmixijqow"]
 
-[ext_resource type="Script" path="res://scripts/background/background.gd" id="1_bg"]
-[ext_resource type="Shader" path="res://visuals/shaders/water_body.gdshader" id="4_waterbody"]
-[ext_resource type="Shader" path="res://visuals/shaders/depth_vignette.gdshader" id="9_vignette"]
-[ext_resource type="Texture2D" path="res://visuals/background/Sky0.png" id="16_sky0"]
-[ext_resource type="Texture2D" path="res://visuals/background/Sky1.png" id="17_sky1"]
-[ext_resource type="Texture2D" path="res://visuals/background/Clouds.png" id="3_clouds"]
-[ext_resource type="Texture2D" path="res://visuals/background/Sky2.png" id="18_sky2"]
-[ext_resource type="Texture2D" path="res://visuals/background/Back.png" id="2_back"]
-[ext_resource type="Texture2D" path="res://visuals/background/far.png" id="10_far"]
-[ext_resource type="Texture2D" path="res://visuals/background/Ocean1.png" id="20_ocean1"]
-[ext_resource type="Texture2D" path="res://visuals/background/Ocean2.png" id="21_ocean2"]
-[ext_resource type="Texture2D" path="res://visuals/background/deep_formations.png" id="15_deepform"]
-[ext_resource type="Texture2D" path="res://visuals/background/sand.png" id="11_sand"]
-[ext_resource type="Texture2D" path="res://visuals/background/foreground-2.png" id="12_fg2"]
-[ext_resource type="Texture2D" path="res://visuals/background/foreground-1.png" id="13_fg1"]
-[ext_resource type="Texture2D" path="res://visuals/background/foregound-merged.png" id="14_merged"]
+[ext_resource type="Script" uid="uid://cbi45xoqp4dx2" path="res://scripts/background/background.gd" id="1_bg"]
+[ext_resource type="Texture2D" uid="uid://blv2o0i5wf51s" path="res://visuals/background/Back.png" id="2_back"]
+[ext_resource type="Texture2D" uid="uid://co7pwmtvojbs2" path="res://visuals/background/Clouds.png" id="3_clouds"]
+[ext_resource type="Shader" uid="uid://c3gafh6pfjyk1" path="res://visuals/shaders/water_body.gdshader" id="4_waterbody"]
+[ext_resource type="Shader" uid="uid://bdnvefycx28q5" path="res://visuals/shaders/depth_vignette.gdshader" id="9_vignette"]
+[ext_resource type="Texture2D" uid="uid://6ykgtkykg712" path="res://visuals/background/far.png" id="10_far"]
+[ext_resource type="Texture2D" uid="uid://bxe80qe5dnnys" path="res://visuals/background/sand.png" id="11_sand"]
+[ext_resource type="Texture2D" uid="uid://cr2djdwrpinf" path="res://visuals/background/foreground-2.png" id="12_fg2"]
+[ext_resource type="Texture2D" uid="uid://qnv8ohu7m53t" path="res://visuals/background/foreground-1.png" id="13_fg1"]
+[ext_resource type="Texture2D" uid="uid://st07lal1kc6g" path="res://visuals/background/foregound-merged.png" id="14_merged"]
+[ext_resource type="Texture2D" uid="uid://dg4d8rcjisnob" path="res://visuals/background/deep_formations.png" id="15_deepform"]
+[ext_resource type="Texture2D" uid="uid://duxcsl6dwpnmi" path="res://visuals/background/Sky0.png" id="16_sky0"]
+[ext_resource type="Texture2D" uid="uid://yx15cl6pydwy" path="res://visuals/background/Sky1.png" id="17_sky1"]
+[ext_resource type="Texture2D" uid="uid://dpofhsf8yauyq" path="res://visuals/background/Sky2.png" id="18_sky2"]
+[ext_resource type="Texture2D" uid="uid://c3b83lqreyoaj" path="res://visuals/background/Ocean1.png" id="20_ocean1"]
+[ext_resource type="Texture2D" uid="uid://b84jqjqx8xbhk" path="res://visuals/background/Ocean2.png" id="21_ocean2"]
 
 [sub_resource type="ShaderMaterial" id="SM_waterbody"]
 shader = ExtResource("4_waterbody")
-
-[sub_resource type="ShaderMaterial" id="SM_vignette"]
-shader = ExtResource("9_vignette")
-shader_parameter/intensity = 0.0
-shader_parameter/vignette_color = Color(0.012, 0.02, 0.051, 1)
+shader_parameter/camera_y = 0.0
+shader_parameter/camera_x = 0.0
+shader_parameter/rect_height = 1400.0
+shader_parameter/rect_width = 2400.0
+shader_parameter/posterize_steps = 24.0
+shader_parameter/color_sunlit = Color(0.161, 0.42, 0.78, 1)
+shader_parameter/color_shallow = Color(0.098, 0.278, 0.522, 1)
+shader_parameter/color_twilight_in = Color(0.071, 0.169, 0.388, 1)
+shader_parameter/color_twilight_out = Color(0.035, 0.09, 0.2, 1)
+shader_parameter/color_midnight = Color(0.012, 0.02, 0.051, 1)
+shader_parameter/color_foam = Color(0.85, 0.95, 1, 0.9)
 
 [sub_resource type="CanvasItemMaterial" id="CIM_add"]
 blend_mode = 1
@@ -64,10 +70,15 @@ scale_min = 0.15
 scale_max = 0.4
 color = Color(1, 0.95, 0.8, 0.8)
 
-[node name="Background" type="Node2D"]
+[sub_resource type="ShaderMaterial" id="SM_vignette"]
+shader = ExtResource("9_vignette")
+shader_parameter/intensity = 0.0
+shader_parameter/vignette_color = Color(0.012, 0.02, 0.051, 1)
+
+[node name="Background" type="Node2D" unique_id=1217331406]
 script = ExtResource("1_bg")
 
-[node name="WaterBody" type="ColorRect" parent="."]
+[node name="WaterBody" type="ColorRect" parent="." unique_id=615896876]
 material = SubResource("SM_waterbody")
 offset_left = -234.0
 offset_top = -728.0
@@ -75,7 +86,7 @@ offset_right = 2166.0
 offset_bottom = 672.0
 mouse_filter = 2
 
-[node name="Sky0" type="Sprite2D" parent="."]
+[node name="Sky0" type="Sprite2D" parent="." unique_id=207990119]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2048, -2800)
@@ -85,7 +96,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1024, 800)
 
-[node name="Sky1" type="Sprite2D" parent="."]
+[node name="Sky1" type="Sprite2D" parent="." unique_id=2053145094]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2048, -2400)
@@ -95,7 +106,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1024, 800)
 
-[node name="CloudsSprite" type="Sprite2D" parent="."]
+[node name="CloudsSprite" type="Sprite2D" parent="." unique_id=1782059241]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2560, -1800)
@@ -105,7 +116,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1280, 240)
 
-[node name="Sky2" type="Sprite2D" parent="."]
+[node name="Sky2" type="Sprite2D" parent="." unique_id=1728582242]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2048, -1400)
@@ -115,7 +126,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1024, 800)
 
-[node name="SkySprite" type="Sprite2D" parent="."]
+[node name="SkySprite" type="Sprite2D" parent="." unique_id=962069132]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2688, -960)
@@ -125,7 +136,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1344, 240)
 
-[node name="FarBand" type="Sprite2D" parent="."]
+[node name="FarBand" type="Sprite2D" parent="." unique_id=404132317]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2048, 0)
@@ -135,14 +146,13 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1024, 5760)
 
-[node name="SunkenShip" type="Sprite2D" parent="."]
+[node name="SunkenShip" type="Sprite2D" parent="." unique_id=952882250]
 texture_filter = 1
 position = Vector2(800, 1100)
 scale = Vector2(3.5, 3.5)
 texture = ExtResource("20_ocean1")
-centered = true
 
-[node name="RockArches" type="Sprite2D" parent="."]
+[node name="RockArches" type="Sprite2D" parent="." unique_id=11323242]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-8192, 2000)
@@ -152,7 +162,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 4096, 322)
 
-[node name="DeepFormations" type="Sprite2D" parent="."]
+[node name="DeepFormations" type="Sprite2D" parent="." unique_id=449907317]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-4864, 0)
@@ -162,7 +172,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 2432, 7616)
 
-[node name="ReefSand" type="Sprite2D" parent="."]
+[node name="ReefSand" type="Sprite2D" parent="." unique_id=636749664]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2048, -218)
@@ -172,7 +182,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1024, 192)
 
-[node name="ReefMid" type="Sprite2D" parent="."]
+[node name="ReefMid" type="Sprite2D" parent="." unique_id=1824065934]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2048, -148)
@@ -182,7 +192,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1024, 192)
 
-[node name="ReefNear" type="Sprite2D" parent="."]
+[node name="ReefNear" type="Sprite2D" parent="." unique_id=1978286263]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2048, -88)
@@ -192,7 +202,7 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 1024, 192)
 
-[node name="ReefFloor" type="Sprite2D" parent="."]
+[node name="ReefFloor" type="Sprite2D" parent="." unique_id=159055139]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-4096, -28)
@@ -202,21 +212,21 @@ centered = false
 region_enabled = true
 region_rect = Rect2(0, 0, 2048, 192)
 
-[node name="AccentSpire" type="Sprite2D" parent="."]
+[node name="AccentSpire" type="Sprite2D" parent="." unique_id=1780086534]
 texture_filter = 1
 scale = Vector2(3, 3)
 texture = ExtResource("13_fg1")
 centered = false
 
-[node name="AccentStatue" type="Sprite2D" parent="."]
+[node name="AccentStatue" type="Sprite2D" parent="." unique_id=1647730527]
 texture_filter = 1
 scale = Vector2(3, 3)
 texture = ExtResource("12_fg2")
 centered = false
 
-[node name="AmbientFollow" type="Node2D" parent="."]
+[node name="AmbientFollow" type="Node2D" parent="." unique_id=1553656784]
 
-[node name="Bubbles" type="GPUParticles2D" parent="AmbientFollow"]
+[node name="Bubbles" type="GPUParticles2D" parent="AmbientFollow" unique_id=1107098155]
 material = SubResource("CIM_add")
 amount = 24
 lifetime = 6.0
@@ -224,7 +234,7 @@ preprocess = 6.0
 randomness = 0.5
 process_material = SubResource("PPM_bubbles")
 
-[node name="Particulate" type="GPUParticles2D" parent="AmbientFollow"]
+[node name="Particulate" type="GPUParticles2D" parent="AmbientFollow" unique_id=867634714]
 amount = 60
 amount_ratio = 0.15
 lifetime = 10.0
@@ -232,20 +242,19 @@ preprocess = 10.0
 randomness = 0.6
 process_material = SubResource("PPM_snow")
 
-[node name="LightFlecks" type="GPUParticles2D" parent="AmbientFollow"]
+[node name="LightFlecks" type="GPUParticles2D" parent="AmbientFollow" unique_id=141077413]
 material = SubResource("CIM_add")
 amount = 40
-amount_ratio = 1.0
 lifetime = 5.0
 preprocess = 5.0
 randomness = 0.7
 process_material = SubResource("PPM_flecks")
 
-[node name="VignetteLayer" type="CanvasLayer" parent="."]
-layer = 1
+[node name="VignetteLayer" type="CanvasLayer" parent="." unique_id=43368448]
 
-[node name="Vignette" type="ColorRect" parent="VignetteLayer"]
+[node name="Vignette" type="ColorRect" parent="VignetteLayer" unique_id=1250885242]
 material = SubResource("SM_vignette")
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2

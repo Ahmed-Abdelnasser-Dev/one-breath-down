@@ -6,6 +6,7 @@ extends Control
 ## once the menu has loaded.
 
 @onready var buttons_panel: PanelContainer = $ButtonsPanel
+@onready var continue_button: Button = $ButtonsPanel/Margin/VBox/ContinueButton
 @onready var start_button: Button = $ButtonsPanel/Margin/VBox/StartButton
 @onready var options_button: Button = $ButtonsPanel/Margin/VBox/OptionsButton
 @onready var controls_button: Button = $ButtonsPanel/Margin/VBox/ControlsButton
@@ -27,6 +28,8 @@ func _ready() -> void:
 		overlay.hide()
 		overlay.closed.connect(_show_main_buttons)
 
+	continue_button.visible = GameState.has_save()
+	continue_button.pressed.connect(_on_continue_pressed)
 	start_button.pressed.connect(_on_start_pressed)
 	options_button.pressed.connect(func() -> void: _show_overlay(options_screen))
 	controls_button.pressed.connect(func() -> void: _show_overlay(controls_screen))
@@ -34,7 +37,10 @@ func _ready() -> void:
 	about_button.pressed.connect(func() -> void: _show_overlay(about_screen))
 	exit_button.pressed.connect(func() -> void: get_tree().quit())
 
-	start_button.grab_focus()
+	if continue_button.visible:
+		continue_button.grab_focus()
+	else:
+		start_button.grab_focus()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -47,7 +53,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 
 
+func _on_continue_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/Game.tscn")
+
+
 func _on_start_pressed() -> void:
+	GameState.reset_progress()
 	get_tree().change_scene_to_file("res://scenes/Game.tscn")
 
 

@@ -1,10 +1,23 @@
 [gd_scene format=3 uid="uid://dat7k1624t8rl"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jo3fh"]
-size = Vector2(1920, 20)
+size = Vector2(2000, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_side"]
+size = Vector2(40, 600)
 
 [node name="barrier" type="StaticBody2D" unique_id=1461762361]
+collision_layer = 8
+collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=547368668]
-position = Vector2(958.5, 0)
+position = Vector2(800, -20)
 shape = SubResource("RectangleShape2D_jo3fh")
+
+[node name="LeftWall" type="CollisionShape2D" parent="."]
+position = Vector2(-20, 250)
+shape = SubResource("RectangleShape2D_side")
+
+[node name="RightWall" type="CollisionShape2D" parent="."]
+position = Vector2(1620, 250)
+shape = SubResource("RectangleShape2D_side")
