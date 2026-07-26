@@ -25,6 +25,7 @@ Settings="*res://scripts/autoloads/Settings.gd"
 Events="*uid://dhuykg56x45u"
 GameState="*uid://codqrkos6f4st"
 Juice="*res://scripts/autoloads/Juice.gd"
+Sfx="*res://scripts/autoloads/Sfx.gd"
 McpInteractionServer="*res://mcp_interaction_server.gd"
 
 [display]

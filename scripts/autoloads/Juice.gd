@@ -7,24 +7,41 @@ extends Node
 ## to zero, so it composes with the camera's own position smoothing.
 
 const MAX_OFFSET := 6.0          ## px — hard ceiling so shake never hides the diver
-const DECAY := 9.0               ## trauma units/sec
+const DECAY := 1.9               ## trauma units/sec
 const SHAKE_SPEED := 34.0        ## noise sampling rate
+const HITSTOP_SCALE := 0.05      ## Engine.time_scale during a freeze frame
 
 var _trauma: float = 0.0
 var _time: float = 0.0
 var _noise := FastNoiseLite.new()
 var _hitstop_until_msec: int = 0
+var _hitstop_active := false
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_noise.seed = randi()
 	_noise.frequency = 0.9
+	Engine.time_scale = 1.0
 
 	Events.enemy_damaged.connect(_on_enemy_damaged)
 	Events.enemy_killed.connect(_on_enemy_killed)
 	Events.player_damaged.connect(_on_player_damaged)
 	Events.player_died.connect(_on_player_died)
+
+	# Belt and braces: a run boundary always returns the engine to normal speed
+	# and drops any leftover shake, whatever happened during the previous run.
+	Events.run_reset.connect(_reset_all)
+	Events.player_died.connect(func(_cause: String) -> void: _end_hitstop())
+	Events.player_surfaced.connect(func(_banked: int) -> void: _end_hitstop())
+
+
+func _reset_all() -> void:
+	_end_hitstop()
+	_trauma = 0.0
+	var cam := get_viewport().get_camera_2d()
+	if cam != null:
+		cam.offset = Vector2.ZERO
 
 
 ## `amount` is trauma, not pixels: it accumulates and is squared on apply, so
@@ -34,39 +51,54 @@ func add_trauma(amount: float) -> void:
 
 
 ## Freezes gameplay for a beat so a hit reads as contact rather than overlap.
-## Uses wall-clock time and an unscaled timer, so it can't be stretched by the
-## very time_scale it sets.
+##
+## Deliberately NOT implemented with `await a timer then restore` — that version
+## hung the game. The restore was gated on a wall-clock comparison that failed
+## whenever the timer fired a millisecond early, so time_scale was left at its
+## frozen value forever and the game appeared locked up. Instead the deadline is
+## just a timestamp and _process (which still runs at full rate under any
+## time_scale) always restores once it passes, so there is no path that can
+## leave the engine slowed down.
 func hitstop(duration_sec: float) -> void:
 	if get_tree().paused:
 		return
-	var until := Time.get_ticks_msec() + int(duration_sec * 1000.0)
-	if until <= _hitstop_until_msec:
-		return
-	_hitstop_until_msec = until
-	Engine.time_scale = 0.02
-	await get_tree().create_timer(duration_sec, true, false, true).timeout
-	if Time.get_ticks_msec() >= _hitstop_until_msec:
-		Engine.time_scale = 1.0
+	_hitstop_until_msec = maxi(_hitstop_until_msec, Time.get_ticks_msec() + int(duration_sec * 1000.0))
+	if not _hitstop_active:
+		_hitstop_active = true
+		Engine.time_scale = HITSTOP_SCALE
 
 
 func _process(delta: float) -> void:
+	# `delta` is scaled by time_scale, so the deadline uses wall-clock instead.
+	if _hitstop_active and (Time.get_ticks_msec() >= _hitstop_until_msec or get_tree().paused):
+		_end_hitstop()
+
 	if _trauma <= 0.0:
 		return
-	_time += delta * SHAKE_SPEED
-	_trauma = maxf(_trauma - DECAY * delta * 0.1, 0.0)
+
+	# Shake advances on real time too, so a freeze frame doesn't stall it.
+	var real_delta: float = delta / maxf(Engine.time_scale, 0.001)
+	_time += real_delta * SHAKE_SPEED
+	_trauma = maxf(_trauma - DECAY * real_delta, 0.0)
 
 	var cam := get_viewport().get_camera_2d()
 	if cam == null:
 		return
 
-	var shake := _trauma * _trauma
 	if _trauma <= 0.001:
 		cam.offset = Vector2.ZERO
 		return
+	var shake := _trauma * _trauma
 	cam.offset = Vector2(
 		_noise.get_noise_2d(_time, 0.0) * MAX_OFFSET * shake,
 		_noise.get_noise_2d(0.0, _time) * MAX_OFFSET * shake
 	)
+
+
+func _end_hitstop() -> void:
+	_hitstop_active = false
+	_hitstop_until_msec = 0
+	Engine.time_scale = 1.0
 
 
 func _on_enemy_damaged(_id: StringName, _amount: int) -> void:

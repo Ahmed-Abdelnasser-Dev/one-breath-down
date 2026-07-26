@@ -9,6 +9,11 @@ const ATTACK_DAMAGE := 25
 const ATTACK_REACH := 28.0     ## px offset of the hitbox from the diver's centre
 const SWING_DURATION := 0.25   ## seconds a swing lasts, start to finish
 const DAMAGE_WINDOW := 0.15    ## the tail of the swing during which damage lands
+## The slash FX plays over its own, longer clock rather than the swing's: the
+## diver's attack animation is 6 frames at 12fps (0.5s), so driving 16 sheet
+## frames off the 0.25s swing made the slash finish while the arm was still
+## moving. Damage timing is unchanged — only the visual was too fast.
+const SLASH_FX_DURATION := 0.5
 
 @export var base_max_speed: float = 160.0   ## = 5 m/s at PIXELS_PER_METRE 32; see docs/phase_2.md §7
 @export var accel: float = 540.0            ## Forward swimming acceleration
@@ -32,6 +37,7 @@ var _hit_this_swing: Array[int] = []
 
 const KNOCK_LOCK_TIME := 0.16   ## seconds steering is ignored after taking a hit
 var _knock_lock: float = 0.0
+var _slash_time: float = 0.0
 
 @onready var camera: Camera2D = get_node_or_null("Camera2D") as Camera2D
 @onready var bubble_particles: GPUParticles2D = get_node_or_null("BubbleTrail") as GPUParticles2D
@@ -158,23 +164,28 @@ func _update_attack(delta: float) -> void:
 				slash.frame = 0
 				slash.rotation = _aim_dir.angle()
 				slash.modulate.a = 0.95
+				_slash_time = 0.0
 
 	if _swing_time > 0.0:
 		_swing_time -= delta
-		if attack_hitbox != null:
-			var slash := attack_hitbox.get_node_or_null("SlashVisual") as Sprite2D
-			if slash != null and slash.visible:
-				# Step the FX sheet across the swing, then hide on the last frame.
-				var played := 1.0 - (_swing_time / SWING_DURATION)
-				slash.frame = clampi(int(played * slash.hframes), 0, slash.hframes - 1)
-				if _swing_time <= 0.0:
-					slash.visible = false
+		if attack_hitbox != null and _swing_time < DAMAGE_WINDOW: # damage lands mid-swing
+			for body in attack_hitbox.get_overlapping_bodies():
+				if body is Enemy and not _hit_this_swing.has(body.get_instance_id()):
+					_hit_this_swing.append(body.get_instance_id())
+					body.take_damage(ATTACK_DAMAGE, global_position)
 
-			if _swing_time < DAMAGE_WINDOW: # damage lands mid-swing
-				for body in attack_hitbox.get_overlapping_bodies():
-					if body is Enemy and not _hit_this_swing.has(body.get_instance_id()):
-						_hit_this_swing.append(body.get_instance_id())
-						body.take_damage(ATTACK_DAMAGE, global_position)
+	# The FX runs on its own clock so it can outlast the damage window and stay
+	# in step with the diver's attack animation.
+	if attack_hitbox != null:
+		var slash := attack_hitbox.get_node_or_null("SlashVisual") as Sprite2D
+		if slash != null and slash.visible:
+			_slash_time += delta
+			var played: float = _slash_time / SLASH_FX_DURATION
+			if played >= 1.0:
+				slash.visible = false
+			else:
+				slash.frame = clampi(int(played * slash.hframes), 0, slash.hframes - 1)
+				slash.modulate.a = 0.95 * clampf(1.0 - maxf(played - 0.6, 0.0) / 0.4, 0.0, 1.0)
 
 
 func input_dir_is_zero() -> bool:
@@ -190,6 +201,7 @@ func _update_particles_and_surface() -> void:
 		if splash_particles != null:
 			splash_particles.restart()
 			splash_particles.emitting = true
+		Sfx.play(&"splash", 0.1)
 
 	# Bubble trail emission control
 	if bubble_particles != null:

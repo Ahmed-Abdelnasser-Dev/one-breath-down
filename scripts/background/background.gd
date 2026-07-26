@@ -319,7 +319,9 @@ func _process(delta: float) -> void:
 			# Faint pulse, quicker as it gets worse — a held breath, not a strobe.
 			_panic_pulse += delta * lerpf(3.0, 7.5, panic)
 			panic *= 0.72 + 0.28 * ((sin(_panic_pulse) + 1.0) * 0.5)
-		vignette.material.set_shader_parameter("intensity", maxf(depth_intensity, panic * 0.9))
+		vignette.material.set_shader_parameter("intensity", maxf(depth_intensity, panic * 0.95))
+		# Only the breath component turns it red; depth alone stays deep-water navy.
+		vignette.material.set_shader_parameter("panic", panic)
 
 
 func _depth_tint(depth: float) -> Color:
