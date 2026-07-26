@@ -7,7 +7,8 @@ class_name Diver
 const SPEED_PENALTY_PER_UNIT := 0.18
 const ATTACK_DAMAGE := 25
 const ATTACK_REACH := 28.0     ## px offset of the hitbox from the diver's centre
-const ATTACK_DURATION := 0.15  ## seconds the hitbox is live per swing
+const SWING_DURATION := 0.25   ## seconds a swing lasts, start to finish
+const DAMAGE_WINDOW := 0.15    ## the tail of the swing during which damage lands
 
 @export var base_max_speed: float = 160.0   ## = 5 m/s at PIXELS_PER_METRE 32; see docs/phase_2.md §7
 @export var accel: float = 540.0            ## Forward swimming acceleration
@@ -28,6 +29,9 @@ var _was_underwater: bool = false
 var _aim_dir: Vector2 = Vector2.RIGHT
 var _swing_time: float = 0.0
 var _hit_this_swing: Array[int] = []
+
+const KNOCK_LOCK_TIME := 0.16   ## seconds steering is ignored after taking a hit
+var _knock_lock: float = 0.0
 
 @onready var camera: Camera2D = get_node_or_null("Camera2D") as Camera2D
 @onready var bubble_particles: GPUParticles2D = get_node_or_null("BubbleTrail") as GPUParticles2D
@@ -95,6 +99,12 @@ func _update_light() -> void:
 func _physics_process(delta: float) -> void:
 	var input_dir := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 
+	# While knocked back, steering is ignored and the impulse is allowed to
+	# carry — otherwise a held direction cancels the hit within a few frames.
+	if _knock_lock > 0.0:
+		_knock_lock -= delta
+		input_dir = Vector2.ZERO
+
 	if input_dir != Vector2.ZERO:
 		input_dir = input_dir.normalized()
 		_aim_dir = input_dir   # movement input takes priority as the aim direction
@@ -112,8 +122,10 @@ func _physics_process(delta: float) -> void:
 
 		velocity = velocity.move_toward(target, current_accel * delta)
 	else:
-		# Smooth underwater gliding drag
-		velocity = velocity.move_toward(Vector2.ZERO, drag * delta)
+		# Smooth underwater gliding drag — much gentler while knocked back so
+		# the impulse actually travels before it bleeds off.
+		var glide_drag := drag * (0.25 if _knock_lock > 0.0 else 1.0)
+		velocity = velocity.move_toward(Vector2.ZERO, glide_drag * delta)
 
 	move_and_slide()
 	_update_particles_and_surface()
@@ -132,28 +144,37 @@ func _update_attack(delta: float) -> void:
 			_animator.trigger_attack()
 
 		Events.player_attacked.emit()
-		_swing_time = 0.25 # Increased duration for sync
+		_swing_time = SWING_DURATION
 		_hit_this_swing.clear()
-		
+
 		if attack_hitbox != null:
-			var slash = attack_hitbox.get_node_or_null("SlashVisual")
-			if slash:
+			# Aim the hitbox NOW, not when the damage window opens. It used to be
+			# assigned inside the damage branch below, so for the first ~0.1s the
+			# slash was drawn at the previous swing's angle and then teleported.
+			attack_hitbox.position = _aim_dir * ATTACK_REACH
+			var slash := attack_hitbox.get_node_or_null("SlashVisual") as Sprite2D
+			if slash != null:
 				slash.visible = true
-				slash.modulate.a = 1.0
-				slash.scale = Vector2(0.3, 0.3)
-				var tw = create_tween()
-				tw.tween_property(slash, "scale", Vector2(1.8, 1.8), 0.15).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-				tw.parallel().tween_property(slash, "modulate:a", 0.0, 0.2)
-				tw.tween_callback(func(): slash.visible = false)
+				slash.frame = 0
+				slash.rotation = _aim_dir.angle()
+				slash.modulate.a = 0.95
 
 	if _swing_time > 0.0:
 		_swing_time -= delta
-		if attack_hitbox != null and _swing_time < 0.15: # Sync damage to middle of swing
-			attack_hitbox.position = _aim_dir * ATTACK_REACH
-			for body in attack_hitbox.get_overlapping_bodies():
-				if body is Enemy and not _hit_this_swing.has(body.get_instance_id()):
-					_hit_this_swing.append(body.get_instance_id())
-					body.take_damage(ATTACK_DAMAGE, global_position)
+		if attack_hitbox != null:
+			var slash := attack_hitbox.get_node_or_null("SlashVisual") as Sprite2D
+			if slash != null and slash.visible:
+				# Step the FX sheet across the swing, then hide on the last frame.
+				var played := 1.0 - (_swing_time / SWING_DURATION)
+				slash.frame = clampi(int(played * slash.hframes), 0, slash.hframes - 1)
+				if _swing_time <= 0.0:
+					slash.visible = false
+
+			if _swing_time < DAMAGE_WINDOW: # damage lands mid-swing
+				for body in attack_hitbox.get_overlapping_bodies():
+					if body is Enemy and not _hit_this_swing.has(body.get_instance_id()):
+						_hit_this_swing.append(body.get_instance_id())
+						body.take_damage(ATTACK_DAMAGE, global_position)
 
 
 func input_dir_is_zero() -> bool:
@@ -205,7 +226,15 @@ func take_hit(amount: int, from: Vector2, knock: float) -> void:
 	var away := global_position - from
 	if away.length() > 0.001:
 		velocity += away.normalized() * knock
+		# Briefly refuse steering input. Without this the knockback is erased on
+		# the very next physics tick by move_toward() if the player happens to be
+		# holding a direction, and the hit never registers as a physical event.
+		_knock_lock = KNOCK_LOCK_TIME
 
 	if _animator != null:
 		_animator.trigger_hurt()
+
+	# Drives screen shake / hitstop via the Juice autoload. This signal was
+	# declared on the Events bus but never actually emitted by anything.
+	Events.player_damaged.emit(amount, &"contact")
 

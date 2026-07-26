@@ -1,6 +1,7 @@
-[gd_scene load_steps=12 format=3 uid="uid://di64q3xym1gbk"]
+[gd_scene load_steps=13 format=3 uid="uid://di64q3xym1gbk"]
 
 [ext_resource type="Script" uid="uid://cln6818e7n334" path="res://scripts/player/diver.gd" id="1_5hnfc"]
+[ext_resource type="Texture2D" path="res://visuals/slash/SlashFX SpriteSheet FX 3E_1.png" id="6_slash"]
 [ext_resource type="Texture2D" uid="uid://doij7aqpdvl33" path="res://visuals/lights/light_radial_stepped.tres" id="1_light"]
 [ext_resource type="Script" uid="uid://clrcsd63bvjl3" path="res://scripts/player/diver_animator.gd" id="2_anim"]
 [ext_resource type="SpriteFrames" uid="uid://blgxg3dxya72g" path="res://visuals/diver/diver_frames.tres" id="2_frames"]
@@ -100,7 +101,10 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AttackHitbox"]
 shape = SubResource("CircleShape2D_attack_hitbox")
 
-[node name="SlashVisual" type="Polygon2D" parent="AttackHitbox"]
+[node name="SlashVisual" type="Sprite2D" parent="AttackHitbox"]
 visible = false
-color = Color(0.9, 0.95, 1, 0.8)
-polygon = PackedVector2Array(-8, -16, 12, -8, 16, 0, 12, 8, -8, 16, 0, 0)
+texture_filter = 1
+scale = Vector2(0.42, 0.42)
+texture = ExtResource("6_slash")
+hframes = 16
+modulate = Color(0.62, 0.94, 1, 0.95)

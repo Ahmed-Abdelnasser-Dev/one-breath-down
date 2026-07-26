@@ -181,9 +181,21 @@ func _die() -> void:
 	if data != null:
 		Events.enemy_killed.emit(data.id, global_position)
 
-	if sprite != null and sprite.sprite_frames != null and sprite.sprite_frames.has_animation("death"):
-		_play("death")
-		sprite.animation_finished.connect(queue_free, CONNECT_ONE_SHOT)
+	if _glow != null:
+		_glow.energy = 0.0
+
+	# A kill used to be an instant queue_free() with no acknowledgement at all.
+	# Flash white, then sink and fade so the body reads as a body.
+	if sprite != null:
+		sprite.modulate = Color(3.0, 3.0, 3.0, 1.0)
+		var tween := create_tween()
+		tween.tween_property(sprite, "modulate", Color(0.7, 0.8, 1.0, 1.0), 0.09)
+		tween.set_parallel(true)
+		tween.tween_property(sprite, "modulate:a", 0.0, 0.45).set_delay(0.09)
+		tween.tween_property(self, "position:y", position.y + 26.0, 0.54) \
+			.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
+		tween.tween_property(sprite, "rotation", sprite.rotation + 0.7, 0.54)
+		tween.chain().tween_callback(queue_free)
 	else:
 		queue_free()
 

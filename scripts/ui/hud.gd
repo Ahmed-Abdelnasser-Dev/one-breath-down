@@ -139,6 +139,16 @@ func _on_pearl_collected(data: PearlData) -> void:
 	weight_text.text = "%.2f kg" % run_manager.diver.carried_weight
 	_refresh_loot()
 
+	# Punch the counter so the pickup lands on the HUD too, not just in world.
+	loot_text.pivot_offset = loot_text.size * 0.5
+	loot_text.scale = Vector2(1.35, 1.35)
+	loot_text.add_theme_color_override("font_color", data.color)
+	var tween := create_tween()
+	tween.tween_property(loot_text, "scale", Vector2.ONE, 0.22) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(loot_text, "theme_override_colors/font_color",
+		Color(0.9, 0.95, 1.0), 0.35)
+
 
 func _on_pearls_banked(_amount: int) -> void:
 	money_text.text = "%d" % GameState.pearls

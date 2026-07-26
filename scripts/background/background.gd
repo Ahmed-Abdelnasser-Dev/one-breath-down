@@ -127,7 +127,11 @@ const CLOUD_DRIFT_SPEED := 7.0
 @onready var accent_spire: Sprite2D = $AccentSpire
 @onready var accent_statue: Sprite2D = $AccentStatue
 
+const BREATH_PANIC_AT := 0.32   ## breath fraction below which the vignette closes in
+
 var _clouds_scroll := 0.0
+var _breath_ratio := 1.0
+var _panic_pulse := 0.0
 var _depth_bands: Node2D
 var _band_parallax: Array[float] = []
 var _band_offsets: Array[float] = []
@@ -228,6 +232,9 @@ func _ready() -> void:
 		if retired != null:
 			retired.visible = false
 
+	Events.breath_changed.connect(func(current: float, maximum: float) -> void:
+		_breath_ratio = current / maximum if maximum > 0.0 else 0.0)
+
 
 func _process(delta: float) -> void:
 	var cam := get_viewport().get_camera_2d()
@@ -302,8 +309,17 @@ func _process(delta: float) -> void:
 	# Particle & Vignette Scaling
 	if particulate != null: particulate.amount_ratio = clampf(depth / TWILIGHT_END, 0.15, 1.0)
 	if light_flecks != null: light_flecks.amount_ratio = clampf(1.0 - depth / SUNLIT_END, 0.05, 1.0)
+	# Vignette answers to BOTH depth and breath. The GDD asks specifically for it
+	# to tighten as oxygen runs out (gdd.md §"juice priorities"); it was purely
+	# depth-driven, so the one moment it should have spoken it stayed silent.
 	if vignette != null and vignette.material != null:
-		vignette.material.set_shader_parameter("intensity", clampf((depth - TWILIGHT_END) / VIGNETTE_RAMP_RANGE, 0.0, 1.0))
+		var depth_intensity: float = clampf((depth - TWILIGHT_END) / VIGNETTE_RAMP_RANGE, 0.0, 1.0)
+		var panic: float = clampf((BREATH_PANIC_AT - _breath_ratio) / BREATH_PANIC_AT, 0.0, 1.0)
+		if panic > 0.0:
+			# Faint pulse, quicker as it gets worse — a held breath, not a strobe.
+			_panic_pulse += delta * lerpf(3.0, 7.5, panic)
+			panic *= 0.72 + 0.28 * ((sin(_panic_pulse) + 1.0) * 0.5)
+		vignette.material.set_shader_parameter("intensity", maxf(depth_intensity, panic * 0.9))
 
 
 func _depth_tint(depth: float) -> Color:

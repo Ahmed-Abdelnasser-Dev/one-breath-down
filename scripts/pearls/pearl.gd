@@ -64,8 +64,34 @@ func _apply_data() -> void:
 	_glow.energy = clampf(0.25 + float(data.value) / 350.0 * 0.55, 0.25, 0.8)
 
 
+var _collected := false
+
+
+## The most-repeated action in the game used to be a same-frame queue_free() —
+## the pearl simply vanished. It now pops, flares and drifts up before it goes,
+## so picking one up registers as an event.
 func _on_body_entered(body: Node2D) -> void:
-	if body is Diver:
-		body.collect(data)
-		Events.pearl_collected.emit(data)
-		queue_free()
+	if _collected or not (body is Diver):
+		return
+	_collected = true
+
+	body.collect(data)
+	Events.pearl_collected.emit(data)
+
+	set_deferred("monitoring", false)
+	var col := get_node_or_null("CollisionShape2D") as CollisionShape2D
+	if col != null:
+		col.set_deferred("disabled", true)
+	set_process(false)
+
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(sprite, "scale", sprite.scale * 2.1, 0.16) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "position:y", position.y - 22.0, 0.26) \
+		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(sprite, "modulate:a", 0.0, 0.26).set_delay(0.06)
+	if _glow != null:
+		tween.tween_property(_glow, "energy", _glow.energy * 2.6, 0.10)
+		tween.tween_property(_glow, "energy", 0.0, 0.18).set_delay(0.10)
+	tween.chain().tween_callback(queue_free)
