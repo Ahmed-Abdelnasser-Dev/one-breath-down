@@ -16,6 +16,10 @@ func _tick_behavior(delta: float) -> void:
 	if data == null:
 		return
 
+	if is_on_wall() and state == Enemy.State.PATROL:
+		var normal := get_wall_normal()
+		velocity += normal * data.accel * delta
+
 	match state:
 		Enemy.State.TELEGRAPH:
 			_tick_telegraph(delta)
@@ -47,11 +51,16 @@ func _tick_hover(delta: float) -> void:
 func _tick_telegraph(delta: float) -> void:
 	velocity = velocity.move_toward(Vector2.ZERO, data.accel * delta)
 	_telegraph_squash = 1.0 + sin(_state_time * 18.0) * 0.06
+	var aim := _dir_to_diver()
+	if aim != Vector2.ZERO and absf(aim.x) > 0.01:
+		_facing_right = aim.x > 0.0
 	_play("idle")
 
 	if _state_time >= data.telegraph_time:
 		_telegraph_squash = 1.0
-		_lunge_dir = _dir_to_diver()
+		var target_pos := _diver.global_position + _diver.velocity * 0.35 if _diver != null else global_position
+		var predicted_dir := (target_pos - global_position).normalized()
+		_lunge_dir = predicted_dir if predicted_dir != Vector2.ZERO else _dir_to_diver()
 		if _lunge_dir == Vector2.ZERO:
 			_lunge_dir = Vector2.RIGHT if _facing_right else Vector2.LEFT
 		if absf(_lunge_dir.x) > 0.01:
@@ -59,12 +68,16 @@ func _tick_telegraph(delta: float) -> void:
 		state = Enemy.State.ATTACK
 		_state_time = 0.0
 		_play("attack")
+		notify_attack()
+
 
 
 func _tick_attack() -> void:
 	velocity = _lunge_dir * data.burst_speed
+	_play("attack")
+	emit_move_puff(get_physics_process_delta_time())
 
-	if _state_time >= data.attack_time:
+	if _state_time >= data.attack_time or (is_on_wall() and _state_time > 0.15):
 		state = Enemy.State.RECOVER
 		_state_time = 0.0
 
@@ -76,3 +89,4 @@ func _tick_recover(delta: float) -> void:
 	if _state_time >= data.recover_time:
 		state = Enemy.State.PATROL
 		_state_time = 0.0
+

@@ -128,6 +128,7 @@ const CLOUD_DRIFT_SPEED := 7.0
 @onready var accent_statue: Sprite2D = $AccentStatue
 
 const BREATH_PANIC_AT := 0.32   ## breath fraction below which the vignette closes in
+const BUBBLE_BOX_HALF_H := 600.0  ## matches PPM_bubbles emission_box_extents.y
 
 var _clouds_scroll := 0.0
 var _breath_ratio := 1.0
@@ -305,6 +306,15 @@ func _process(delta: float) -> void:
 	var deepform_color := _depth_tint(depth)
 	deepform_color.a = lerpf(0.22, 0.08, clampf(depth / TWILIGHT_END, 0.0, 1.0))
 	if deep_formations != null: deep_formations.modulate = deepform_color
+
+	# Bubbles must never surface into the sky. The emitter box is 600px tall and
+	# rides the camera, so near the waterline half of it sat above y=0 and the
+	# bubbles rose straight out of the sea. Push the box down until it clears
+	# the surface, and fade the field in only once genuinely submerged.
+	var bubbles := ambient_follow.get_node_or_null("Bubbles") as GPUParticles2D if ambient_follow else null
+	if bubbles != null:
+		bubbles.amount_ratio = clampf((depth - 120.0) / 400.0, 0.0, 1.0)
+		bubbles.position.y = maxf(0.0, BUBBLE_BOX_HALF_H + 40.0 - depth)
 
 	# Particle & Vignette Scaling
 	if particulate != null: particulate.amount_ratio = clampf(depth / TWILIGHT_END, 0.15, 1.0)

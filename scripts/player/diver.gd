@@ -202,10 +202,12 @@ func _update_particles_and_surface() -> void:
 			splash_particles.emitting = true
 		Sfx.play(&"splash", 0.1)
 
-	# Bubble trail emission control
+	# Bubble trail emission control. Gated below a shallow band as well as by
+	# depth sign: bubbles rise ~50px over their lifetime, so trailing them right
+	# under the waterline sent them straight up into the sky.
 	if bubble_particles != null:
 		var is_moving := velocity.length() > 20.0
-		bubble_particles.emitting = is_underwater and is_moving
+		bubble_particles.emitting = is_underwater and is_moving and global_position.y > 90.0
 
 
 func collect(data: PearlData) -> void:

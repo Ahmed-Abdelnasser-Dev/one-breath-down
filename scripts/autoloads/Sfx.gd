@@ -9,19 +9,31 @@ extends Node
 
 const POLYPHONY := 10
 
+const PACK := "res://audio/mp3/JDSherbert - Pixel Game Essentials SFX Pack - %s.mp3"
+
+## Authored clips (the JDSherbert pack) where one exists for the moment, and the
+## generated underwater set for the things a generic pack has no equivalent of —
+## a held breath, a heartbeat, a body of water.
 const CLIPS := {
-	&"pearl_pickup": "res://audio/sfx/pearl_pickup.wav",
-	&"pearl_rare": "res://audio/sfx/pearl_rare.wav",
-	&"swing": "res://audio/sfx/swing.wav",
-	&"hit": "res://audio/sfx/hit.wav",
-	&"hurt": "res://audio/sfx/hurt.wav",
-	&"enemy_death": "res://audio/sfx/enemy_death.wav",
+	&"pearl_pickup": PACK % "Coin 1",
+	&"pearl_rare": PACK % "Coin 2",
+	&"swing": PACK % "Shoot 1",
+	&"hit": PACK % "Box Break 1",
+	&"enemy_attack": PACK % "Shoot 2",
+	&"hurt": PACK % "Damage 1",
+	&"enemy_death": PACK % "Die 2",
+	&"player_death": PACK % "Die 1",
+	&"drowned": PACK % "Level Fail 1",
+	&"bank": PACK % "Level Complete 1",
+	&"upgrade": PACK % "Powerup 1",
+	&"ui_click": PACK % "Switch 1",
+	&"ui_confirm": PACK % "Checkpoint 1",
+	# No pack equivalent — keep the generated underwater ones.
 	&"splash": "res://audio/sfx/splash.wav",
 	&"heartbeat": "res://audio/sfx/heartbeat.wav",
-	&"bank": "res://audio/sfx/bank.wav",
-	&"ui_click": "res://audio/sfx/ui_click.wav",
-	&"ui_confirm": "res://audio/sfx/ui_confirm.wav",
 }
+
+const MUSIC_TRACK := "res://audio/gam music.mp3"
 
 ## Value above which a pearl gets the richer pickup sound — a golden pearl
 ## should not sound like a seed pearl.
@@ -38,6 +50,7 @@ var _players: Array[AudioStreamPlayer] = []
 var _next := 0
 
 var _ambience: AudioStreamPlayer
+var _music: AudioStreamPlayer
 var _heartbeat_timer := 0.0
 var _breath_ratio := 1.0
 var _submerged := false
@@ -72,18 +85,71 @@ func _ready() -> void:
 	add_child(_ambience)
 	_ambience.play()
 
+	# Music sits under everything on its own bus so the options slider governs
+	# it independently of the SFX.
+	_music = AudioStreamPlayer.new()
+	_music.bus = &"Music"
+	_music.stream = load(MUSIC_TRACK) as AudioStream
+	if _music.stream is AudioStreamMP3:
+		(_music.stream as AudioStreamMP3).loop = true
+	_music.volume_db = -14.0
+	add_child(_music)
+	if _music.stream != null:
+		_music.play()
+
+	# UI sounds are attached centrally by watching the tree rather than wiring
+	# every screen by hand: menus are built across a dozen scenes (and some rows
+	# are created at runtime), so anything else would miss some and drift.
+	get_tree().node_added.connect(_attach_ui_sound)
+	_attach_ui_sound_recursive(get_tree().root)
+
 	Events.pearl_collected.connect(_on_pearl_collected)
 	Events.pearls_banked.connect(func(_amount: int) -> void: play(&"bank"))
-	Events.player_attacked.connect(func() -> void: play(&"swing", 0.12))
+	Events.player_attacked.connect(func() -> void: play(&"swing", 0.12, -4.0))
 	Events.enemy_damaged.connect(func(_id: StringName, _amt: int) -> void: play(&"hit", 0.14))
+	Events.enemy_attacked.connect(func(_id: StringName, _at: Vector2) -> void: play(&"enemy_attack", 0.16, -6.0))
 	Events.enemy_killed.connect(func(_id: StringName, _at: Vector2) -> void: play(&"enemy_death", 0.1))
 	Events.player_damaged.connect(func(_amt: int, _src: StringName) -> void: play(&"hurt", 0.08))
 	Events.breath_changed.connect(_on_breath_changed)
-	Events.upgrade_purchased.connect(func(_id: StringName) -> void: play(&"ui_confirm"))
+	Events.upgrade_purchased.connect(func(_id: StringName) -> void: play(&"upgrade"))
 	Events.run_started.connect(func() -> void: _submerged = true)
 	Events.run_reset.connect(func() -> void: _submerged = false)
-	Events.player_died.connect(func(_cause: String) -> void: _submerged = false)
+	Events.player_died.connect(_on_player_died)
 	Events.player_surfaced.connect(func(_banked: int) -> void: _submerged = false)
+
+
+func _attach_ui_sound_recursive(node: Node) -> void:
+	_attach_ui_sound(node)
+	for c in node.get_children():
+		_attach_ui_sound_recursive(c)
+
+
+## Click on press, softer tick on hover/focus — so keyboard navigation sounds
+## the same as the mouse. Disabled buttons stay silent.
+func _attach_ui_sound(node: Node) -> void:
+	if node is BaseButton:
+		var b := node as BaseButton
+		if b.has_meta(&"sfx_wired"):
+			return
+		b.set_meta(&"sfx_wired", true)
+		b.pressed.connect(func() -> void: play(&"ui_confirm", 0.04, -5.0))
+		b.focus_entered.connect(func() -> void: play(&"ui_click", 0.05, -13.0))
+		b.mouse_entered.connect(func() -> void:
+			if not b.disabled:
+				play(&"ui_click", 0.05, -13.0)
+		)
+	elif node is ItemList:
+		var l := node as ItemList
+		if l.has_meta(&"sfx_wired"):
+			return
+		l.set_meta(&"sfx_wired", true)
+		l.item_selected.connect(func(_i: int) -> void: play(&"ui_click", 0.05, -10.0))
+
+
+## Drowning and being eaten deserve different last sounds.
+func _on_player_died(cause: String) -> void:
+	_submerged = false
+	play(&"player_death" if cause == "killed" else &"drowned")
 
 
 ## Round-robin voice stealing: with POLYPHONY voices a burst of pickups or hits

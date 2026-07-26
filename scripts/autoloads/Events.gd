@@ -51,6 +51,8 @@ signal player_damaged(amount: int, source_id: StringName)
 @warning_ignore("unused_signal")
 signal player_attacked
 @warning_ignore("unused_signal")
+signal enemy_attacked(id: StringName, at: Vector2)
+@warning_ignore("unused_signal")
 signal enemy_damaged(id: StringName, amount: int)
 @warning_ignore("unused_signal")
 signal enemy_killed(id: StringName, at: Vector2)

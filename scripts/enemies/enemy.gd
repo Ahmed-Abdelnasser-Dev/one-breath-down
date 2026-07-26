@@ -119,6 +119,36 @@ func _tick_behavior(_delta: float) -> void:
 	pass
 
 
+## Called by the behaviour subclasses the moment they commit to an attack, so
+## the lunge/bite has a visible arc in front of it instead of the enemy simply
+## moving fast. Announces on the bus too, which is what drives the attack SFX.
+func notify_attack() -> void:
+	if data == null:
+		return
+	Events.enemy_attacked.emit(data.id, global_position)
+	var dir := _dir_to_diver()
+	if dir == Vector2.ZERO:
+		dir = Vector2.RIGHT if _facing_right else Vector2.LEFT
+	var reach: float = data.hitbox_radius + 12.0
+	Vfx.spawn(get_parent(), Vfx.Kind.SLASH, global_position + dir * reach,
+		Color(1.0, 0.55, 0.5, 0.9), 0.7, dir.angle())
+
+
+## A puff of churned water behind something moving hard. Subclasses call this
+## while bursting; it's rate-limited so a long charge leaves a trail, not a wall.
+func emit_move_puff(delta: float) -> void:
+	_puff_timer -= delta
+	if _puff_timer > 0.0:
+		return
+	_puff_timer = 0.11
+	var back := -velocity.normalized() * (data.hitbox_radius if data else 10.0)
+	Vfx.spawn(get_parent(), Vfx.Kind.SMOKE, global_position + back,
+		Color(0.75, 0.9, 1.0, 0.35), 0.55, randf() * TAU)
+
+
+var _puff_timer: float = 0.0
+
+
 func _update_facing() -> void:
 	if sprite == null or data == null:
 		return
@@ -153,11 +183,22 @@ func take_damage(amount: int, from: Vector2) -> void:
 	if data.invulnerable:
 		_stun_time = maxf(_stun_time, 1.0)
 		_flash()
+		# Sparks off armour: the swing landed but did nothing, and the player
+		# needs to be told that rather than left guessing.
+		var off := (from - global_position).normalized() * 10.0
+		Vfx.spawn(get_parent(), Vfx.Kind.IMPACT, global_position + off,
+			Color(0.7, 0.85, 1.0, 0.8), 0.45, randf() * TAU)
 		return
 
 	_stun_time = maxf(_stun_time, data.stun_on_hit)
 	hp -= amount
 	Events.enemy_damaged.emit(data.id, amount)
+
+	# Impact burst on the struck side, so the hit has a point of contact rather
+	# than just a colour flash on the sprite.
+	var toward := (from - global_position).normalized()
+	Vfx.spawn(get_parent(), Vfx.Kind.IMPACT, global_position + toward * 10.0,
+		Color(1.0, 0.95, 0.8, 0.95), 0.6, randf() * TAU)
 
 	if hp <= 0:
 		_die()
@@ -169,6 +210,19 @@ func _enter_hurt() -> void:
 	state = State.HURT
 	_play("hurt")
 	_flash()
+	_stagger()
+
+
+## Visible recoil. The knockback impulse alone moves the enemy but reads as
+## drifting; a sharp squash-and-snap on the sprite makes the hit land.
+func _stagger() -> void:
+	if sprite == null:
+		return
+	var base := Vector2(data.sprite_scale, data.sprite_scale) if data else Vector2.ONE
+	sprite.scale = base * Vector2(1.35, 0.7)
+	var tween := create_tween()
+	tween.tween_property(sprite, "scale", base, 0.22) \
+		.set_trans(Tween.TRANS_ELASTIC).set_ease(Tween.EASE_OUT)
 
 
 func _die() -> void:

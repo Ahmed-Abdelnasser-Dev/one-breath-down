@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://debx7tcrw3fb6"
+path="res://.godot/imported/JDSherbert - Pixel Game Essentials SFX Pack - Switch 1.mp3-185f4cf0930de5f43e8df6b98f0c3d3d.mp3str"
+
+[deps]
+
+source_file="res://audio/mp3/JDSherbert - Pixel Game Essentials SFX Pack - Switch 1.mp3"
+dest_files=["res://.godot/imported/JDSherbert - Pixel Game Essentials SFX Pack - Switch 1.mp3-185f4cf0930de5f43e8df6b98f0c3d3d.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

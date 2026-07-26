@@ -40,10 +40,19 @@ script = ExtResource("1_elqb8")
 
 [node name="World" type="Node2D" parent="." unique_id=868154501]
 
+[node name="SkyBackground" type="ColorRect" parent="World" groups=["sky_background"]]
+z_index = -11
+offset_left = -400.0
+offset_top = -3200.0
+offset_right = 2000.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.125, 0.376, 0.69, 1)
+
 [node name="WaterBackground" type="ColorRect" parent="World" unique_id=677764444 groups=["water_background"]]
 z_index = -10
 offset_left = -400.0
-offset_top = -3000.0
+offset_top = 0.0
 offset_right = 2000.0
 offset_bottom = 7000.0
 mouse_filter = 2

@@ -6,7 +6,7 @@ extends Node
 ## a per-frame offset on whatever Camera2D is current, and always decays back
 ## to zero, so it composes with the camera's own position smoothing.
 
-const MAX_OFFSET := 6.0          ## px — hard ceiling so shake never hides the diver
+const MAX_OFFSET := 9.0          ## px — hard ceiling so shake never hides the diver
 const DECAY := 1.9               ## trauma units/sec
 const SHAKE_SPEED := 34.0        ## noise sampling rate
 const HITSTOP_SCALE := 0.05      ## Engine.time_scale during a freeze frame
@@ -101,19 +101,22 @@ func _end_hitstop() -> void:
 	Engine.time_scale = 1.0
 
 
+## Landing a hit is the loudest thing the player does, so it gets the longest
+## freeze of the three — the stagger is what sells the blow as heavy rather than
+## the swing simply passing through.
 func _on_enemy_damaged(_id: StringName, _amount: int) -> void:
-	add_trauma(0.28)
-	hitstop(0.05)
+	add_trauma(0.42)
+	hitstop(0.085)
 
 
 func _on_enemy_killed(_id: StringName, _at: Vector2) -> void:
-	add_trauma(0.4)
-	hitstop(0.08)
+	add_trauma(0.55)
+	hitstop(0.12)
 
 
 func _on_player_damaged(_amount: int, _source_id: StringName) -> void:
-	add_trauma(0.62)
-	hitstop(0.07)
+	add_trauma(0.75)
+	hitstop(0.1)
 
 
 func _on_player_died(_cause: String) -> void:

@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://buuigrg2s2s23"
+path="res://.godot/imported/JDSherbert - Pixel Game Essentials SFX Pack - Jump 1.mp3-4bbd622838b958d3fc8ddbd1083fa918.mp3str"
+
+[deps]
+
+source_file="res://audio/mp3/JDSherbert - Pixel Game Essentials SFX Pack - Jump 1.mp3"
+dest_files=["res://.godot/imported/JDSherbert - Pixel Game Essentials SFX Pack - Jump 1.mp3-4bbd622838b958d3fc8ddbd1083fa918.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
