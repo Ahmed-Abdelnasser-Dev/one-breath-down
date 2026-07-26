@@ -54,7 +54,7 @@ const CATALOG: Array[Dictionary] = [
 	{
 		"id": &"lantern_1",
 		"name": "Diver's Lantern",
-		"effect": "A wide, bright lamp — the only way to see in the midnight zone.",
+		"effect": "A wide, bright lamp. The only way to see in the midnight zone.",
 		"cost": 95,
 		"prereq": &""
 	},
@@ -75,7 +75,7 @@ const CATALOG: Array[Dictionary] = [
 	{
 		"id": &"vigor_1",
 		"name": "Diver's Vigor",
-		"effect": "Raises stamina to 130 — more swings before you tire.",
+		"effect": "Raises stamina to 130, so you get more swings before you tire.",
 		"cost": 75,
 		"prereq": &""
 	},
@@ -97,6 +97,9 @@ const CATALOG: Array[Dictionary] = [
 @onready var close_button: Button = $Panel/Margin/VBox/CloseButton
 
 var _selected_index: int = 0
+## CATALOG entries followed by the consumables, so one list index maps to either.
+## Consumables are repeat-buyable up to GameState.MAX_PER_KIND, unlike upgrades.
+var _rows: Array = []
 
 
 func _ready() -> void:
@@ -112,25 +115,37 @@ func focus_default() -> void:
 
 
 func refresh_catalog() -> void:
-	money_label.text = "⌾ %d" % GameState.pearls
+	money_label.text = "\u233e %d" % GameState.pearls
 	item_list.clear()
-	
+	_rows.clear()
+
 	for item in CATALOG:
-		var owned := GameState.has_upgrade(item["id"])
+		_rows.append({"kind": "upgrade", "data": item})
 		var label_text: String = item["name"]
-		if owned:
+		if GameState.has_upgrade(item["id"]):
 			label_text += " [OWNED]"
 		item_list.add_item(label_text)
-	
-	if CATALOG.size() > 0:
-		_selected_index = clamp(_selected_index, 0, CATALOG.size() - 1)
+
+	for c in Consumables.all():
+		_rows.append({"kind": "consumable", "data": c})
+		item_list.add_item("%s  %d/%d" % [c.display_name,
+			GameState.consumable_count(c.id), GameState.MAX_PER_KIND])
+
+	if not _rows.is_empty():
+		_selected_index = clamp(_selected_index, 0, _rows.size() - 1)
 		item_list.select(_selected_index)
 		_on_item_selected(_selected_index)
 
 
 func _on_item_selected(index: int) -> void:
 	_selected_index = index
-	var item: Dictionary = CATALOG[index]
+	if index < 0 or index >= _rows.size():
+		return
+	var row: Dictionary = _rows[index]
+	if row["kind"] == "consumable":
+		_show_consumable(row["data"] as ConsumableData)
+		return
+	var item: Dictionary = row["data"]
 	var owned: bool = GameState.has_upgrade(String(item["id"]))
 	var prereq_ok: bool = String(item["prereq"]) == "" or GameState.has_upgrade(String(item["prereq"]))
 	
@@ -155,9 +170,36 @@ func _on_item_selected(index: int) -> void:
 		buy_button.text = "Buy Upgrade"
 
 
-func _on_buy_pressed() -> void:
-	if _selected_index < 0 or _selected_index >= CATALOG.size():
+## Consumables show stock and re-buy up to the per-kind cap, and say plainly
+## that they are used with X or C — otherwise nothing in the shop explains that.
+func _show_consumable(c: ConsumableData) -> void:
+	var held := GameState.consumable_count(c.id)
+	detail_name.text = c.display_name
+	detail_effect.text = "%s\n\nHeld: %d / %d. Equip in the Inventory, use with X or C." % [
+		c.description, held, GameState.MAX_PER_KIND
+	]
+	if not GameState.can_buy_consumable(c.id):
+		detail_cost.text = "FULL (%d/%d)" % [held, GameState.MAX_PER_KIND]
+		detail_cost.modulate = Color(0.4, 0.9, 0.4, 1)
+		buy_button.disabled = true
+		buy_button.text = "Full"
 		return
-	var item: Dictionary = CATALOG[_selected_index]
+	detail_cost.text = "COST: %d Pearls" % c.cost
+	var affordable: bool = GameState.pearls >= c.cost
+	detail_cost.modulate = Color(1, 1, 1, 1) if affordable else Color(1, 0.4, 0.4, 1)
+	buy_button.disabled = not affordable
+	buy_button.text = "Buy x1"
+
+
+func _on_buy_pressed() -> void:
+	if _selected_index < 0 or _selected_index >= _rows.size():
+		return
+	var row: Dictionary = _rows[_selected_index]
+	if row["kind"] == "consumable":
+		var c := row["data"] as ConsumableData
+		if GameState.buy_consumable(c.id, c.cost):
+			refresh_catalog()
+		return
+	var item: Dictionary = row["data"]
 	if GameState.purchase_upgrade(item["id"], item["cost"]):
 		refresh_catalog()

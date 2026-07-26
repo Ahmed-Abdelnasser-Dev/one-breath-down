@@ -63,6 +63,15 @@ func apply_damage(amount: float) -> void:
 		Events.health_depleted.emit()
 
 
+## Partial heal, for consumables. Distinct from restore_health(), which is the
+## ship's full top-up.
+func heal(amount: float) -> void:
+	if amount <= 0.0:
+		return
+	current_hp = minf(max_hp, current_hp + amount)
+	Events.health_changed.emit(current_hp, max_hp)
+
+
 func restore_health() -> void:
 	current_hp = max_hp
 	if _sprite != null:

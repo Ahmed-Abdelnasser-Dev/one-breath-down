@@ -21,6 +21,11 @@ class_name Hud
 @onready var bank_amount: Label = $BankToast/BankAmount
 @onready var prompt_bar_panel: PanelContainer = $PromptBarPanel
 @onready var prompt_bar: Label = $PromptBarPanel/PromptBar
+@onready var top_left_section: PanelContainer = $TopLeftSection
+@onready var depth_section: PanelContainer = $DepthSection
+
+## Vertical gap between the stat panel and the depth panel below it.
+const PANEL_GAP := 6.0
 
 var carried_count: int = 0
 var carried_value: int = 0
@@ -56,6 +61,7 @@ func _ready() -> void:
 	Events.stamina_changed.connect(_on_stamina_changed)
 	Events.pearl_collected.connect(_on_pearl_collected)
 	Events.carry_weight_changed.connect(_on_carry_weight_changed)
+	Events.consumable_used.connect(_on_consumable_used)
 	Events.pearls_banked.connect(_on_pearls_banked)
 	Events.player_surfaced.connect(_show_bank_toast)
 	Events.player_surfaced.connect(_on_run_ended)
@@ -87,6 +93,18 @@ func _ready() -> void:
 	prompt_bar.text = _shop_prompt
 	prompt_bar_panel.hide()
 
+	# The depth panel used to sit at a hardcoded y, which silently collided with
+	# the stat panel every time its font sizes or spacing changed. Follow the
+	# real measured height instead.
+	top_left_section.resized.connect(_reflow_depth_panel)
+	# Deferred because the panel has not been laid out yet this frame, so its
+	# size is still zero here.
+	_reflow_depth_panel.call_deferred()
+
+
+func _reflow_depth_panel() -> void:
+	depth_section.position.y = top_left_section.position.y + top_left_section.size.y + PANEL_GAP
+
 
 func _process(delta: float) -> void:
 	_update_prompt()
@@ -116,7 +134,7 @@ func _update_prompt() -> void:
 		prompt_bar.remove_theme_color_override("font_color")
 	elif carried_count > 0:
 		prompt_bar_panel.show()
-		prompt_bar.text = "Carrying %d pearls (%d) — surface at the ship to sell" % [
+		prompt_bar.text = "Carrying %d pearls (%d). Surface at the ship to sell" % [
 			carried_count, carried_value
 		]
 		prompt_bar.add_theme_color_override("font_color", Color(1, 0.88, 0.4))
@@ -205,6 +223,22 @@ func _show_bank_toast(banked: int) -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.chain().tween_interval(1.15)
 	tween.chain().tween_property(bank_toast, "modulate:a", 0.0, 0.45)
+
+
+## Names the item as it fires, so a mid-dive panic press is confirmed on screen
+## rather than only in the slot count.
+func _on_consumable_used(id: StringName, _at: Vector2) -> void:
+	var data := Consumables.get_by_id(id)
+	if data == null:
+		return
+	bank_title.text = data.display_name.to_upper()
+	bank_amount.text = "used"
+	bank_toast.modulate.a = 0.0
+	bank_toast.scale = Vector2.ONE
+	var tween := create_tween()
+	tween.tween_property(bank_toast, "modulate:a", 1.0, 0.1)
+	tween.tween_interval(0.5)
+	tween.tween_property(bank_toast, "modulate:a", 0.0, 0.35)
 
 
 func _refresh_loot() -> void:

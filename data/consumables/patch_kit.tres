@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ConsumableData" format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/ConsumableData.gd" id="1"]
+[ext_resource type="Texture2D" path="res://visuals/items/icons/icon_patch.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"patch_kit"
+display_name = "Patch Kit"
+description = "Binds a wound mid-dive. Restores 45 health."
+cost = 40
+effect = 2
+magnitude = 45.0
+duration = 0.0
+radius = 0.0
+icon = ExtResource("2")
+fx_color = Color(1, 0.5, 0.62, 1)

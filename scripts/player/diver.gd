@@ -28,6 +28,7 @@ var carried_weight: float = 0.0
 var _animator: DiverAnimator
 var _health: HealthComponent
 var _stamina: StaminaComponent
+var _consumables: ConsumableComponent
 var _was_underwater: bool = false
 
 var _aim_dir: Vector2 = Vector2.RIGHT
@@ -50,6 +51,7 @@ func _ready() -> void:
 	_animator = get_node_or_null("AnimatedSprite2D") as DiverAnimator
 	_health = get_node_or_null("HealthComponent") as HealthComponent
 	_stamina = get_node_or_null("StaminaComponent") as StaminaComponent
+	_consumables = get_node_or_null("ConsumableComponent") as ConsumableComponent
 	_was_underwater = global_position.y > 0.0
 
 	if camera != null:
@@ -109,6 +111,15 @@ func _physics_process(delta: float) -> void:
 	if _knock_lock > 0.0:
 		_knock_lock -= delta
 		input_dir = Vector2.ZERO
+
+	# A jet boost deliberately exceeds the speed cap. Without this the very next
+	# move_toward() would haul the impulse back down to max_speed and the boost
+	# would be invisible.
+	if _consumables != null and _consumables.is_boosting():
+		move_and_slide()
+		_update_particles_and_surface()
+		_update_attack(delta)
+		return
 
 	if input_dir != Vector2.ZERO:
 		input_dir = input_dir.normalized()
@@ -185,6 +196,12 @@ func _update_attack(delta: float) -> void:
 			else:
 				slash.frame = clampi(int(played * slash.hframes), 0, slash.hframes - 1)
 				slash.modulate.a = 0.95 * clampf(1.0 - maxf(played - 0.6, 0.0) / 0.4, 0.0, 1.0)
+
+
+## Where the diver is pointing right now — movement input if any, otherwise the
+## sprite's facing. Used by consumables that fire directionally.
+func aim_direction() -> Vector2:
+	return _aim_dir
 
 
 func input_dir_is_zero() -> bool:

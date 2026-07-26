@@ -28,6 +28,12 @@ const CLIPS := {
 	&"upgrade": PACK % "Powerup 1",
 	&"ui_click": PACK % "Switch 1",
 	&"ui_confirm": PACK % "Checkpoint 1",
+	# Consumables
+	&"jet": PACK % "Jump 2",
+	&"air_gain": PACK % "Powerup 2",
+	&"heal": PACK % "Powerup 1",
+	&"blast": PACK % "Box Break 1",
+	&"ballast": PACK % "Footstep 1",
 	# No pack equivalent — keep the generated underwater ones.
 	&"splash": "res://audio/sfx/splash.wav",
 	&"heartbeat": "res://audio/sfx/heartbeat.wav",

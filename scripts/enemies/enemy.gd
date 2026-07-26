@@ -30,6 +30,7 @@ var _glow: PointLight2D
 
 
 func _ready() -> void:
+	add_to_group(&"enemies")
 	_home = global_position
 	if data != null:
 		_apply_data()

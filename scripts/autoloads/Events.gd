@@ -38,6 +38,10 @@ signal carry_weight_changed(current: float, capacity: float)
 signal pearls_banked(amount: int)
 @warning_ignore("unused_signal")
 signal upgrade_purchased(id: StringName)
+@warning_ignore("unused_signal")
+signal consumables_changed
+@warning_ignore("unused_signal")
+signal consumable_used(id: StringName, at: Vector2)
 
 # Combat / vitals
 @warning_ignore("unused_signal")

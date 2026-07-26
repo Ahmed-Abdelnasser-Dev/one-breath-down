@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://di64q3xym1gbk"]
+[gd_scene load_steps=18 format=3 uid="uid://di64q3xym1gbk"]
 
 [ext_resource type="Script" uid="uid://cln6818e7n334" path="res://scripts/player/diver.gd" id="1_5hnfc"]
 [ext_resource type="Texture2D" path="res://visuals/slash/SlashFX SpriteSheet FX 3E_1.png" id="6_slash"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" uid="uid://ck3jjlm7a2atk" path="res://scripts/components/breath_component.gd" id="3_pxx4y"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="4_health"]
 [ext_resource type="Script" path="res://scripts/components/stamina_component.gd" id="5_stamina"]
+[ext_resource type="Script" path="res://scripts/components/consumable_component.gd" id="7_consumable"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_diver"]
 radius = 6.0
@@ -115,6 +116,9 @@ script = ExtResource("4_health")
 
 [node name="StaminaComponent" type="Node" parent="."]
 script = ExtResource("5_stamina")
+
+[node name="ConsumableComponent" type="Node" parent="."]
+script = ExtResource("7_consumable")
 
 [node name="AttackHitbox" type="Area2D" parent="."]
 collision_layer = 0
