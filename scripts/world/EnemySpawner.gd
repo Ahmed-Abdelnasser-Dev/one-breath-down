@@ -10,28 +10,27 @@ class_name EnemySpawner
 ## way overlapping pearls are), and this runs in _physics_process since
 ## everything it reads (diver.global_position) is physics-driven.
 
-const SPAWN_MIN_AHEAD := 400.0
-const SPAWN_MAX_AHEAD := 1400.0
+const SPAWN_MIN_AHEAD := 250.0
+const SPAWN_MAX_AHEAD := 1100.0
 const CULL_ABOVE := 1200.0    ## diver.y - this -> free (behind on the way down)
 const CULL_BELOW := 2200.0    ## diver.y + this -> free (behind on the way back up)
-const MIN_SEPARATION := 180.0
-const MIN_DIVER_CLEAR := 260.0
-const SPAWN_COOLDOWN := 1.2
-const PLACEMENT_TRIES := 8
+const MIN_SEPARATION := 90.0
+const MIN_DIVER_CLEAR := 150.0
+const SPAWN_COOLDOWN := 0.3
+const PLACEMENT_TRIES := 25
 const SEABED_Y := 6400.0
-## 120px was 3.75m — about a diver and a half below the waterline, despite the
-## comment claiming it prevented surface ambushes.
-const MIN_SPAWN_Y := 400.0
-const WALL_MARGIN := 70.0     ## keep spawns off the cave walls
+const MIN_SPAWN_Y := 160.0
+const WALL_MARGIN := 50.0     ## keep spawns off the cave walls
 
 ## The GDD wants the ascent to be the dangerous half of the dive, but spawning
 ## only ever looked *down*: everything appeared below the diver and was culled
 ## 1200px above, so the water you climbed back through was guaranteed empty.
 ## While carrying loot and heading up, some spawns now appear above instead.
 const ASCENT_SPAWN_CHANCE := 0.55
-const SPAWN_MIN_BEHIND := 420.0
-const SPAWN_MAX_BEHIND := 1000.0
-const DEFAULT_CAP := 3        ## used when no ZoneManager is live (e.g. test runner)
+const SPAWN_MIN_BEHIND := 300.0
+const SPAWN_MAX_BEHIND := 900.0
+const DEFAULT_CAP := 12       ## used when no ZoneManager is live (e.g. test runner)
+
 
 @export var enemy_types: Array[EnemyData] = []
 @export var enemies_container_path: NodePath = "../Enemies"
@@ -148,27 +147,25 @@ func _prune_and_cull(diver_y: float) -> void:
 		i -= 1
 
 
-func _pick_type_for_depth(depth_m: int, player_depth_m: int) -> EnemyData:
+func _pick_type_for_depth(depth_m: int, player_depth_m: int = -1) -> EnemyData:
+	if player_depth_m < 0:
+		player_depth_m = depth_m
 	var pool: Array[Dictionary] = []
+
 	var total := 0.0
 	for d in enemy_types:
 		if depth_m < d.min_depth_m or depth_m > d.max_depth_m:
 			continue
 		if d.max_concurrent > 0 and _count_live_of(d.id) >= d.max_concurrent:
 			continue
-			
-		var is_hard := d.max_hp > 50 or d.invulnerable
-		var weight := d.spawn_weight
-		
-		if is_hard:
-			weight *= 0.3
-			weight += player_depth_m * 0.1
-		else:
-			weight *= 2.0
-			weight += player_depth_m * 0.05
-			
+
+		var weight := d.spawn_weight + player_depth_m * 0.1
+		if d.invulnerable:
+			weight *= 0.4
+
 		pool.append({"data": d, "weight": weight})
 		total += weight
+
 
 	if pool.is_empty() or total <= 0.0:
 		return null

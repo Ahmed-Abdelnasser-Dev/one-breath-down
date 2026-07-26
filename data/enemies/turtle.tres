@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dl614tlqq2wmw"]
 
-[ext_resource type="Script" path="res://scripts/resources/EnemyData.gd" id="1"]
-[ext_resource type="SpriteFrames" path="res://visuals/enemies/turtle/turtle_frames.tres" id="2_frames"]
+[ext_resource type="Script" uid="uid://45hby1hdpf5x" path="res://scripts/resources/EnemyData.gd" id="1"]
+[ext_resource type="SpriteFrames" uid="uid://b57erde78dxby" path="res://visuals/enemies/turtle/turtle_frames.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/patroller.tscn" id="3_behavior"]
 
 [resource]
@@ -9,22 +9,17 @@ script = ExtResource("1")
 id = &"turtle"
 display_name = "Turtle"
 behavior_scene = ExtResource("3_behavior")
-max_hp = 90
-contact_damage = 10
+max_hp = 110
+contact_damage = 18
 contact_damage_requires_attack = true
 hit_knockback_speed = 250.0
 stun_on_hit = 0.25
 player_knockback = 140.0
-move_speed = 26.0
-burst_speed = 95.0
+move_speed = 28.0
+burst_speed = 75.0
 accel = 140.0
 patrol_range = 60.0
-detect_radius = 70.0
-min_depth_m = 0
-max_depth_m = 55
-spawn_weight = 100.0
-max_concurrent = 0
+detect_radius = 80.0
+lose_radius = 130.0
+max_depth_m = 30
 frames = ExtResource("2_frames")
-faces_left = true
-sprite_scale = 1.0
-hitbox_radius = 12.0

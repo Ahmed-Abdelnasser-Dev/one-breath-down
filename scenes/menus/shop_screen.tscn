@@ -24,7 +24,7 @@ grow_vertical = 2
 color = Color(0, 0, 0, 0.6)
 
 [node name="Panel" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(360, 210)
+custom_minimum_size = Vector2(390, 225)
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -55,12 +55,13 @@ theme_override_colors/font_color = Color(1, 0.9, 0.6, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 11
-text = "THE MERCHANT"
+text = "SHIP CHANDLER & SHOP"
 
 [node name="MoneyLabel" type="Label" parent="Panel/Margin/VBox/Header"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
-text = "⌾ 0"
+theme_override_font_sizes/font_size = 9
+text = "Coins: 0"
 horizontal_alignment = 2
 
 [node name="HSeparator" type="HSeparator" parent="Panel/Margin/VBox"]
@@ -71,25 +72,44 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="ItemList" type="ItemList" parent="Panel/Margin/VBox/Columns"]
-custom_minimum_size = Vector2(168, 130)
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_font_sizes/font_size = 8
-auto_height = true
-text_overrun_behavior = 0
-
-[node name="Detail" type="VBoxContainer" parent="Panel/Margin/VBox/Columns"]
+[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox/Columns"]
+custom_minimum_size = Vector2(230, 145)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ItemGrid" type="GridContainer" parent="Panel/Margin/VBox/Columns/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 2
+
+[node name="Detail" type="VBoxContainer" parent="Panel/Margin/VBox/Columns"]
+custom_minimum_size = Vector2(136, 0)
+layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 3
 
-[node name="NameLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
+[node name="Header" type="HBoxContainer" parent="Panel/Margin/VBox/Columns/Detail"]
 layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DetailIcon" type="TextureRect" parent="Panel/Margin/VBox/Columns/Detail/Header"]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NameLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
-theme_override_font_sizes/font_size = 10
-text = "—"
+theme_override_font_sizes/font_size = 9
+clip_text = true
+text = "Item Name"
 
 [node name="EffectLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
 layout_mode = 2
@@ -97,16 +117,17 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.8, 0.88, 0.95, 1)
 theme_override_font_sizes/font_size = 8
 autowrap_mode = 3
-text = ""
+text = "Item effect details."
 
 [node name="CostLabel" type="Label" parent="Panel/Margin/VBox/Columns/Detail"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 9
-text = "COST: 0"
+theme_override_font_sizes/font_size = 8
+text = "COST: 0 Coins"
 
 [node name="BuyButton" type="Button" parent="Panel/Margin/VBox/Columns/Detail"]
 layout_mode = 2
-text = "Purchase"
+theme_override_font_sizes/font_size = 9
+text = "Buy Upgrade"
 
 [node name="CloseButton" type="Button" parent="Panel/Margin/VBox"]
 layout_mode = 2

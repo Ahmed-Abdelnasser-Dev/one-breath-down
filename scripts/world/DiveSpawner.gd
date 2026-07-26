@@ -73,7 +73,7 @@ func spawn_column() -> void:
 	_clear_pearls()
 	_cache_references()
 
-	for band_top in range(0, MAX_DEPTH_M, BAND_M):
+	for band_top in range(10, MAX_DEPTH_M, BAND_M):
 		var t := float(band_top) / float(MAX_DEPTH_M)
 		var expected_count := lerpf(2.5, 0.8, t)
 		# randi_range(floor, ceil) has a mean of floor+0.5 regardless of the

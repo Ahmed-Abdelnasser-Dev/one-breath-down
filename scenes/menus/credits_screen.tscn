@@ -1,7 +1,26 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/menus/credits_screen.gd" id="1_script"]
-[ext_resource type="Theme" path="res://theme/menu_theme.tres" id="2_theme"]
+[ext_resource type="Theme" uid="uid://prunik7k8003" path="res://theme/menu_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/brand_corner.tscn" id="3_brand"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_page"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.055, 0.09, 0.135, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.24, 0.35, 0.46, 1)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 4
 
 [node name="CreditsScreen" type="Control"]
 process_mode = 3
@@ -21,55 +40,105 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.02, 0.04, 0.08, 0.88)
+color = Color(0.015, 0.03, 0.06, 0.92)
 
-[node name="Panel" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(260, 0)
+[node name="Page" type="PanelContainer" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_page")
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
+[node name="Margin" type="MarginContainer" parent="Page"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 7
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 7
 
-[node name="VBox" type="VBoxContainer" parent="Panel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Page/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
-[node name="TitleLabel" type="Label" parent="Panel/Margin/VBox"]
+[node name="HeaderRow" type="HBoxContainer" parent="Page/Margin/VBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.9, 0.6, 1)
-theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="Page/Margin/VBox/HeaderRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(1, 0.87, 0.5, 1)
+theme_override_colors/font_outline_color = Color(0.04, 0.07, 0.11, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 11
+theme_override_font_sizes/font_size = 13
 text = "CREDITS"
-horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="Panel/Margin/VBox"]
-layout_mode = 2
-
-[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/VBox"]
-custom_minimum_size = Vector2(240, 120)
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="CreditsLabel" type="RichTextLabel" parent="Panel/Margin/VBox/Scroll"]
+[node name="HeaderSpacer" type="Control" parent="Page/Margin/VBox/HeaderRow"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="GameLabel" type="Label" parent="Page/Margin/VBox/HeaderRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.55, 0.68, 0.79, 1)
+theme_override_font_sizes/font_size = 8
+text = "ONE BREATH DOWN"
+horizontal_alignment = 2
+
+[node name="HeaderRule" type="HSeparator" parent="Page/Margin/VBox"]
+layout_mode = 2
+
+[node name="Scroll" type="ScrollContainer" parent="Page/Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ScrollMargin" type="MarginContainer" parent="Page/Margin/VBox/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_right = 8
+
+[node name="CreditsLabel" type="RichTextLabel" parent="Page/Margin/VBox/Scroll/ScrollMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/line_separation = 1
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
 
-[node name="BackButton" type="Button" parent="Panel/Margin/VBox"]
+[node name="StatusLabel" type="Label" parent="Page/Margin/VBox"]
+custom_minimum_size = Vector2(0, 9)
 layout_mode = 2
-size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.48, 0.6, 0.7, 1)
+theme_override_font_sizes/font_size = 8
+text = "Click a highlighted name to open it in your browser"
+text_overrun_behavior = 3
+
+[node name="FooterRow" type="HBoxContainer" parent="Page/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="BrandCorner" parent="Page/Margin/VBox/FooterRow" instance=ExtResource("3_brand")]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="FooterSpacer" type="Control" parent="Page/Margin/VBox/FooterRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FooterRight" type="VBoxContainer" parent="Page/Margin/VBox/FooterRow"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_constants/separation = 4
+alignment = 2
+
+[node name="BackButton" type="Button" parent="Page/Margin/VBox/FooterRow/FooterRight"]
+layout_mode = 2
+size_flags_horizontal = 8
 text = "Back"

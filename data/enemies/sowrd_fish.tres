@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://7ldterg1hj8o"]
 
-[ext_resource type="Script" path="res://scripts/resources/EnemyData.gd" id="1"]
-[ext_resource type="SpriteFrames" path="res://visuals/enemies/sowrd-fish/sowrd_fish_frames.tres" id="2_frames"]
+[ext_resource type="Script" uid="uid://45hby1hdpf5x" path="res://scripts/resources/EnemyData.gd" id="1"]
+[ext_resource type="SpriteFrames" uid="uid://dvif4fbojlgjr" path="res://visuals/enemies/sowrd-fish/sowrd_fish_frames.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/charger.tscn" id="3_behavior"]
 
 [resource]
@@ -9,26 +9,19 @@ script = ExtResource("1")
 id = &"sowrd_fish"
 display_name = "Swordfish"
 behavior_scene = ExtResource("3_behavior")
-max_hp = 50
-contact_damage = 14
+max_hp = 80
+contact_damage = 22
 contact_damage_requires_attack = true
 hit_knockback_speed = 380.0
-stun_on_hit = 0.35
 player_knockback = 160.0
 move_speed = 30.0
-burst_speed = 300.0
-accel = 900.0
-detect_radius = 150.0
-attack_radius = 150.0
-lose_radius = 240.0
-telegraph_time = 0.55
-attack_time = 0.5
+burst_speed = 210.0
+accel = 600.0
+detect_radius = 125.0
+attack_radius = 125.0
+lose_radius = 180.0
+telegraph_time = 0.45
 recover_time = 1.1
-min_depth_m = 50
-max_depth_m = 150
-spawn_weight = 100.0
-max_concurrent = 0
+min_depth_m = 90
+max_depth_m = 130
 frames = ExtResource("2_frames")
-faces_left = false
-sprite_scale = 1.0
-hitbox_radius = 12.0

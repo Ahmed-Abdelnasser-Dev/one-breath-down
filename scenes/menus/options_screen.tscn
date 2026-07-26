@@ -84,16 +84,7 @@ text = "Resolution"
 [node name="OptionButton" type="OptionButton" parent="Panel/Margin/VBox/ResolutionRow"]
 layout_mode = 2
 
-[node name="VsyncRow" type="HBoxContainer" parent="Panel/Margin/VBox"]
-layout_mode = 2
 
-[node name="Label" type="Label" parent="Panel/Margin/VBox/VsyncRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "VSync"
-
-[node name="CheckButton" type="CheckButton" parent="Panel/Margin/VBox/VsyncRow"]
-layout_mode = 2
 
 [node name="HSeparator1" type="HSeparator" parent="Panel/Margin/VBox"]
 layout_mode = 2

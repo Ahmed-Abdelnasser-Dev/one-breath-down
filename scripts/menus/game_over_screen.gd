@@ -26,6 +26,8 @@ func _ready() -> void:
 
 	Events.player_died.connect(_on_player_died)
 	new_run_button.pressed.connect(_on_new_run_pressed)
+	# A browser tab can't quit itself, so the button would be dead on web.
+	exit_button.visible = not OS.has_feature("web")
 	exit_button.pressed.connect(func() -> void: get_tree().quit())
 
 

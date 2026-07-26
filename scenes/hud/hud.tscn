@@ -1,11 +1,11 @@
-[gd_scene load_steps=11 format=3 uid="uid://dvnx1l5gxox82"]
+[gd_scene format=3 uid="uid://dvnx1l5gxox82"]
 
 [ext_resource type="Script" uid="uid://dvfrawbyxn2y" path="res://scripts/ui/hud.gd" id="1_48c2t"]
-[ext_resource type="Script" path="res://scripts/ui/ConsumableBar.gd" id="30_consumablebar"]
 [ext_resource type="Theme" uid="uid://prunik7k8003" path="res://theme/menu_theme.tres" id="4_theme"]
-[ext_resource type="AtlasTexture" path="res://visuals/hud/icon_money.tres" id="5_money"]
-[ext_resource type="AtlasTexture" path="res://visuals/hud/icon_weight.tres" id="6_weight"]
-[ext_resource type="AtlasTexture" path="res://visuals/hud/icon_pearl.tres" id="7_pearl"]
+[ext_resource type="Texture2D" path="res://visuals/hud/icon_money.tres" id="5_money"]
+[ext_resource type="Texture2D" path="res://visuals/hud/icon_weight.tres" id="6_weight"]
+[ext_resource type="Texture2D" path="res://visuals/hud/icon_pearl.tres" id="7_pearl"]
+[ext_resource type="Script" uid="uid://bat8irhq056l8" path="res://scripts/ui/ConsumableBar.gd" id="30_consumablebar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hud_panel"]
 content_margin_left = 8.0
@@ -62,38 +62,33 @@ corner_radius_top_right = 1
 corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 
-[node name="Hud" type="CanvasLayer"]
+[node name="Hud" type="CanvasLayer" unique_id=724474713]
 layer = 10
 script = ExtResource("1_48c2t")
 
-[node name="TopLeftSection" type="PanelContainer" parent="."]
-theme = ExtResource("4_theme")
-theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
-layout_mode = 3
-anchors_preset = 0
+[node name="TopLeftSection" type="PanelContainer" parent="." unique_id=896882408]
 offset_left = 8.0
 offset_top = 8.0
-grow_horizontal = 1
-grow_vertical = 1
+theme = ExtResource("4_theme")
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TopLeftSection"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TopLeftSection" unique_id=1858071131]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="BreathRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
+[node name="BreathRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer" unique_id=1814375589]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="BreathText" type="Label" parent="TopLeftSection/VBoxContainer/BreathRow"]
+[node name="BreathText" type="Label" parent="TopLeftSection/VBoxContainer/BreathRow" unique_id=1648810890]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.4, 0.85, 0.95, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "AIR"
 
-[node name="BreathBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/BreathRow"]
+[node name="BreathBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/BreathRow" unique_id=1965847736]
 custom_minimum_size = Vector2(54, 8)
 layout_mode = 2
 size_flags_vertical = 4
@@ -101,30 +96,28 @@ theme_override_styles/background = SubResource("StyleBoxFlat_breath_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_breath_fill")
 show_percentage = false
 
-[node name="BreathCounterText" type="Label" parent="TopLeftSection/VBoxContainer/BreathRow"]
+[node name="BreathCounterText" type="Label" parent="TopLeftSection/VBoxContainer/BreathRow" unique_id=714917728]
 custom_minimum_size = Vector2(26, 0)
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0.04, 0.06, 0.1, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "0:00"
 
-[node name="HealthRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
+[node name="HealthRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer" unique_id=1988974884]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="HealthText" type="Label" parent="TopLeftSection/VBoxContainer/HealthRow"]
+[node name="HealthText" type="Label" parent="TopLeftSection/VBoxContainer/HealthRow" unique_id=362309788]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.95, 0.4, 0.42, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "HP"
 
-[node name="HealthBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/HealthRow"]
+[node name="HealthBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/HealthRow" unique_id=1449335772]
 custom_minimum_size = Vector2(54, 8)
 layout_mode = 2
 size_flags_vertical = 4
@@ -132,20 +125,19 @@ theme_override_styles/background = SubResource("StyleBoxFlat_breath_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_health_fill")
 show_percentage = false
 
-[node name="StaminaRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
+[node name="StaminaRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer" unique_id=151264793]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="StaminaText" type="Label" parent="TopLeftSection/VBoxContainer/StaminaRow"]
+[node name="StaminaText" type="Label" parent="TopLeftSection/VBoxContainer/StaminaRow" unique_id=94719716]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.55, 0.9, 0.5, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "STA"
 
-[node name="StaminaBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/StaminaRow"]
+[node name="StaminaBar" type="ProgressBar" parent="TopLeftSection/VBoxContainer/StaminaRow" unique_id=1066766995]
 custom_minimum_size = Vector2(54, 8)
 layout_mode = 2
 size_flags_vertical = 4
@@ -153,115 +145,105 @@ theme_override_styles/background = SubResource("StyleBoxFlat_breath_bg")
 theme_override_styles/fill = SubResource("StyleBoxFlat_stamina_fill")
 show_percentage = false
 
-[node name="StatusSubRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer"]
+[node name="StatusSubRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer" unique_id=1047414184]
 layout_mode = 2
 theme_override_constants/separation = 11
 
-[node name="MoneyRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow"]
+[node name="MoneyRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow" unique_id=1278482613]
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="MoneyIcon" type="TextureRect" parent="TopLeftSection/VBoxContainer/StatusSubRow/MoneyRow"]
+[node name="MoneyIcon" type="TextureRect" parent="TopLeftSection/VBoxContainer/StatusSubRow/MoneyRow" unique_id=1617719625]
+texture_filter = 1
 custom_minimum_size = Vector2(9, 9)
 layout_mode = 2
 size_flags_vertical = 4
-texture_filter = 1
 texture = ExtResource("5_money")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="MoneyText" type="Label" parent="TopLeftSection/VBoxContainer/StatusSubRow/MoneyRow"]
+[node name="MoneyText" type="Label" parent="TopLeftSection/VBoxContainer/StatusSubRow/MoneyRow" unique_id=150857075]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
 theme_override_font_sizes/font_size = 8
 text = "0"
 
-[node name="WeightRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow"]
+[node name="WeightRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow" unique_id=1195233598]
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="WeightIcon" type="TextureRect" parent="TopLeftSection/VBoxContainer/StatusSubRow/WeightRow"]
+[node name="WeightIcon" type="TextureRect" parent="TopLeftSection/VBoxContainer/StatusSubRow/WeightRow" unique_id=937365508]
+texture_filter = 1
 custom_minimum_size = Vector2(9, 9)
 layout_mode = 2
 size_flags_vertical = 4
-texture_filter = 1
 texture = ExtResource("6_weight")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="WeightText" type="Label" parent="TopLeftSection/VBoxContainer/StatusSubRow/WeightRow"]
+[node name="WeightText" type="Label" parent="TopLeftSection/VBoxContainer/StatusSubRow/WeightRow" unique_id=1286487458]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.75, 0.85, 0.95, 1)
 theme_override_font_sizes/font_size = 8
 text = "0.00 kg"
 
-[node name="BestRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow"]
+[node name="BestRow" type="HBoxContainer" parent="TopLeftSection/VBoxContainer/StatusSubRow" unique_id=1121988008]
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="BestDepthText" type="Label" parent="TopLeftSection/VBoxContainer/StatusSubRow/BestRow"]
+[node name="BestDepthText" type="Label" parent="TopLeftSection/VBoxContainer/StatusSubRow/BestRow" unique_id=1086180772]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 0.85, 0.35, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "BEST: 0m"
 
-[node name="DepthSection" type="PanelContainer" parent="."]
-theme = ExtResource("4_theme")
-theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
-layout_mode = 3
-anchors_preset = 0
+[node name="DepthSection" type="PanelContainer" parent="." unique_id=1884680982]
 offset_left = 8.0
 offset_top = 74.0
-grow_horizontal = 1
-grow_vertical = 1
+theme = ExtResource("4_theme")
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
 
-[node name="DepthText" type="Label" parent="DepthSection"]
+[node name="DepthText" type="Label" parent="DepthSection" unique_id=854840199]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.4, 0.88, 0.95, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
 theme_override_font_sizes/font_size = 8
 text = "DEPTH: 0 m"
 
-[node name="TopRightSection" type="PanelContainer" parent="."]
-theme = ExtResource("4_theme")
-theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
-layout_mode = 3
+[node name="TopRightSection" type="PanelContainer" parent="." unique_id=705705599]
+anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -8.0
 offset_top = 8.0
 offset_right = -8.0
 grow_horizontal = 0
-grow_vertical = 1
+theme = ExtResource("4_theme")
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="TopRightSection"]
+[node name="VBoxContainer" type="VBoxContainer" parent="TopRightSection" unique_id=297470687]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="LootHeaderRow" type="HBoxContainer" parent="TopRightSection/VBoxContainer"]
+[node name="LootHeaderRow" type="HBoxContainer" parent="TopRightSection/VBoxContainer" unique_id=1024162580]
 layout_mode = 2
 size_flags_horizontal = 8
 theme_override_constants/separation = 3
 
-[node name="PearlIcon" type="TextureRect" parent="TopRightSection/VBoxContainer/LootHeaderRow"]
+[node name="PearlIcon" type="TextureRect" parent="TopRightSection/VBoxContainer/LootHeaderRow" unique_id=1051905226]
+texture_filter = 1
 custom_minimum_size = Vector2(9, 9)
 layout_mode = 2
 size_flags_vertical = 4
-texture_filter = 1
 texture = ExtResource("7_pearl")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LootHeader" type="Label" parent="TopRightSection/VBoxContainer/LootHeaderRow"]
+[node name="LootHeader" type="Label" parent="TopRightSection/VBoxContainer/LootHeaderRow" unique_id=1382503815]
 layout_mode = 2
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
 theme_override_constants/outline_size = 2
@@ -269,21 +251,21 @@ theme_override_font_sizes/font_size = 8
 text = "LOOT"
 horizontal_alignment = 2
 
-[node name="LootText" type="Label" parent="TopRightSection/VBoxContainer"]
+[node name="LootText" type="Label" parent="TopRightSection/VBoxContainer" unique_id=1902561727]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.93, 0.96, 1)
 theme_override_font_sizes/font_size = 8
 text = "Pearls x0"
 horizontal_alignment = 2
 
-[node name="ValueText" type="Label" parent="TopRightSection/VBoxContainer"]
+[node name="ValueText" type="Label" parent="TopRightSection/VBoxContainer" unique_id=35968525]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
 theme_override_font_sizes/font_size = 8
 text = "0"
 horizontal_alignment = 2
 
-[node name="StrainText" type="Label" parent="TopRightSection/VBoxContainer"]
+[node name="StrainText" type="Label" parent="TopRightSection/VBoxContainer" unique_id=2016619502]
 visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.4, 0.2, 1)
@@ -293,7 +275,7 @@ theme_override_font_sizes/font_size = 8
 text = "OVERBURDENED"
 horizontal_alignment = 2
 
-[node name="BankToast" type="VBoxContainer" parent="."]
+[node name="BankToast" type="VBoxContainer" parent="." unique_id=217027131]
 modulate = Color(1, 1, 1, 0)
 anchors_preset = 8
 anchor_left = 0.5
@@ -308,7 +290,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 4
 
-[node name="BankTitle" type="Label" parent="BankToast"]
+[node name="BankTitle" type="Label" parent="BankToast" unique_id=1955410743]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
@@ -317,7 +299,7 @@ theme_override_font_sizes/font_size = 10
 text = "CATCH SOLD"
 horizontal_alignment = 1
 
-[node name="BankAmount" type="Label" parent="BankToast"]
+[node name="BankAmount" type="Label" parent="BankToast" unique_id=575180289]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 1, 0.8, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
@@ -326,21 +308,22 @@ theme_override_font_sizes/font_size = 8
 text = "+0"
 horizontal_alignment = 1
 
-[node name="ConsumableBar" type="HBoxContainer" parent="."]
+[node name="ConsumableSection" type="PanelContainer" parent="." unique_id=1350518294]
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = -46.0
-offset_right = 100.0
-offset_bottom = -26.0
+offset_left = 8.0
+offset_top = -19.0
+offset_right = 24.0
 grow_vertical = 0
-script = ExtResource("30_consumablebar")
-
-[node name="PromptBarPanel" type="PanelContainer" parent="."]
 theme = ExtResource("4_theme")
 theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
-layout_mode = 3
+
+[node name="ConsumableBar" type="HBoxContainer" parent="ConsumableSection" unique_id=617017902]
+layout_mode = 2
+script = ExtResource("30_consumablebar")
+
+[node name="PromptBarPanel" type="PanelContainer" parent="." unique_id=384934874]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -350,10 +333,12 @@ offset_top = -10.0
 offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
+theme = ExtResource("4_theme")
+theme_override_styles/panel = SubResource("StyleBoxFlat_hud_panel")
 
-[node name="PromptBar" type="Label" parent="PromptBarPanel"]
+[node name="PromptBar" type="Label" parent="PromptBarPanel" unique_id=1986746817]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.97, 0.93, 0.84, 1)
 theme_override_font_sizes/font_size = 8
-horizontal_alignment = 1
 text = "[F] Shop    [I] Inventory"
+horizontal_alignment = 1

@@ -1,114 +1,217 @@
 extends Control
-## Loadout screen. Two jobs: show what the passive upgrades are doing, and let
-## the player assign bought consumables to the X and C slots.
-##
-## This screen was previously read-only and advertised gear that didn't exist.
-## The consumable rows are the reason it has a purpose now: buying puts an item
-## in your stock, and this is where you decide which two kinds you dive with.
+## Inventory & Loadout screen. Allows equipping bought consumables into dive slots X and C,
+## displaying consumables in a 2-column icon grid, and presenting a clean diver stats summary.
 
 signal closed
 
-## prefix -> display name, plus the per-level effect summary. Mirrors the real
-## upgrade families in shop_screen.gd's CATALOG so it can't advertise
-## unimplemented gear.
-const ITEMS: Array[Dictionary] = [
-	{"prefix": "lungs_", "name": "Lungs", "levels": ["50s breath", "75s breath", "100s breath"]},
-	{"prefix": "fins_", "name": "Fins", "levels": ["base speed", "+20% speed, less air", "+40% speed, least air"]},
-	{"prefix": "basket_", "name": "Basket", "levels": ["3.0kg carry", "4.5kg carry", "6.0kg carry"]},
-	{"prefix": "lantern_", "name": "Lantern", "levels": ["no lamp, midnight is blind", "bright lamp"]},
-	{"prefix": "wetsuit_", "name": "Wetsuit", "levels": ["100 health", "130 health", "160 health"]},
-	{"prefix": "vigor_", "name": "Vigor", "levels": ["100 stamina", "130 stamina", "160 stamina"]},
-]
-
 @onready var run_manager: RunManager = get_parent().get_parent()
 @onready var carry_weight_label: Label = $Panel/Margin/VBox/Header/CarryWeightLabel
-@onready var items_list: VBoxContainer = $Panel/Margin/VBox/ItemsList
-@onready var loadout_label: Label = $Panel/Margin/VBox/LoadoutLabel
+
+@onready var slot1_key_lbl: Label = $Panel/Margin/VBox/EquippedRow/Slot1Panel/Slot1HBox/Slot1Key
+@onready var slot1_icon: TextureRect = $Panel/Margin/VBox/EquippedRow/Slot1Panel/Slot1HBox/Slot1Icon
+@onready var slot1_lbl: Label = $Panel/Margin/VBox/EquippedRow/Slot1Panel/Slot1HBox/Slot1Label
+@onready var slot1_clear_btn: Button = $Panel/Margin/VBox/EquippedRow/Slot1Panel/Slot1HBox/Slot1UnequipBtn
+
+@onready var slot2_key_lbl: Label = $Panel/Margin/VBox/EquippedRow/Slot2Panel/Slot2HBox/Slot2Key
+@onready var slot2_icon: TextureRect = $Panel/Margin/VBox/EquippedRow/Slot2Panel/Slot2HBox/Slot2Icon
+@onready var slot2_lbl: Label = $Panel/Margin/VBox/EquippedRow/Slot2Panel/Slot2HBox/Slot2Label
+@onready var slot2_clear_btn: Button = $Panel/Margin/VBox/EquippedRow/Slot2Panel/Slot2HBox/Slot2UnequipBtn
+
+@onready var item_grid: GridContainer = $Panel/Margin/VBox/Columns/Scroll/ItemGrid
+@onready var detail_icon: TextureRect = $Panel/Margin/VBox/Columns/Detail/Header/DetailIcon
+@onready var detail_name: Label = $Panel/Margin/VBox/Columns/Detail/Header/NameLabel
+@onready var detail_desc: Label = $Panel/Margin/VBox/Columns/Detail/DescriptionLabel
+@onready var detail_stock: Label = $Panel/Margin/VBox/Columns/Detail/StockLabel
+@onready var equip_slot1_btn: Button = $Panel/Margin/VBox/Columns/Detail/EquipSlot1Btn
+@onready var equip_slot2_btn: Button = $Panel/Margin/VBox/Columns/Detail/EquipSlot2Btn
+
+@onready var stats_summary_label: Label = $Panel/Margin/VBox/StatsSummaryLabel
 @onready var close_button: Button = $Panel/Margin/VBox/CloseButton
 
-var _rows: Array[Dictionary] = []
-var _consumable_rows: Array[Dictionary] = []
-var _slot_labels: Array[Label] = []
+var _selected_index: int = 0
+var _consumables: Array[ConsumableData] = []
+var _grid_buttons: Array[Button] = []
 
 
 func _ready() -> void:
-	for item in ITEMS:
-		var built := _build_row(item)
-		items_list.add_child(built["row"])
-		_rows.append({"prefix": item["prefix"], "item": item,
-			"check": built["check"], "note": built["note"]})
-
-	_build_consumable_section()
 	close_button.pressed.connect(func() -> void: closed.emit())
+	slot1_clear_btn.pressed.connect(func() -> void: GameState.clear_slot(0))
+	slot2_clear_btn.pressed.connect(func() -> void: GameState.clear_slot(1))
+	equip_slot1_btn.pressed.connect(func() -> void: _equip_selected(0))
+	equip_slot2_btn.pressed.connect(func() -> void: _equip_selected(1))
+
 	Events.consumables_changed.connect(_refresh)
 
 
 func focus_default() -> void:
 	_refresh()
-	close_button.grab_focus()
-
-
-## Divider plus one row per consumable: icon, name, stock, and two buttons that
-## bind it to a slot. Buttons rather than a drag interaction because this has to
-## work on the keyboard.
-func _build_consumable_section() -> void:
-	var sep := HSeparator.new()
-	items_list.add_child(sep)
-
-	var header := Label.new()
-	header.text = "CONSUMABLES   (two kinds max, three charges each)"
-	header.add_theme_font_size_override("font_size", 8)
-	header.add_theme_color_override("font_color", Color(1, 0.88, 0.4))
-	items_list.add_child(header)
-
-	for c in Consumables.all():
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 4)
-
-		var icon := TextureRect.new()
-		icon.texture = c.icon
-		icon.custom_minimum_size = Vector2(12, 12)
-		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		row.add_child(icon)
-
-		var name_label := Label.new()
-		name_label.text = c.display_name
-		name_label.custom_minimum_size = Vector2(84, 0)
-		name_label.add_theme_font_size_override("font_size", 8)
-		row.add_child(name_label)
-
-		var stock := Label.new()
-		stock.custom_minimum_size = Vector2(26, 0)
-		stock.add_theme_font_size_override("font_size", 8)
-		row.add_child(stock)
-
-		var slot_buttons: Array[Button] = []
-		for slot in GameState.CONSUMABLE_SLOTS:
-			var b := Button.new()
-			b.text = _slot_key(slot)
-			b.custom_minimum_size = Vector2(18, 0)
-			b.add_theme_font_size_override("font_size", 8)
-			var id := c.id
-			var s := slot
-			b.pressed.connect(func() -> void: _on_slot_pressed(s, id))
-			row.add_child(b)
-			slot_buttons.append(b)
-
-		items_list.add_child(row)
-		_consumable_rows.append({"data": c, "stock": stock, "buttons": slot_buttons,
-			"name": name_label})
-
-
-## Pressing the slot button of an already-equipped item unequips it, so one
-## button does both and nothing needs a separate "clear" control.
-func _on_slot_pressed(slot: int, id: StringName) -> void:
-	if GameState.equipped[slot] == id:
-		GameState.clear_slot(slot)
+	if not _grid_buttons.is_empty():
+		_grid_buttons[clampi(_selected_index, 0, _grid_buttons.size() - 1)].grab_focus()
 	else:
-		GameState.equip_consumable(slot, id)
-	_refresh()
+		close_button.grab_focus()
+
+
+func _refresh() -> void:
+	var key1 := _slot_key(0)
+	var key2 := _slot_key(1)
+	slot1_key_lbl.text = "[%s]" % key1
+	slot2_key_lbl.text = "[%s]" % key2
+
+	equip_slot1_btn.text = "Equip [%s]" % key1
+	equip_slot2_btn.text = "Equip [%s]" % key2
+
+	# Carry weight
+	if run_manager != null and run_manager.diver != null:
+		carry_weight_label.text = "Carry %.2f / %.1f kg" % [
+			run_manager.diver.carried_weight, GameState.weight_capacity
+		]
+	else:
+		carry_weight_label.text = "Capacity: %.1f kg" % GameState.weight_capacity
+
+	# Equipped slots status
+	_update_equipped_slot_ui(0, slot1_icon, slot1_lbl, slot1_clear_btn)
+	_update_equipped_slot_ui(1, slot2_icon, slot2_lbl, slot2_clear_btn)
+
+	# Grid refresh
+	_consumables = Consumables.all()
+	_grid_buttons.clear()
+
+	for child in item_grid.get_children():
+		child.queue_free()
+
+	for i in _consumables.size():
+		var c := _consumables[i]
+		var btn := _create_grid_button(i, c)
+		item_grid.add_child(btn)
+		_grid_buttons.append(btn)
+
+	if not _consumables.is_empty():
+		_selected_index = clampi(_selected_index, 0, _consumables.size() - 1)
+		_select_consumable(_selected_index)
+
+	# Diver stats summary
+	_update_stats_summary()
+
+
+func _update_equipped_slot_ui(slot_idx: int, icon_rect: TextureRect, label: Label, clear_btn: Button) -> void:
+	var id: StringName = GameState.equipped[slot_idx]
+	var data := Consumables.get_by_id(id) if id != &"" else null
+	if data != null:
+		icon_rect.texture = data.icon
+		var count := GameState.consumable_count(id)
+		label.text = "%s (x%d)" % [data.display_name, count]
+		clear_btn.disabled = false
+	else:
+		icon_rect.texture = null
+		label.text = "Empty"
+		clear_btn.disabled = true
+
+
+func _create_grid_button(index: int, c: ConsumableData) -> Button:
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(102, 38)
+	btn.focus_mode = Control.FOCUS_ALL
+	btn.clip_text = true
+
+	var margin := MarginContainer.new()
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	margin.add_theme_constant_override("margin_left", 3)
+	margin.add_theme_constant_override("margin_top", 2)
+	margin.add_theme_constant_override("margin_right", 3)
+	margin.add_theme_constant_override("margin_bottom", 2)
+	btn.add_child(margin)
+
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 4)
+	margin.add_child(hbox)
+
+	var icon_rect := TextureRect.new()
+	icon_rect.texture = c.icon
+	icon_rect.custom_minimum_size = Vector2(16, 16)
+	icon_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	icon_rect.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon_rect.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	hbox.add_child(icon_rect)
+
+	var vbox := VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	vbox.add_theme_constant_override("separation", 0)
+	hbox.add_child(vbox)
+
+	var name_lbl := Label.new()
+	name_lbl.text = c.display_name
+	name_lbl.add_theme_font_size_override("font_size", 8)
+	name_lbl.clip_text = true
+	vbox.add_child(name_lbl)
+
+	var count := GameState.consumable_count(c.id)
+	var count_lbl := Label.new()
+	count_lbl.text = "Stock: %d" % count
+	count_lbl.add_theme_font_size_override("font_size", 7)
+	count_lbl.clip_text = true
+	vbox.add_child(count_lbl)
+
+	var is_equipped: bool = GameState.equipped.has(c.id)
+	if is_equipped:
+		btn.modulate = Color(0.45, 1.0, 0.55)
+		count_lbl.add_theme_color_override("font_color", Color(0.45, 1.0, 0.55))
+	elif count <= 0:
+		btn.modulate = Color(0.6, 0.6, 0.6, 0.7)
+		count_lbl.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6))
+	else:
+		count_lbl.add_theme_color_override("font_color", Color(1, 0.88, 0.4))
+
+	btn.pressed.connect(func() -> void: _select_consumable(index))
+	btn.focus_entered.connect(func() -> void: _select_consumable(index))
+	return btn
+
+
+func _select_consumable(index: int) -> void:
+	_selected_index = index
+	if index < 0 or index >= _consumables.size():
+		return
+	var c := _consumables[index]
+	detail_icon.texture = c.icon
+	detail_name.text = c.display_name
+	detail_desc.text = c.description
+	var count := GameState.consumable_count(c.id)
+	detail_stock.text = "Stock: %d / %d" % [count, GameState.MAX_PER_KIND]
+
+	var can_equip := count > 0
+	equip_slot1_btn.disabled = not can_equip
+	equip_slot2_btn.disabled = not can_equip
+
+
+func _equip_selected(slot: int) -> void:
+	if _selected_index < 0 or _selected_index >= _consumables.size():
+		return
+	var c := _consumables[_selected_index]
+	if GameState.consumable_count(c.id) > 0:
+		GameState.equip_consumable(slot, c.id)
+		_refresh()
+
+
+func _update_stats_summary() -> void:
+	var breath_cap := 50
+	var lungs_lvl := GameState.get_upgrade_level("lungs_")
+	if lungs_lvl == 1: breath_cap = 75
+	elif lungs_lvl >= 2: breath_cap = 100
+
+	var has_lamp := GameState.has_upgrade(&"lantern_1")
+	var lamp_str := "Lamp: YES" if has_lamp else "Lamp: NO"
+
+	var hp := 100 + (30 if GameState.has_upgrade(&"wetsuit_1") else 0) + (30 if GameState.has_upgrade(&"wetsuit_2") else 0)
+	var sta := 100 + (30 if GameState.has_upgrade(&"vigor_1") else 0) + (30 if GameState.has_upgrade(&"vigor_2") else 0)
+
+	var speed_ms := 4.0
+	if run_manager != null and run_manager.diver != null:
+		speed_ms = run_manager.diver.max_speed / GameState.PIXELS_PER_METRE
+
+	stats_summary_label.text = "KIT STATS: Breath %ds  |  Swim %.1f m/s  |  HP %d  |  Sta %d  |  Carry %.1fkg  |  %s" % [
+		breath_cap, speed_ms, hp, sta, GameState.weight_capacity, lamp_str
+	]
 
 
 func _slot_key(slot: int) -> String:
@@ -117,63 +220,3 @@ func _slot_key(slot: int) -> String:
 		if event is InputEventKey:
 			return (event as InputEventKey).as_text_physical_keycode()
 	return str(slot + 1)
-
-
-func _refresh() -> void:
-	carry_weight_label.text = "Carry %.2f / %.1f kg" % [
-		run_manager.diver.carried_weight, GameState.weight_capacity
-	]
-
-	for entry in _rows:
-		var level: int = GameState.get_upgrade_level(entry["prefix"])
-		if entry["prefix"] == "lantern_":
-			level = 1 if GameState.has_upgrade(&"lantern_1") else 0
-		var levels: Array = entry["item"]["levels"]
-		var idx: int = clampi(level, 0, levels.size() - 1)
-		var check: CheckButton = entry["check"]
-		var note: Label = entry["note"]
-		check.button_pressed = level > 0
-		note.text = "> " + str(levels[idx])
-		note.modulate = Color(1, 1, 1) if level > 0 else Color(0.55, 0.6, 0.68)
-
-	for row in _consumable_rows:
-		var c := row["data"] as ConsumableData
-		var held := GameState.consumable_count(c.id)
-		var stock_label := row["stock"] as Label
-		stock_label.text = "x%d" % held
-		stock_label.modulate = Color(1, 1, 1) if held > 0 else Color(0.5, 0.55, 0.62)
-		(row["name"] as Label).modulate = Color(1, 1, 1) if held > 0 else Color(0.55, 0.6, 0.68)
-		var buttons: Array = row["buttons"]
-		for slot in buttons.size():
-			var b := buttons[slot] as Button
-			var mine: bool = GameState.equipped[slot] == c.id
-			b.disabled = held <= 0 and not mine
-			b.modulate = Color(0.45, 1.0, 0.55) if mine else Color.WHITE
-
-	var speed_ms := run_manager.diver.max_speed / GameState.PIXELS_PER_METRE
-	loadout_label.text = "Breath %ds     Swim %.1f m/s     Slots: %s" % [
-		int(run_manager.breath.max_breath), speed_ms, _slot_summary()
-	]
-
-
-func _slot_summary() -> String:
-	var parts: PackedStringArray = []
-	for slot in GameState.CONSUMABLE_SLOTS:
-		var id: StringName = GameState.equipped[slot]
-		var c := Consumables.get_by_id(id) if id != &"" else null
-		parts.append("%s=%s" % [_slot_key(slot), c.display_name if c else "empty"])
-	return "  ".join(parts)
-
-
-func _build_row(item: Dictionary) -> Dictionary:
-	var row := HBoxContainer.new()
-	var check := CheckButton.new()
-	check.disabled = true
-	row.add_child(check)
-	var name_label := Label.new()
-	name_label.text = item["name"]
-	name_label.custom_minimum_size = Vector2(62, 0)
-	row.add_child(name_label)
-	var note_label := Label.new()
-	row.add_child(note_label)
-	return {"row": row, "check": check, "note": note_label}

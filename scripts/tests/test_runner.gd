@@ -12,6 +12,7 @@ func _ready() -> void:
 	failures += _test_report_depth()
 	failures += _test_enemy_band_selection()
 	failures += _test_health_and_stamina()
+	failures += _test_prop_spawner()
 
 	if failures == 0:
 		print("SUCCESS: All unit tests passed cleanly!")
@@ -156,8 +157,8 @@ func _test_enemy_band_selection() -> int:
 	print("[Test] EnemySpawner Depth-Band Selection")
 	var fails := 0
 
-	var shallow: EnemyData = load("res://data/enemies/turtle.tres")     # band 0-55m
-	var deep: EnemyData = load("res://data/enemies/octopus.tres")      # band 140-200m
+	var shallow: EnemyData = load("res://data/enemies/turtle.tres")     # band 0-30m
+	var deep: EnemyData = load("res://data/enemies/octopus.tres")      # band 120-160m
 
 	if shallow == null or deep == null:
 		print("  FAIL: Enemy data resources could not be loaded")
@@ -172,18 +173,20 @@ func _test_enemy_band_selection() -> int:
 		print("  FAIL: Depth 20m should only match turtle, got %s" % [pick_shallow.id if pick_shallow else "null"])
 		fails += 1
 
-	var pick_deep := spawner._pick_type_for_depth(180)
+	var pick_deep := spawner._pick_type_for_depth(140)
 	if pick_deep == null or pick_deep.id != deep.id:
-		print("  FAIL: Depth 180m should only match octopus, got %s" % [pick_deep.id if pick_deep else "null"])
+		print("  FAIL: Depth 140m should only match octopus, got %s" % [pick_deep.id if pick_deep else "null"])
 		fails += 1
 
-	var pick_none := spawner._pick_type_for_depth(100)
+	var pick_none := spawner._pick_type_for_depth(60)
 	if pick_none != null:
-		print("  FAIL: Depth 100m matches neither band, expected null, got %s" % pick_none.id)
+		print("  FAIL: Depth 60m matches neither band, expected null, got %s" % pick_none.id)
 		fails += 1
 
 	spawner.free()
 	return fails
+
+
 
 
 func _test_health_and_stamina() -> int:
@@ -239,3 +242,37 @@ func _test_health_and_stamina() -> int:
 
 	stamina.free()
 	return fails
+
+
+func _test_prop_spawner() -> int:
+	print("[Test] PropSpawner background props generation & blue overlay tint")
+	var fails := 0
+
+	var spawner := PropSpawner.new()
+	spawner._ready()
+
+	var child_count := spawner.get_child_count()
+	if child_count == 0:
+		print("  FAIL: PropSpawner should generate background prop children")
+		fails += 1
+
+	var sprite_count := 0
+	var blue_tinted_count := 0
+	for child in spawner.get_children():
+		if child is Sprite2D:
+			sprite_count += 1
+			# Verify blue background wash overlay tint is applied
+			if child.modulate.b > 0.3:
+				blue_tinted_count += 1
+
+	if sprite_count == 0:
+		print("  FAIL: PropSpawner should generate Sprite2D background props")
+		fails += 1
+
+	if blue_tinted_count < sprite_count * 0.9:
+		print("  FAIL: Background props should have blue underwater wash overlay applied")
+		fails += 1
+
+	spawner.free()
+	return fails
+

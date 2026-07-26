@@ -66,7 +66,7 @@ autowrap_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.75, 0.45, 1)
 theme_override_font_sizes/font_size = 8
-text = "GMTK Game Jam 2026 — Theme: Countdown"
+text = "GMTK Game Jam 2026   Theme: Countdown"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="Panel/Margin/VBox"]
@@ -81,7 +81,7 @@ size_flags_vertical = 3
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 9
-text = "You dive into the flooded remains of a civilization swallowed by the sea — broken statues, drowned colonnades, coral-reclaimed stonework. The deeper you go, the older and stranger the ruins become, and the more valuable — and dangerous — the pearls they still guard.
+text = "You dive into the flooded remains of a civilization swallowed by the sea: broken statues, drowned colonnades, coral-reclaimed stonework. The deeper you go, the older and stranger the ruins become, and the pearls they still guard grow more valuable and more dangerous.
 
 Every choice down there is measured against the one thing no upgrade can buy back: the breath you're already holding."
 autowrap_mode = 3

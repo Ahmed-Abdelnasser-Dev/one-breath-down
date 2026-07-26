@@ -1,7 +1,7 @@
 extends Node
 ## Persistent display/audio settings autoload.
 ## Controls Fullscreen vs Windowed modes, 16:9 pixel viewport resolutions,
-## VSync, and audio bus volumes. Applies settings in _ready() before the first frame.
+## and audio bus volumes. Applies settings in _ready() before the first frame.
 
 const SAVE_PATH := "user://settings.cfg"
 
@@ -18,39 +18,45 @@ const BUS_NAMES: Array[String] = ["Master", "Music", "SFX"]
 
 var fullscreen: bool = false
 var resolution: Vector2i = Vector2i(1280, 720)
-var vsync: bool = true
 var bus_volumes: Dictionary = {"Master": 1.0, "Music": 1.0, "SFX": 1.0}
 
 
+var _loaded_from_disk: bool = false
+
+
 func _ready() -> void:
-	_load()
+	_loaded_from_disk = _load()
+	if not _loaded_from_disk and _has_window():
+		# First launch: adopt whatever window the project opened with instead of
+		# forcing our defaults over it (notably the editor's size override).
+		resolution = DisplayServer.window_get_size()
+		fullscreen = DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN
 	apply_all()
 
 
-func apply_all() -> void:
-	_apply_window_mode()
-	_apply_resolution()
-	_apply_vsync()
+## `user_initiated` must be true when this runs from a button press: browsers
+## only grant fullscreen from inside a real input event, so a saved fullscreen
+## preference can't be restored at boot — it lands on the next Apply instead.
+func apply_all(user_initiated: bool = false) -> void:
+	_apply_window_mode(user_initiated)
+	# Only ever resize a window the player has actually expressed a preference
+	# about — a first launch keeps whatever size the project opened with.
+	if user_initiated or _loaded_from_disk:
+		_apply_resolution()
+	_disable_vsync()
 	for bus_name in BUS_NAMES:
 		_apply_bus_volume(bus_name)
 
 
 func set_fullscreen(enabled: bool) -> void:
 	fullscreen = enabled
-	_apply_window_mode()
-	_apply_resolution()
+	apply_all(true)
 	save()
 
 
 func set_resolution(size: Vector2i) -> void:
 	resolution = size
-	_apply_resolution()
-	save()
-
-
-func set_vsync(enabled: bool) -> void:
-	vsync = enabled
-	_apply_vsync()
+	apply_all(true)
 	save()
 
 
@@ -63,15 +69,13 @@ func set_bus_volume(bus_name: String, value: float) -> void:
 func apply_display_and_audio(
 	new_fullscreen: bool,
 	new_resolution: Vector2i,
-	new_vsync: bool,
 	new_volumes: Dictionary
 ) -> void:
 	fullscreen = new_fullscreen
 	resolution = new_resolution
-	vsync = new_vsync
 	for bus_name in BUS_NAMES:
 		bus_volumes[bus_name] = clampf(new_volumes.get(bus_name, 1.0), 0.0, 1.0)
-	apply_all()
+	apply_all(true)
 	save()
 
 
@@ -79,26 +83,32 @@ func get_bus_volume(bus_name: String) -> float:
 	return bus_volumes.get(bus_name, 1.0)
 
 
-func _is_window_embedded() -> bool:
-	if DisplayServer.get_name() == "headless":
-		return true
-	if get_tree() and get_tree().root and get_tree().root.gui_embed_subwindows:
-		return true
-	return false
+## False only where there is no OS window to talk to at all.
+func _has_window() -> bool:
+	return DisplayServer.get_name() != "headless"
 
 
-func _apply_window_mode() -> void:
-	if _is_window_embedded():
+## The browser canvas is sized by the embedding page (an itch.io iframe, say),
+## so an arbitrary window size is meaningless there — Options hides the row.
+func supports_resolution() -> bool:
+	return _has_window() and not OS.has_feature("web")
+
+
+func _apply_window_mode(user_initiated: bool) -> void:
+	if not _has_window():
 		return
-	var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
-	if DisplayServer.window_get_mode() != mode:
-		DisplayServer.window_set_mode(mode)
+	if OS.has_feature("web") and not user_initiated:
+		return
+	if fullscreen:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 
 
 func _apply_resolution() -> void:
-	if fullscreen or _is_window_embedded():
+	if not supports_resolution():
 		return
-	if DisplayServer.window_get_size() != resolution:
+	if not fullscreen:
 		DisplayServer.window_set_size(resolution)
 		var current_screen := DisplayServer.window_get_current_screen()
 		var screen_size := DisplayServer.screen_get_size(current_screen)
@@ -108,9 +118,9 @@ func _apply_resolution() -> void:
 		DisplayServer.window_set_position(centered_pos)
 
 
-func _apply_vsync() -> void:
-	var mode := DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED
-	DisplayServer.window_set_vsync_mode(mode)
+func _disable_vsync() -> void:
+	if _has_window():
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 
 
 func _apply_bus_volume(bus_name: String) -> void:
@@ -126,18 +136,19 @@ func save() -> void:
 	var cfg := ConfigFile.new()
 	cfg.set_value("display", "fullscreen", fullscreen)
 	cfg.set_value("display", "resolution", resolution)
-	cfg.set_value("display", "vsync", vsync)
 	for bus_name in BUS_NAMES:
 		cfg.set_value("audio", bus_name, bus_volumes.get(bus_name, 1.0))
 	cfg.save(SAVE_PATH)
 
 
-func _load() -> void:
+## Returns whether a settings file actually existed, so _ready() can tell a
+## real saved preference apart from an untouched first launch.
+func _load() -> bool:
 	var cfg := ConfigFile.new()
 	if cfg.load(SAVE_PATH) != OK:
-		return
+		return false
 	fullscreen = cfg.get_value("display", "fullscreen", fullscreen)
 	resolution = cfg.get_value("display", "resolution", resolution)
-	vsync = cfg.get_value("display", "vsync", vsync)
 	for bus_name in BUS_NAMES:
 		bus_volumes[bus_name] = cfg.get_value("audio", bus_name, bus_volumes.get(bus_name, 1.0))
+	return true

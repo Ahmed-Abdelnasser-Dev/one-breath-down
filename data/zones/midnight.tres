@@ -10,4 +10,4 @@ start_depth_m = 150
 water_color = Color(0.02, 0.08, 0.18, 1)
 darkness = 0.75
 drain_multiplier = 1.35
-max_live_enemies = 7
+max_live_enemies = 22

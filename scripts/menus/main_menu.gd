@@ -6,6 +6,7 @@ extends Control
 ## once the menu has loaded.
 
 @onready var buttons_panel: PanelContainer = $ButtonsPanel
+@onready var brand_corner: BrandCorner = $BrandCorner
 @onready var continue_button: Button = $ButtonsPanel/Margin/VBox/ContinueButton
 @onready var start_button: Button = $ButtonsPanel/Margin/VBox/StartButton
 @onready var options_button: Button = $ButtonsPanel/Margin/VBox/OptionsButton
@@ -35,6 +36,8 @@ func _ready() -> void:
 	controls_button.pressed.connect(func() -> void: _show_overlay(controls_screen))
 	credits_button.pressed.connect(func() -> void: _show_overlay(credits_screen))
 	about_button.pressed.connect(func() -> void: _show_overlay(about_screen))
+	# A browser tab can't quit itself, so the button would be dead on web.
+	exit_button.visible = not OS.has_feature("web")
 	exit_button.pressed.connect(func() -> void: get_tree().quit())
 
 	if continue_button.visible:
@@ -64,6 +67,9 @@ func _on_start_pressed() -> void:
 
 func _show_overlay(overlay: Control) -> void:
 	buttons_panel.hide()
+	# The overlays are translucent, so the signature corner would otherwise ghost
+	# through behind them. The Credits screen carries its own copy in its footer.
+	brand_corner.hide()
 	overlay.show()
 	overlay.focus_default()
 
@@ -72,4 +78,5 @@ func _show_main_buttons() -> void:
 	for overlay in _overlays:
 		overlay.hide()
 	buttons_panel.show()
+	brand_corner.show()
 	start_button.grab_focus()

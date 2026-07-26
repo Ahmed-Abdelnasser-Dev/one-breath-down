@@ -7,32 +7,55 @@ class_name Patroller
 ## merely touching it hurts, or only a committed ram does.
 
 var _dir: float = 1.0   ## +1 = swimming toward home.x + patrol_range, -1 = back
+var _aggro: bool = false
 
 
 func _tick_behavior(delta: float) -> void:
 	if data == null:
 		return
 
-	# Reverse direction at the lane edges.
-	var offset_x := global_position.x - _home.x
-	if offset_x >= data.patrol_range:
-		_dir = -1.0
-	elif offset_x <= -data.patrol_range:
-		_dir = 1.0
+	var dist := _dist_to_diver()
+	var lose_r := data.get_lose_radius()
+	if _aggro:
+		if dist > lose_r:
+			_aggro = false
+	elif data.detect_radius > 0.0 and dist <= data.detect_radius:
+		_aggro = true
 
-	var target_speed := data.move_speed
-	if data.burst_speed > 0.0 and data.detect_radius > 0.0 and _dist_to_diver() <= data.detect_radius:
-		# Ram: commit toward the diver's current x rather than the lane.
-		target_speed = data.burst_speed
-		_dir = signf(_dir_to_diver().x) if _dir_to_diver().x != 0.0 else _dir
+	if _aggro and data.burst_speed > 0.0:
+		# Ram: aggressively pursue diver in 2D (X and Y) toward diver's position
+		var target_speed := data.burst_speed
+		var dir := _dir_to_diver()
+		if dir != Vector2.ZERO:
+			velocity = velocity.move_toward(dir * target_speed, data.accel * delta)
+			if absf(dir.x) > 0.01:
+				_facing_right = dir.x > 0.0
 		state = Enemy.State.ATTACK
 	else:
 		state = Enemy.State.PATROL
+		# Reverse direction at the lane edges or when hitting a wall.
+		var offset_x := global_position.x - _home.x
+		if offset_x >= data.patrol_range:
+			_dir = -1.0
+		elif offset_x <= -data.patrol_range:
+			_dir = 1.0
 
-	velocity.x = move_toward(velocity.x, target_speed * _dir, data.accel * delta)
-	velocity.y = move_toward(velocity.y, 0.0, data.accel * delta)
+		if is_on_wall():
+			var normal := get_wall_normal()
+			if normal.x != 0.0:
+				_dir = signf(normal.x)
+			else:
+				_dir = -_dir
 
-	if absf(velocity.x) > 5.0:
-		_facing_right = velocity.x > 0.0
+		velocity.x = move_toward(velocity.x, data.move_speed * _dir, data.accel * delta)
+		velocity.y = move_toward(velocity.y, 0.0, data.accel * delta)
+		if absf(velocity.x) > 5.0:
+			_facing_right = velocity.x > 0.0
 
-	_play("walk")
+
+
+	if state == Enemy.State.ATTACK:
+		_play("attack")
+	else:
+		_play("walk")
+

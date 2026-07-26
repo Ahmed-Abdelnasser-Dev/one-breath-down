@@ -7,11 +7,6 @@
 script = ExtResource("1")
 id = &"seed_pearl"
 display_name = "Seed Pearl"
-value = 10
-carry_weight = 0.2
-min_depth_m = 0
-max_depth_m = 40
-spawn_weight = 100.0
+min_depth_m = 10
 color = Color(0.96, 0.98, 1, 1)
-radius = 8.0
 sprite = ExtResource("2_sprite")

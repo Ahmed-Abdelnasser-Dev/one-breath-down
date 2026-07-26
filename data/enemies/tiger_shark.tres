@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://cbm8m2et20o1i"]
 
-[ext_resource type="Script" path="res://scripts/resources/EnemyData.gd" id="1"]
-[ext_resource type="SpriteFrames" path="res://visuals/enemies/shark/tiger_shark_frames.tres" id="2_frames"]
+[ext_resource type="Script" uid="uid://45hby1hdpf5x" path="res://scripts/resources/EnemyData.gd" id="1"]
+[ext_resource type="SpriteFrames" uid="uid://cyt32l6vcyeie" path="res://visuals/enemies/shark/tiger_shark_frames.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/chaser.tscn" id="3_behavior"]
 
 [resource]
@@ -11,22 +11,21 @@ display_name = "Tiger Shark"
 behavior_scene = ExtResource("3_behavior")
 max_hp = 999
 invulnerable = true
-contact_damage = 28
+contact_damage = 36
 contact_damage_requires_attack = true
 hit_knockback_speed = 500.0
 stun_on_hit = 1.0
 player_knockback = 220.0
-move_speed = 80.0
-burst_speed = 218.0
-accel = 300.0
-detect_radius = 230.0
-attack_radius = 36.0
-lose_radius = 380.0
-telegraph_time = 0.25
+move_speed = 95.0
+burst_speed = 280.0
+accel = 360.0
+detect_radius = 280.0
+attack_radius = 48.0
+lose_radius = 440.0
+telegraph_time = 0.18
 attack_time = 0.4
-recover_time = 0.8
-min_depth_m = 150
-max_depth_m = 200
+recover_time = 0.65
+min_depth_m = 165
 spawn_weight = 40.0
 max_concurrent = 1
 frames = ExtResource("2_frames")

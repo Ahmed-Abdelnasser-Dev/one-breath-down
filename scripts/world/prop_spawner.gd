@@ -1,7 +1,8 @@
 extends Node2D
 class_name PropSpawner
 ## Dresses the open water between the cave walls: sunken cargo, large ruin
-## silhouettes, and small ambient fish. Pure visuals — nothing here collides.
+## silhouettes, ambient fish, deepsea creatures, and sunken item props (gold, coins, fishing rods).
+## Pure visuals — nothing here collides or interacts with the player.
 ## Regenerates on run_reset like DiveSpawner; tint follows the same
 ## depth-tint convention as CaveWallGenerator's flora.
 
@@ -18,14 +19,20 @@ const MAX_DEPTH_Y := 6300.0
 const TWILIGHT_START_Y := 1600.0
 const MIDNIGHT_START_Y := 4800.0
 
-const BUBBLE_TEXTURE: Texture2D = preload("res://visuals/water particle effectd/proj_bubblebeam3_sheet.png")
+const FISH_FRAMES := 2   ## Catch/*.png are 2-frame swim strips
 
+const BUBBLE_TEXTURE: Texture2D = preload("res://visuals/water particle effectd/proj_bubblebeam3_sheet.png")
+const DEEPSEA_SHEET: Texture2D = preload("res://visuals/general assets/Catch/DeepseaCreatures_spritesheet.png")
+const ITEMS_SHEET: Texture2D = preload("res://visuals/items/items.png")
+
+## Shipwreck cargo only. Fishbarrel3/4 were dropped: they're dock dressing —
+## brightly banded market barrels, and one has fresh-caught fish poking out of
+## the lid, which makes no sense 90m down in a drowned civilisation. A plain
+## barrel, a crate and a strongbox are things that sink with a ship.
 var cargo_textures: Array[Texture2D] = [
 	preload("res://visuals/general assets/Catch/Barrel.png"),
 	preload("res://visuals/general assets/Catch/Box.png"),
 	preload("res://visuals/general assets/Catch/Chest.png"),
-	preload("res://visuals/general assets/Fishbarrel3.png"),
-	preload("res://visuals/general assets/Fishbarrel4.png"),
 ]
 
 var ruin_textures: Array[Texture2D] = [
@@ -42,12 +49,29 @@ var fish_textures: Array[Texture2D] = [
 	preload("res://visuals/general assets/Catch/7.png"),
 ]
 
+## Sunken debris from items.png. Rendering the previous list showed the
+## comments were guesses and most entries did not belong on a seabed: a floating
+## "$" glyph, three separate flame icons, an explosion, a UI health-heart, a
+## lightning bolt and an axe. What is left is only what a drowned civilisation
+## and the ships above it would actually leave behind.
+var item_icon_rects: Array[Rect2] = [
+	Rect2(0, 0, 16, 16),      # amphora — the classic sunken-ruin vessel
+	Rect2(96, 1120, 16, 16),  # gold crown — the drowned civilisation itself
+	Rect2(144, 576, 16, 16),  # spill of gold coins
+	Rect2(48, 192, 16, 16),   # cut gemstone
+	Rect2(64, 80, 16, 16),    # ship's lantern, long since dark
+	Rect2(160, 304, 16, 16),  # water-smoothed stone
+	Rect2(32, 16, 16, 16),    # rock outcrop
+]
+
 @export var cave_wall_generator_path: NodePath = "../CaveWallGenerator"
 
 var _cave: CaveWallGenerator
 var _rng := RandomNumberGenerator.new()
 var _fish: Array[Sprite2D] = []
 var _fish_speeds: Array[float] = []
+var _fish_base_y: Array[float] = []
+var _fish_wobble_phase: Array[float] = []
 
 
 func _ready() -> void:
@@ -61,10 +85,14 @@ func _respawn() -> void:
 		c.queue_free()
 	_fish.clear()
 	_fish_speeds.clear()
+	_fish_base_y.clear()
+	_fish_wobble_phase.clear()
 	_rng.randomize()
 	_spawn_ruins()
 	_spawn_cargo()
 	_spawn_fish()
+	_spawn_deepsea_fish()
+	_spawn_sunken_items()
 	_spawn_bubble_vents()
 
 
@@ -75,9 +103,7 @@ func _wall_range(y: float) -> Vector2:
 
 
 ## Rock formations — MIDNIGHT ONLY. Each zone gets one identity: clear water
-## up top, the drowned fleet through twilight, bare rock at the bottom. Rock
-## spires scattered through the shallows is what made the descent read as a
-## shuffle of unrelated scenery instead of a journey.
+## up top, the drowned fleet through twilight, bare rock at the bottom.
 func _spawn_ruins() -> void:
 	var y := MIDNIGHT_START_Y
 	while y < MAX_DEPTH_Y - 300.0:
@@ -96,8 +122,7 @@ func _spawn_ruins() -> void:
 
 
 ## Wreck cargo — TWILIGHT ONLY, matching the drowned-fleet identity the
-## background bands establish for the same depths. The sunlit zone stays clear
-## water on purpose: it's the calm the rest of the dive is measured against.
+## background bands establish for the same depths.
 func _spawn_cargo() -> void:
 	var y := TWILIGHT_START_Y
 	while y < MIDNIGHT_START_Y + 400.0:
@@ -117,8 +142,7 @@ func _spawn_cargo() -> void:
 		y += _rng.randf_range(160.0, 260.0)
 
 
-## Ambient fish: dense near the surface, thinning out until Midnight has
-## almost none — life visibly retreating is part of the descent's mood.
+## Ambient fish: dense near the surface, thinning out until Midnight.
 func _spawn_fish() -> void:
 	var y := 120.0
 	while y < TWILIGHT_END + 800.0:
@@ -131,26 +155,95 @@ func _spawn_fish() -> void:
 				var tex: Texture2D = fish_textures[_rng.randi() % fish_textures.size()]
 				var spr := Sprite2D.new()
 				spr.texture = tex
+				# Every Catch/*.png is a two-frame swim strip, not a single fish.
+				# Without hframes the whole strip drew as one sprite, so each
+				# "fish" was two fish fused nose to tail.
+				spr.hframes = FISH_FRAMES
 				spr.texture_filter = TEXTURE_FILTER_NEAREST
 				var s := _rng.randf_range(1.0, 1.8)
 				spr.scale = Vector2(s, s)
-				spr.position = Vector2(base_x + _rng.randf_range(-50.0, 50.0), y + _rng.randf_range(-30.0, 30.0))
+				var fy := y + _rng.randf_range(-30.0, 30.0)
+				spr.position = Vector2(base_x + _rng.randf_range(-50.0, 50.0), fy)
 				spr.modulate = _prop_tint(y, 0.62)
 				spr.flip_h = speed < 0.0
 				add_child(spr)
 				_fish.append(spr)
 				_fish_speeds.append(speed * _rng.randf_range(0.9, 1.1))
+				_fish_base_y.append(fy)
+				_fish_wobble_phase.append(_rng.randf_range(0.0, TAU))
 		y += _rng.randf_range(120.0, 260.0)
 
 
-## Seabed vents streaming bubbles up the shaft. These are the strongest signal
-## that the water is alive rather than a still backdrop, and they double as
-## vertical motion cues while the diver is descending.
+## Deepsea fish & creatures from DeepseaCreatures_spritesheet.png (62 frames, 48x48 each),
+## acting as background props for deep ocean depths.
+func _spawn_deepsea_fish() -> void:
+	var y := 800.0
+	while y < MAX_DEPTH_Y - 200.0:
+		var depth_t := clampf(y / MAX_DEPTH_Y, 0.0, 1.0)
+		var spawn_chance := lerpf(0.5, 0.95, depth_t)
+		if _rng.randf() < spawn_chance:
+			var count := _rng.randi_range(1, 3)
+			var base_x := _rng.randf_range(_wall_range(y).x, _wall_range(y).y)
+			var speed := _rng.randf_range(10.0, 32.0) * (1.0 if _rng.randf() < 0.5 else -1.0)
+			for i in count:
+				var frame_idx := _rng.randi_range(0, 61)
+				var col := frame_idx % 2
+				var row := frame_idx / 2
+				
+				var spr := Sprite2D.new()
+				spr.texture = DEEPSEA_SHEET
+				spr.texture_filter = TEXTURE_FILTER_NEAREST
+				spr.region_enabled = true
+				spr.region_rect = Rect2(col * 48, row * 48, 48, 48)
+				
+				var s := _rng.randf_range(1.2, 2.0)
+				spr.scale = Vector2(s, s)
+				var fy := y + _rng.randf_range(-40.0, 40.0)
+				spr.position = Vector2(base_x + _rng.randf_range(-60.0, 60.0), fy)
+				spr.modulate = _prop_tint(fy, 0.65)
+				spr.flip_h = speed < 0.0
+				
+				add_child(spr)
+				_fish.append(spr)
+				_fish_speeds.append(speed * _rng.randf_range(0.85, 1.15))
+				_fish_base_y.append(fy)
+				_fish_wobble_phase.append(_rng.randf_range(0.0, TAU))
+		y += _rng.randf_range(140.0, 280.0)
+
+
+## Sunken items (gold, coins, fishing rods, anchors, relics) from items.png as background props.
+func _spawn_sunken_items() -> void:
+	var y := 400.0
+	while y < MAX_DEPTH_Y - 300.0:
+		if _rng.randf() < 0.65:
+			var spr := Sprite2D.new()
+			spr.texture = ITEMS_SHEET
+			spr.texture_filter = TEXTURE_FILTER_NEAREST
+			spr.region_enabled = true
+			spr.region_rect = item_icon_rects[_rng.randi() % item_icon_rects.size()]
+			
+			var s := _rng.randf_range(2.0, 3.2)
+			spr.scale = Vector2(s, s)
+			spr.rotation = _rng.randf_range(-0.45, 0.45)
+			
+			var xr := _wall_range(y)
+			var x: float
+			if _rng.randf() < 0.6:
+				x = xr.x + _rng.randf_range(15.0, 70.0) if _rng.randf() < 0.5 else xr.y - _rng.randf_range(15.0, 70.0)
+			else:
+				x = _rng.randf_range(xr.x, xr.y)
+				
+			spr.position = Vector2(x, y + _rng.randf_range(-40.0, 40.0))
+			spr.modulate = _prop_tint(y, 0.68)
+			add_child(spr)
+		y += _rng.randf_range(180.0, 340.0)
+
+
+## Seabed vents streaming bubbles up the shaft.
 func _spawn_bubble_vents() -> void:
 	var y := 500.0
 	while y < MAX_DEPTH_Y - 200.0:
 		var xr := _wall_range(y)
-		# Vents cling to the walls, where a fissure would plausibly be.
 		var from_left := _rng.randf() < 0.5
 		var x: float = (xr.x + _rng.randf_range(10.0, 90.0)) if from_left \
 			else (xr.y - _rng.randf_range(10.0, 90.0))
@@ -163,7 +256,6 @@ func _spawn_bubble_vents() -> void:
 		vent.lifetime = _rng.randf_range(3.0, 5.0)
 		vent.preprocess = 3.0
 		vent.randomness = 0.6
-		# Only simulate vents the diver is near; 20 always-on emitters is waste.
 		vent.visibility_rect = Rect2(-60, -420, 120, 460)
 		vent.local_coords = false
 
@@ -200,6 +292,10 @@ func _process(delta: float) -> void:
 		if not is_instance_valid(f):
 			continue
 		f.position.x += _fish_speeds[i] * delta
+		_fish_wobble_phase[i] += delta * 2.5
+		f.position.y = _fish_base_y[i] + sin(_fish_wobble_phase[i]) * 3.5
+		if f.hframes * f.vframes > 1:
+			f.frame = 1 if sin(_fish_wobble_phase[i] * 1.7) > 0.0 else 0
 		var xr := _wall_range(f.position.y)
 		if f.position.x < xr.x:
 			_fish_speeds[i] = absf(_fish_speeds[i])
@@ -217,16 +313,14 @@ func _depth_tint(depth: float) -> Color:
 
 ## Blue haze wash. Props must read as *background* at a glance — anything that
 ## keeps its native brown/green sits in the same visual layer as enemies and
-## pearls, and the player ends up dodging scenery. Multiplying by a blue-
-## dominant color drops the warm channels, which is what atmospheric distance
-## does in the shipped art (visual-bible §2.2 reef ramp).
+## pearls. Multiplying by a blue-dominant color drops the warm channels.
 const BACKGROUND_WASH := Color(0.34, 0.52, 0.92)
 
 
 ## Props only lean partway toward the depth tint — the CanvasModulate darkness
-## already darkens the whole world, so a full tint would double-darken them
-## into the water color (which is exactly what made the first pass invisible).
+## already darkens the whole world, so a full tint would double-darken them.
 func _prop_tint(depth: float, alpha: float) -> Color:
 	var c := BACKGROUND_WASH * Color.WHITE.lerp(_depth_tint(depth), 0.45)
 	c.a = alpha
 	return c
+

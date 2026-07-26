@@ -18,6 +18,8 @@ func _ready() -> void:
 	resume_button.pressed.connect(func() -> void: closed.emit())
 	options_button.pressed.connect(func() -> void: menu_manager.push(options_screen))
 	main_menu_button.pressed.connect(_on_main_menu_pressed)
+	# A browser tab can't quit itself, so the button would be dead on web.
+	exit_button.visible = not OS.has_feature("web")
 	exit_button.pressed.connect(func() -> void: get_tree().quit())
 
 

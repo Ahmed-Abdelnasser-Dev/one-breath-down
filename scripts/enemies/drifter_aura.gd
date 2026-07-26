@@ -45,8 +45,16 @@ func _tick_behavior(delta: float) -> void:
 	velocity.y = (target_y - global_position.y) * 2.0
 	velocity.x = move_toward(velocity.x, 0.0, data.accel * delta)
 
+	if is_on_wall():
+		var normal := get_wall_normal()
+		velocity += normal * data.accel * delta
+
 	_tick_aura_cycle(delta)
-	_play("idle")
+	if (_aura_phase == AuraPhase.LIVE or _aura_phase == AuraPhase.TELEGRAPH) and sprite != null and sprite.sprite_frames != null and sprite.sprite_frames.has_animation("attack"):
+		_play("attack")
+	else:
+		_play("idle")
+
 
 
 func _tick_aura_cycle(delta: float) -> void:

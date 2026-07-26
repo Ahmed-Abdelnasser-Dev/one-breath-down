@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://dohtntiwmflhy"]
 
-[ext_resource type="Script" path="res://scripts/resources/EnemyData.gd" id="1"]
-[ext_resource type="SpriteFrames" path="res://visuals/enemies/shark/hammerhead_shark_frames.tres" id="2_frames"]
+[ext_resource type="Script" uid="uid://45hby1hdpf5x" path="res://scripts/resources/EnemyData.gd" id="1"]
+[ext_resource type="SpriteFrames" uid="uid://dxqvm6hbmi0oj" path="res://visuals/enemies/shark/hammerhead_shark_frames.tres" id="2_frames"]
 [ext_resource type="PackedScene" path="res://scenes/enemies/chaser.tscn" id="3_behavior"]
 
 [resource]
@@ -11,22 +11,20 @@ display_name = "Hammerhead Shark"
 behavior_scene = ExtResource("3_behavior")
 max_hp = 999
 invulnerable = true
-contact_damage = 26
+contact_damage = 34
 contact_damage_requires_attack = true
 hit_knockback_speed = 500.0
 stun_on_hit = 1.0
 player_knockback = 210.0
-move_speed = 90.0
-burst_speed = 200.0
-accel = 700.0
-detect_radius = 250.0
-attack_radius = 36.0
-lose_radius = 420.0
-telegraph_time = 0.3
-attack_time = 0.45
+move_speed = 70.0
+burst_speed = 170.0
+accel = 260.0
+detect_radius = 155.0
+attack_radius = 48.0
+lose_radius = 225.0
+telegraph_time = 0.28
 recover_time = 0.7
-min_depth_m = 170
-max_depth_m = 200
+min_depth_m = 175
 spawn_weight = 35.0
 max_concurrent = 1
 frames = ExtResource("2_frames")

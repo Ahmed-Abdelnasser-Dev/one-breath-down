@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" path="res://scenes/menus/about_screen.tscn" id="5_about"]
 [ext_resource type="PackedScene" path="res://scenes/menus/credits_screen.tscn" id="6_credits"]
 [ext_resource type="Texture2D" uid="uid://cobglfe8xarjy" path="res://visuals/GMTK Game Jam 2026/GMTK Game Jam 2026 G Logo.png" id="7_jam_logo"]
+[ext_resource type="PackedScene" path="res://scenes/ui/brand_corner.tscn" id="8_brand"]
 
 [node name="MainMenu" type="Control" unique_id=1105082139]
 layout_mode = 3
@@ -41,6 +42,18 @@ grow_vertical = 0
 texture = ExtResource("7_jam_logo")
 expand_mode = 1
 stretch_mode = 5
+
+[node name="BrandCorner" parent="." unique_id=537343820 instance=ExtResource("8_brand")]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -20.0
+offset_right = 66.0
+offset_bottom = -8.0
+grow_vertical = 0
+show_links = false
 
 [node name="TitleBox" type="VBoxContainer" parent="." unique_id=1280805228]
 layout_mode = 1

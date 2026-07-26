@@ -134,7 +134,7 @@ func _update_prompt() -> void:
 		prompt_bar.remove_theme_color_override("font_color")
 	elif carried_count > 0:
 		prompt_bar_panel.show()
-		prompt_bar.text = "Carrying %d pearls (%d). Surface at the ship to sell" % [
+		prompt_bar.text = "Carrying %d pearls (%d). Surface at the ship to sell for Gold Coins" % [
 			carried_count, carried_value
 		]
 		prompt_bar.add_theme_color_override("font_color", Color(1, 0.88, 0.4))
@@ -205,13 +205,12 @@ func _on_run_ended(_arg) -> void:
 	_refresh_loot()
 
 
-## Docking silently emptied the basket and bumped a number in the corner. This
-## says out loud what just happened, since it's the payoff the whole dive is for.
+## Docking sells the catch for Gold Coins.
 func _show_bank_toast(banked: int) -> void:
 	if banked <= 0:
 		return
-	bank_title.text = "CATCH SOLD"
-	bank_amount.text = "Basket emptied   +%d" % banked
+	bank_title.text = "PEARLS SOLD"
+	bank_amount.text = "Catch sold for +%d Gold Coins" % banked
 	bank_toast.modulate.a = 0.0
 	bank_toast.scale = Vector2(0.85, 0.85)
 	bank_toast.pivot_offset = bank_toast.size * 0.5
@@ -223,6 +222,7 @@ func _show_bank_toast(banked: int) -> void:
 		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.chain().tween_interval(1.15)
 	tween.chain().tween_property(bank_toast, "modulate:a", 0.0, 0.45)
+
 
 
 ## Names the item as it fires, so a mid-dive panic press is confirmed on screen
