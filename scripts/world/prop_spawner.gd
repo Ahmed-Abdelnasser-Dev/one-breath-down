@@ -12,6 +12,12 @@ const MIDNIGHT_TINT := Color(0.012, 0.020, 0.051)
 
 const MAX_DEPTH_Y := 6300.0
 
+## Zone boundaries in world px, matching data/zones/*.tres (50m / 150m at
+## PIXELS_PER_METRE 32). Props key off these so the gameplay layer and the
+## background bands tell the same story at the same depths.
+const TWILIGHT_START_Y := 1600.0
+const MIDNIGHT_START_Y := 4800.0
+
 var cargo_textures: Array[Texture2D] = [
 	preload("res://visuals/general assets/Catch/Barrel.png"),
 	preload("res://visuals/general assets/Catch/Box.png"),
@@ -65,11 +71,12 @@ func _wall_range(y: float) -> Vector2:
 	return Vector2(160.0, 1440.0)
 
 
-## Large ruin silhouettes: one broken reef/column formation every ~25-40m so
-## every screen of open water has an anchor shape. Semi-transparent and
-## depth-tinted, so they read as "further back" than gameplay objects.
+## Rock formations — MIDNIGHT ONLY. Each zone gets one identity: clear water
+## up top, the drowned fleet through twilight, bare rock at the bottom. Rock
+## spires scattered through the shallows is what made the descent read as a
+## shuffle of unrelated scenery instead of a journey.
 func _spawn_ruins() -> void:
-	var y := 700.0
+	var y := MIDNIGHT_START_Y
 	while y < MAX_DEPTH_Y - 300.0:
 		var tex: Texture2D = ruin_textures[_rng.randi() % ruin_textures.size()]
 		var spr := Sprite2D.new()
@@ -82,14 +89,15 @@ func _spawn_ruins() -> void:
 		spr.position = Vector2(_rng.randf_range(xr.x + 80.0, xr.y - 80.0), y)
 		spr.modulate = _prop_tint(y, 0.5)
 		add_child(spr)
-		y += _rng.randf_range(520.0, 900.0)
+		y += _rng.randf_range(420.0, 700.0)
 
 
-## Small sunken cargo scattered on a tighter cadence — the "people were here"
-## details you swim right past.
+## Wreck cargo — TWILIGHT ONLY, matching the drowned-fleet identity the
+## background bands establish for the same depths. The sunlit zone stays clear
+## water on purpose: it's the calm the rest of the dive is measured against.
 func _spawn_cargo() -> void:
-	var y := 350.0
-	while y < MAX_DEPTH_Y:
+	var y := TWILIGHT_START_Y
+	while y < MIDNIGHT_START_Y + 400.0:
 		for i in _rng.randi_range(1, 2):
 			var tex: Texture2D = cargo_textures[_rng.randi() % cargo_textures.size()]
 			var spr := Sprite2D.new()

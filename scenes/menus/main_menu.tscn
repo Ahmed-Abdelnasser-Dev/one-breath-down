@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://sbd0428itv7v"]
 
-[ext_resource type="PackedScene" path="res://scenes/background/background.tscn" id="1_bg_scene"]
+[ext_resource type="PackedScene" uid="uid://boaxbmixijqow" path="res://scenes/background/background.tscn" id="1_bg_scene"]
 [ext_resource type="Script" uid="uid://brbbklyhgvv0v" path="res://scripts/menus/main_menu.gd" id="1_script"]
 [ext_resource type="Theme" uid="uid://prunik7k8003" path="res://theme/menu_theme.tres" id="2_theme"]
-[ext_resource type="PackedScene" path="res://scenes/menus/options_screen.tscn" id="3_options"]
+[ext_resource type="PackedScene" uid="uid://2riryyudi43r" path="res://scenes/menus/options_screen.tscn" id="3_options"]
 [ext_resource type="PackedScene" path="res://scenes/menus/controls_screen.tscn" id="4_controls"]
 [ext_resource type="PackedScene" path="res://scenes/menus/about_screen.tscn" id="5_about"]
 [ext_resource type="PackedScene" path="res://scenes/menus/credits_screen.tscn" id="6_credits"]
-[ext_resource type="Texture2D" path="res://visuals/GMTK Game Jam 2026/GMTK Game Jam 2026 G Logo.png" id="7_jam_logo"]
+[ext_resource type="Texture2D" uid="uid://cobglfe8xarjy" path="res://visuals/GMTK Game Jam 2026/GMTK Game Jam 2026 G Logo.png" id="7_jam_logo"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1105082139]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,12 +19,13 @@ grow_vertical = 2
 theme = ExtResource("2_theme")
 script = ExtResource("1_script")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1292831952]
 position = Vector2(240, 135)
 
-[node name="Background" parent="." instance=ExtResource("1_bg_scene")]
+[node name="Background" parent="." unique_id=1041310177 instance=ExtResource("1_bg_scene")]
+position = Vector2(316, -177)
 
-[node name="JamLogo" type="TextureRect" parent="."]
+[node name="JamLogo" type="TextureRect" parent="." unique_id=685360886]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -41,7 +42,7 @@ texture = ExtResource("7_jam_logo")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="TitleBox" type="VBoxContainer" parent="."]
+[node name="TitleBox" type="VBoxContainer" parent="." unique_id=1280805228]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -51,7 +52,7 @@ grow_horizontal = 2
 theme_override_constants/separation = 1
 alignment = 1
 
-[node name="TitleLabel" type="Label" parent="TitleBox"]
+[node name="TitleLabel" type="Label" parent="TitleBox" unique_id=409317878]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.92, 0.65, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
@@ -60,7 +61,7 @@ theme_override_font_sizes/font_size = 14
 text = "ONE BREATH DOWN"
 horizontal_alignment = 1
 
-[node name="SubTitleLabel" type="Label" parent="TitleBox"]
+[node name="SubTitleLabel" type="Label" parent="TitleBox" unique_id=133137714]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.8, 0.88, 1)
 theme_override_colors/font_outline_color = Color(0.05, 0.08, 0.12, 1)
@@ -69,7 +70,7 @@ theme_override_font_sizes/font_size = 8
 text = "~ Hold your breath. Reach the deep. ~"
 horizontal_alignment = 1
 
-[node name="ButtonsPanel" type="PanelContainer" parent="."]
+[node name="ButtonsPanel" type="PanelContainer" parent="." unique_id=1357140608]
 custom_minimum_size = Vector2(130, 0)
 layout_mode = 1
 anchors_preset = 5
@@ -78,58 +79,59 @@ anchor_right = 0.5
 offset_top = 74.0
 grow_horizontal = 2
 
-[node name="Margin" type="MarginContainer" parent="ButtonsPanel"]
+[node name="Margin" type="MarginContainer" parent="ButtonsPanel" unique_id=1852430695]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 6
 theme_override_constants/margin_bottom = 6
 
-[node name="VBox" type="VBoxContainer" parent="ButtonsPanel/Margin"]
+[node name="VBox" type="VBoxContainer" parent="ButtonsPanel/Margin" unique_id=609264829]
 layout_mode = 2
 theme_override_constants/separation = 3
 alignment = 1
 
-[node name="ContinueButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
+[node name="ContinueButton" type="Button" parent="ButtonsPanel/Margin/VBox" unique_id=1959578921]
 visible = false
+layout_mode = 2
 text = "Continue"
 
-[node name="StartButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
+[node name="StartButton" type="Button" parent="ButtonsPanel/Margin/VBox" unique_id=954316068]
 layout_mode = 2
 text = "New Game"
 
-[node name="OptionsButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
+[node name="OptionsButton" type="Button" parent="ButtonsPanel/Margin/VBox" unique_id=2093118549]
 layout_mode = 2
 text = "Options"
 
-[node name="ControlsButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
+[node name="ControlsButton" type="Button" parent="ButtonsPanel/Margin/VBox" unique_id=416281055]
 layout_mode = 2
 text = "Controls"
 
-[node name="CreditsButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
+[node name="CreditsButton" type="Button" parent="ButtonsPanel/Margin/VBox" unique_id=1064958783]
 layout_mode = 2
 text = "Credits"
 
-[node name="AboutButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
+[node name="AboutButton" type="Button" parent="ButtonsPanel/Margin/VBox" unique_id=1063724901]
 layout_mode = 2
 text = "About"
 
-[node name="ExitButton" type="Button" parent="ButtonsPanel/Margin/VBox"]
+[node name="ExitButton" type="Button" parent="ButtonsPanel/Margin/VBox" unique_id=1118657940]
 layout_mode = 2
 text = "Exit"
 
-[node name="OptionsScreen" parent="." instance=ExtResource("3_options")]
+[node name="OptionsScreen" parent="." unique_id=851641711 instance=ExtResource("3_options")]
 visible = false
 layout_mode = 1
 
-[node name="ControlsScreen" parent="." instance=ExtResource("4_controls")]
+[node name="ControlsScreen" parent="." unique_id=163016197 instance=ExtResource("4_controls")]
 visible = false
 layout_mode = 1
 
-[node name="AboutScreen" parent="." instance=ExtResource("5_about")]
+[node name="AboutScreen" parent="." unique_id=74669556 instance=ExtResource("5_about")]
 visible = false
 layout_mode = 1
 
-[node name="CreditsScreen" parent="." instance=ExtResource("6_credits")]
+[node name="CreditsScreen" parent="." unique_id=875744545 instance=ExtResource("6_credits")]
 visible = false
 layout_mode = 1
