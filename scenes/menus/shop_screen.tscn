@@ -77,7 +77,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 8
 auto_height = true
-text_overrun_behavior = 3
+text_overrun_behavior = 0
 
 [node name="Detail" type="VBoxContainer" parent="Panel/Margin/VBox/Columns"]
 layout_mode = 2

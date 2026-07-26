@@ -31,7 +31,7 @@ const WALL_MARGIN := 70.0     ## keep spawns off the cave walls
 const ASCENT_SPAWN_CHANCE := 0.55
 const SPAWN_MIN_BEHIND := 420.0
 const SPAWN_MAX_BEHIND := 1000.0
-const DEFAULT_CAP := 3        ## used when ZoneManager.instance is unavailable (e.g. test runner)
+const DEFAULT_CAP := 3        ## used when no ZoneManager is live (e.g. test runner)
 
 @export var enemy_types: Array[EnemyData] = []
 @export var enemies_container_path: NodePath = "../Enemies"
@@ -88,8 +88,9 @@ func _physics_process(delta: float) -> void:
 		return
 
 	var cap := DEFAULT_CAP
-	if ZoneManager.instance != null and ZoneManager.instance.current_zone != null:
-		cap = ZoneManager.instance.current_zone.max_live_enemies
+	var zone := ZoneManager.get_current_zone()
+	if zone != null:
+		cap = zone.max_live_enemies
 	if _live.size() >= cap:
 		return
 

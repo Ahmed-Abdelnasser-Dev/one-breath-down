@@ -87,7 +87,7 @@ func _current_multiplier() -> float:
 	var exertion: float = 1.0 + speed_ratio * exertion_bonus
 	var over: float = maxf(0.0, diver.carried_weight - GameState.weight_capacity)
 	var strain: float = 1.0 + over * DRAIN_PENALTY_PER_UNIT
-	var zone_mult: float = ZoneManager.instance.current_drain_multiplier if ZoneManager.instance != null else 1.0
+	var zone_mult := ZoneManager.get_drain_multiplier()
 	return minf(exertion * strain * zone_mult, MAX_DRAIN_MULT)
 
 

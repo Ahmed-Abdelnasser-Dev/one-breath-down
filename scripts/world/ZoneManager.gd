@@ -27,6 +27,29 @@ func _enter_tree() -> void:
 	instance = self
 
 
+## Static vars outlive the scene. Without this, returning to the main menu left
+## `instance` pointing at a freed node — and the Sfx autoload, which persists
+## across scenes, polls it every frame. A freed object is not null, so the usual
+## `!= null` guard would sail straight past it into a crash.
+func _exit_tree() -> void:
+	if instance == self:
+		instance = null
+
+
+## Single safe accessor for the persistent autoloads. Everything outside the
+## run scene should go through this rather than touching `instance` directly.
+static func get_current_zone() -> ZoneData:
+	if instance != null and is_instance_valid(instance):
+		return instance.current_zone
+	return null
+
+
+static func get_drain_multiplier() -> float:
+	if instance != null and is_instance_valid(instance):
+		return instance.current_drain_multiplier
+	return 1.0
+
+
 func _ready() -> void:
 	# Ensure zones are sorted by start depth ascending
 	zones.sort_custom(func(a: ZoneData, b: ZoneData): return a.start_depth_m < b.start_depth_m)

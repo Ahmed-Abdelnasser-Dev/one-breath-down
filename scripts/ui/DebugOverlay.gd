@@ -53,7 +53,7 @@ func _process(_delta: float) -> void:
 	var exertion: float = 1.0 + speed_ratio * _breath.exertion_bonus
 	var over: float = maxf(0.0, _diver.carried_weight - GameState.weight_capacity)
 	var strain: float = 1.0 + over * 0.15
-	var zone_mult: float = ZoneManager.instance.current_drain_multiplier if ZoneManager.instance != null else 1.0
+	var zone_mult := ZoneManager.get_drain_multiplier()
 	var total_drain: float = _breath._current_multiplier()
 
 	var speed_mult: float = _diver._speed_multiplier()

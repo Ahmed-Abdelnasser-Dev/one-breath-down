@@ -61,7 +61,13 @@ func _ready() -> void:
 	_ambience.bus = &"Music"
 	_ambience.stream = load("res://audio/sfx/ambient_deep.wav") as AudioStream
 	if _ambience.stream is AudioStreamWAV:
-		(_ambience.stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_FORWARD
+		# loop_end defaults to 0, which is an empty loop range — setting only
+		# loop_mode left the bed playing once and then stopping for good.
+		var wav := _ambience.stream as AudioStreamWAV
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		wav.loop_begin = 0
+		@warning_ignore("integer_division")
+		wav.loop_end = wav.data.size() / 2   # 16-bit mono: 2 bytes per frame
 	_ambience.volume_db = -80.0
 	add_child(_ambience)
 	_ambience.play()
@@ -105,16 +111,25 @@ func _on_breath_changed(current: float, maximum: float) -> void:
 
 
 func _process(delta: float) -> void:
+	# Null whenever no run scene is live — this autoload outlives the run, so it
+	# doubles as the "are we actually diving" test below.
+	var zone := ZoneManager.get_current_zone()
+
 	# Ambience swells with depth so the deep sounds heavier than the shallows.
 	if _ambience != null:
+		# Safety net: if the bed ever stops (import settings, seek, device
+		# change), bring it back rather than leaving the dive silent forever.
+		if not _ambience.playing:
+			_ambience.play()
 		var target := -80.0
-		if _submerged and ZoneManager.instance != null and ZoneManager.instance.current_zone != null:
-			target = lerpf(-26.0, -12.0, ZoneManager.instance.current_zone.darkness)
+		if _submerged and zone != null:
+			target = lerpf(-26.0, -12.0, zone.darkness)
 		_ambience.volume_db = lerpf(_ambience.volume_db, target, clampf(delta * 1.5, 0.0, 1.0))
 
 	# Heartbeat: only underwater, only when the countdown is genuinely biting,
-	# accelerating as it runs out.
-	if not _submerged or _breath_ratio > HEARTBEAT_AT or _breath_ratio <= 0.0:
+	# accelerating as it runs out. The zone check doubles as "are we still in a
+	# run at all" — quitting to the menu mid-dive never clears _submerged.
+	if zone == null or not _submerged or _breath_ratio > HEARTBEAT_AT or _breath_ratio <= 0.0:
 		_heartbeat_timer = 0.0
 		return
 	var urgency: float = clampf(1.0 - _breath_ratio / HEARTBEAT_AT, 0.0, 1.0)

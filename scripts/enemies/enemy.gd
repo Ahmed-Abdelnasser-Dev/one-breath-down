@@ -52,8 +52,9 @@ func _update_glow() -> void:
 	if _glow == null:
 		return
 	var darkness := 0.0
-	if ZoneManager.instance != null and ZoneManager.instance.current_zone != null:
-		darkness = ZoneManager.instance.current_zone.darkness
+	var zone := ZoneManager.get_current_zone()
+	if zone != null:
+		darkness = zone.darkness
 	_glow.energy = darkness * 0.7
 
 
@@ -185,8 +186,11 @@ func _die() -> void:
 		_glow.energy = 0.0
 
 	# A kill used to be an instant queue_free() with no acknowledgement at all.
-	# Flash white, then sink and fade so the body reads as a body.
+	# Flash white, then sink and fade so the body reads as a body. Species that
+	# ship a death animation still play it underneath (sharks don't have one).
 	if sprite != null:
+		if sprite.sprite_frames != null and sprite.sprite_frames.has_animation("death"):
+			_play("death")
 		sprite.modulate = Color(3.0, 3.0, 3.0, 1.0)
 		var tween := create_tween()
 		tween.tween_property(sprite, "modulate", Color(0.7, 0.8, 1.0, 1.0), 0.09)

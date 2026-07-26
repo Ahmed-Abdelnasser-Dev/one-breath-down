@@ -89,8 +89,9 @@ func _update_light() -> void:
 	if dive_light == null:
 		return
 	var darkness := 0.0
-	if ZoneManager.instance != null and ZoneManager.instance.current_zone != null:
-		darkness = ZoneManager.instance.current_zone.darkness
+	var zone := ZoneManager.get_current_zone()
+	if zone != null:
+		darkness = zone.darkness
 	var has_lantern := GameState.has_upgrade("lantern_1")
 	var target_energy := darkness * (1.7 if has_lantern else 1.0)
 	var target_scale := 1.9 if has_lantern else 1.1
