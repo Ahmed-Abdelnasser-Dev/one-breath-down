@@ -21,7 +21,6 @@ const SLASH_FX_DURATION := 0.5
 @export var drag: float = 400.0             ## Underwater gliding deceleration when input is released
 
 var max_speed: float = 160.0
-var unweighted_max_speed: float = 160.0
 var carried_count: int = 0
 var carried_value: int = 0
 var carried_weight: float = 0.0
@@ -78,7 +77,6 @@ func apply_upgrades() -> void:
 	elif fins_level >= 2:
 		speed = 224.0 # 7 m/s
 		
-	unweighted_max_speed = speed
 	max_speed = speed * _speed_multiplier()
 	_update_light()
 

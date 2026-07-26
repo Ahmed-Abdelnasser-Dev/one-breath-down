@@ -25,6 +25,7 @@ class_name Hud
 var carried_count: int = 0
 var carried_value: int = 0
 
+var _shop_prompt: String = ""
 var _pulse_time: float = 0.0
 var _current_ratio: float = 1.0
 var _fill_stylebox: StyleBoxFlat
@@ -80,18 +81,15 @@ func _ready() -> void:
 	best_depth_text.text = "BEST: %d m" % GameState.best_depth_m
 	_refresh_loot()
 
-	prompt_bar.text = "Press [%s] Shop    Press [%s] Inventory" % [
+	_shop_prompt = "Press [%s] Shop    Press [%s] Inventory" % [
 		_bound_key_text("open_shop"), _bound_key_text("open_inventory")
 	]
+	prompt_bar.text = _shop_prompt
 	prompt_bar_panel.hide()
 
 
 func _process(delta: float) -> void:
-	# Only advertise F/I where MenuManager will actually honor them: at the
-	# surface AND docked at the ship.
-	prompt_bar_panel.visible = (
-		run_manager.state == RunManager.RunState.AT_SURFACE and run_manager.is_at_ship()
-	)
+	_update_prompt()
 
 	# Low breath visual warning pulse
 	if _current_ratio < 0.25:
@@ -103,6 +101,27 @@ func _process(delta: float) -> void:
 		breath_counter_text.add_theme_color_override("font_color", danger_red)
 	else:
 		_pulse_time = 0.0
+
+
+## The prompt bar used to permanently advertise "[F] Shop / [I] Inventory",
+## including 190m down where neither key does anything. It now only says things
+## that are true where the diver actually is.
+func _update_prompt() -> void:
+	var docked: bool = (
+		run_manager.state == RunManager.RunState.AT_SURFACE and run_manager.is_at_ship()
+	)
+	if docked:
+		prompt_bar_panel.show()
+		prompt_bar.text = _shop_prompt
+		prompt_bar.remove_theme_color_override("font_color")
+	elif carried_count > 0:
+		prompt_bar_panel.show()
+		prompt_bar.text = "Carrying %d pearls (%d) — surface at the ship to sell" % [
+			carried_count, carried_value
+		]
+		prompt_bar.add_theme_color_override("font_color", Color(1, 0.88, 0.4))
+	else:
+		prompt_bar_panel.hide()
 
 
 func _on_depth_changed(metres: int) -> void:

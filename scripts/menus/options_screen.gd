@@ -100,3 +100,14 @@ func _on_apply_pressed() -> void:
 func _on_cancel_pressed() -> void:
 	_load_pending_from_settings()
 	closed.emit()
+
+
+## Esc backs out of this screen. Handled here and marked consumed so it works
+## identically from the main menu (whose own handler sits on a parent node) and
+## from the in-game MenuManager stack, without both of them popping at once.
+func _unhandled_input(event: InputEvent) -> void:
+	if not visible:
+		return
+	if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		closed.emit()

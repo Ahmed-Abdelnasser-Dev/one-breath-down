@@ -5,13 +5,9 @@ class_name ShipHub
 ## and the shop/inventory access hub.
 
 signal diver_docked
-signal diver_undocked
 
 @onready var boat: Sprite2D = $Boat
 @onready var dock_area: Area2D = $ShipDockArea
-# The HUD's prompt bar is the single source of the F/I hint; the scene's old
-# PromptLabel stays permanently hidden so the two never stack.
-@onready var prompt_label: Label = $PromptLabel
 
 var _time := 0.0
 var _anim_timer := 0.0
@@ -27,8 +23,6 @@ func _ready() -> void:
 	if dock_area != null:
 		dock_area.body_entered.connect(_on_body_entered)
 		dock_area.body_exited.connect(_on_body_exited)
-	if prompt_label != null:
-		prompt_label.visible = false
 
 
 func _process(delta: float) -> void:
@@ -65,6 +59,5 @@ func _on_body_entered(body: Node2D) -> void:
 func _on_body_exited(body: Node2D) -> void:
 	if body is Diver:
 		is_diver_at_ship = false
-		diver_undocked.emit()
 
 
