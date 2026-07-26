@@ -1,7 +1,9 @@
-[gd_scene load_steps=13 format=3 uid="uid://di64q3xym1gbk"]
+[gd_scene load_steps=17 format=3 uid="uid://di64q3xym1gbk"]
 
 [ext_resource type="Script" uid="uid://cln6818e7n334" path="res://scripts/player/diver.gd" id="1_5hnfc"]
 [ext_resource type="Texture2D" path="res://visuals/slash/SlashFX SpriteSheet FX 3E_1.png" id="6_slash"]
+[ext_resource type="Texture2D" path="res://visuals/water particle effectd/proj_bubblebeam3_sheet.png" id="41_bubble"]
+[ext_resource type="Texture2D" path="res://visuals/water particle effectd/impact_water_sheet.png" id="42_impact"]
 [ext_resource type="Texture2D" uid="uid://doij7aqpdvl33" path="res://visuals/lights/light_radial_stepped.tres" id="1_light"]
 [ext_resource type="Script" uid="uid://clrcsd63bvjl3" path="res://scripts/player/diver_animator.gd" id="2_anim"]
 [ext_resource type="SpriteFrames" uid="uid://blgxg3dxya72g" path="res://visuals/diver/diver_frames.tres" id="2_frames"]
@@ -19,6 +21,20 @@ radius = 28.0
 [sub_resource type="CanvasItemMaterial" id="CIM_diver_add"]
 blend_mode = 1
 
+[sub_resource type="CanvasItemMaterial" id="CIM_diver_bubble"]
+blend_mode = 1
+particles_animation = true
+particles_anim_h_frames = 6
+particles_anim_v_frames = 1
+particles_anim_loop = true
+
+[sub_resource type="CanvasItemMaterial" id="CIM_diver_splashfx"]
+blend_mode = 1
+particles_animation = true
+particles_anim_h_frames = 8
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
 [sub_resource type="ParticleProcessMaterial" id="PPM_diver_bubbles"]
 emission_shape = 1
 emission_sphere_radius = 4.0
@@ -27,9 +43,11 @@ spread = 25.0
 initial_velocity_min = 15.0
 initial_velocity_max = 35.0
 gravity = Vector3(0, -30, 0)
-scale_min = 0.4
-scale_max = 0.9
-color = Color(0.85, 0.95, 1, 0.6)
+scale_min = 0.3
+scale_max = 0.65
+color = Color(0.88, 0.96, 1, 0.75)
+anim_speed_min = 0.9
+anim_speed_max = 2.0
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_diver_splash"]
 emission_shape = 1
@@ -39,24 +57,30 @@ spread = 60.0
 initial_velocity_min = 40.0
 initial_velocity_max = 90.0
 gravity = Vector3(0, 120, 0)
-scale_min = 0.5
-scale_max = 1.2
-color = Color(0.9, 0.97, 1, 0.85)
+scale_min = 0.25
+scale_max = 0.6
+color = Color(0.92, 0.98, 1, 0.9)
+anim_speed_min = 1.0
+anim_speed_max = 1.0
 
 [node name="Diver" type="CharacterBody2D" unique_id=88714604]
 collision_mask = 12
 script = ExtResource("1_5hnfc")
 
 [node name="BubbleTrail" type="GPUParticles2D" parent="." unique_id=1074194299]
-material = SubResource("CIM_diver_add")
-amount = 16
-lifetime = 1.2
+material = SubResource("CIM_diver_bubble")
+texture_filter = 1
+texture = ExtResource("41_bubble")
+amount = 30
+lifetime = 1.5
 process_material = SubResource("PPM_diver_bubbles")
 emitting = false
 
 [node name="SplashParticles" type="GPUParticles2D" parent="." unique_id=1074194300]
-material = SubResource("CIM_diver_add")
-amount = 12
+material = SubResource("CIM_diver_splashfx")
+texture_filter = 1
+texture = ExtResource("42_impact")
+amount = 14
 lifetime = 0.6
 one_shot = true
 explosiveness = 0.9

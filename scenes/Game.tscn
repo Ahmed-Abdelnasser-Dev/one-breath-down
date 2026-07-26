@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/ZoneBanner.tscn" id="18_banner"]
 [ext_resource type="PackedScene" path="res://scenes/ui/DebugOverlay.tscn" id="21_debugoverlay"]
 [ext_resource type="Script" uid="uid://ei4gp3demdag" path="res://scripts/world/prop_spawner.gd" id="22_propspawner"]
+[ext_resource type="Script" path="res://scripts/world/bird_flock.gd" id="37_birdflock"]
 [ext_resource type="Resource" path="res://data/enemies/ugly_fish.tres" id="24_uglyfish_data"]
 [ext_resource type="Script" uid="uid://bqg1cxjuvk7l3" path="res://scripts/world/cave_wall_generator.gd" id="25_cavewall"]
 [ext_resource type="Script" uid="uid://chqv5sew6rrsp" path="res://scripts/world/EnemySpawner.gd" id="26_enemyspawner"]
@@ -51,6 +52,9 @@ color = Color(0.12, 0.55, 0.72, 1)
 [node name="Background" parent="World" unique_id=1629878394 instance=ExtResource("6_bg")]
 
 [node name="SurfaceAtmosphere" parent="World" unique_id=1069534349 instance=ExtResource("33_atmosphere")]
+
+[node name="BirdFlock" type="Node2D" parent="World"]
+script = ExtResource("37_birdflock")
 
 [node name="ShipHub" parent="World" unique_id=1895724059 instance=ExtResource("32_shiphub")]
 position = Vector2(0, -32)

@@ -18,6 +18,8 @@ const MAX_DEPTH_Y := 6300.0
 const TWILIGHT_START_Y := 1600.0
 const MIDNIGHT_START_Y := 4800.0
 
+const BUBBLE_TEXTURE: Texture2D = preload("res://visuals/water particle effectd/proj_bubblebeam3_sheet.png")
+
 var cargo_textures: Array[Texture2D] = [
 	preload("res://visuals/general assets/Catch/Barrel.png"),
 	preload("res://visuals/general assets/Catch/Box.png"),
@@ -63,6 +65,7 @@ func _respawn() -> void:
 	_spawn_ruins()
 	_spawn_cargo()
 	_spawn_fish()
+	_spawn_bubble_vents()
 
 
 func _wall_range(y: float) -> Vector2:
@@ -138,6 +141,57 @@ func _spawn_fish() -> void:
 				_fish.append(spr)
 				_fish_speeds.append(speed * _rng.randf_range(0.9, 1.1))
 		y += _rng.randf_range(120.0, 260.0)
+
+
+## Seabed vents streaming bubbles up the shaft. These are the strongest signal
+## that the water is alive rather than a still backdrop, and they double as
+## vertical motion cues while the diver is descending.
+func _spawn_bubble_vents() -> void:
+	var y := 500.0
+	while y < MAX_DEPTH_Y - 200.0:
+		var xr := _wall_range(y)
+		# Vents cling to the walls, where a fissure would plausibly be.
+		var from_left := _rng.randf() < 0.5
+		var x: float = (xr.x + _rng.randf_range(10.0, 90.0)) if from_left \
+			else (xr.y - _rng.randf_range(10.0, 90.0))
+
+		var vent := GPUParticles2D.new()
+		vent.texture = BUBBLE_TEXTURE
+		vent.texture_filter = TEXTURE_FILTER_NEAREST
+		vent.position = Vector2(x, y)
+		vent.amount = _rng.randi_range(8, 16)
+		vent.lifetime = _rng.randf_range(3.0, 5.0)
+		vent.preprocess = 3.0
+		vent.randomness = 0.6
+		# Only simulate vents the diver is near; 20 always-on emitters is waste.
+		vent.visibility_rect = Rect2(-60, -420, 120, 460)
+		vent.local_coords = false
+
+		var mat := CanvasItemMaterial.new()
+		mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+		mat.particles_animation = true
+		mat.particles_anim_h_frames = 6
+		mat.particles_anim_v_frames = 1
+		mat.particles_anim_loop = true
+		vent.material = mat
+
+		var pm := ParticleProcessMaterial.new()
+		pm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_BOX
+		pm.emission_box_extents = Vector3(6, 2, 0)
+		pm.direction = Vector3(0, -1, 0)
+		pm.spread = 9.0
+		pm.initial_velocity_min = 18.0
+		pm.initial_velocity_max = 42.0
+		pm.gravity = Vector3(0, -34, 0)
+		pm.scale_min = 0.28
+		pm.scale_max = 0.62
+		pm.anim_speed_min = 0.8
+		pm.anim_speed_max = 1.8
+		pm.color = Color(0.85, 0.95, 1.0, 0.6)
+		vent.process_material = pm
+
+		add_child(vent)
+		y += _rng.randf_range(280.0, 620.0)
 
 
 func _process(delta: float) -> void:

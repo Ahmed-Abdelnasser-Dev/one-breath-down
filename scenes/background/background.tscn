@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://dpofhsf8yauyq" path="res://visuals/background/Sky2.png" id="18_sky2"]
 [ext_resource type="Texture2D" uid="uid://c3b83lqreyoaj" path="res://visuals/background/Ocean1.png" id="20_ocean1"]
 [ext_resource type="Texture2D" uid="uid://b84jqjqx8xbhk" path="res://visuals/background/Ocean2.png" id="21_ocean2"]
+[ext_resource type="Texture2D" uid="uid://dbv23seeiq2gu" path="res://visuals/water particle effectd/proj_bubblebeam3_sheet.png" id="40_bubble"]
 
 [sub_resource type="ShaderMaterial" id="SM_waterbody"]
 shader = ExtResource("4_waterbody")
@@ -31,8 +32,12 @@ shader_parameter/color_twilight_out = Color(0.035, 0.09, 0.2, 1)
 shader_parameter/color_midnight = Color(0.012, 0.02, 0.051, 1)
 shader_parameter/color_foam = Color(0.85, 0.95, 1, 0.9)
 
-[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+[sub_resource type="CanvasItemMaterial" id="CIM_bubble"]
 blend_mode = 1
+particles_animation = true
+particles_anim_h_frames = 6
+particles_anim_v_frames = 1
+particles_anim_loop = true
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_bubbles"]
 emission_shape = 3
@@ -42,9 +47,11 @@ spread = 12.0
 initial_velocity_min = 25.0
 initial_velocity_max = 55.0
 gravity = Vector3(0, -25, 0)
-scale_min = 0.4
-scale_max = 1.1
-color = Color(0.9, 0.97, 1, 0.4)
+scale_min = 0.3
+scale_max = 0.72
+color = Color(0.85, 0.95, 1, 0.6)
+anim_speed_min = 0.7
+anim_speed_max = 1.6
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_snow"]
 emission_shape = 3
@@ -57,6 +64,9 @@ gravity = Vector3(0, 4, 0)
 scale_min = 0.3
 scale_max = 0.7
 color = Color(0.85, 0.9, 0.95, 0.25)
+
+[sub_resource type="CanvasItemMaterial" id="CIM_add"]
+blend_mode = 1
 
 [sub_resource type="ParticleProcessMaterial" id="PPM_flecks"]
 emission_shape = 3
@@ -73,7 +83,11 @@ color = Color(1, 0.95, 0.8, 0.8)
 [sub_resource type="ShaderMaterial" id="SM_vignette"]
 shader = ExtResource("9_vignette")
 shader_parameter/intensity = 0.0
+shader_parameter/panic = 0.0
 shader_parameter/vignette_color = Color(0.012, 0.02, 0.051, 1)
+shader_parameter/panic_color = Color(0.44, 0.03, 0.05, 1)
+shader_parameter/cells = 60.0
+shader_parameter/posterize_steps = 5.0
 
 [node name="Background" type="Node2D" unique_id=1217331406]
 script = ExtResource("1_bg")
@@ -127,6 +141,7 @@ region_enabled = true
 region_rect = Rect2(0, 0, 1024, 800)
 
 [node name="SkySprite" type="Sprite2D" parent="." unique_id=962069132]
+visible = false
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(-2688, -960)
@@ -227,8 +242,10 @@ centered = false
 [node name="AmbientFollow" type="Node2D" parent="." unique_id=1553656784]
 
 [node name="Bubbles" type="GPUParticles2D" parent="AmbientFollow" unique_id=1107098155]
-material = SubResource("CIM_add")
-amount = 24
+texture_filter = 1
+material = SubResource("CIM_bubble")
+amount = 60
+texture = ExtResource("40_bubble")
 lifetime = 6.0
 preprocess = 6.0
 randomness = 0.5

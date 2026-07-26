@@ -6,6 +6,7 @@ class_name Pearl
 @onready var sprite: Sprite2D = $Sprite2D
 
 static var _glow_texture: Texture2D = preload("res://visuals/lights/light_radial_stepped.tres")
+static var _pop_texture: Texture2D = preload("res://visuals/water particle effectd/proj_bubblebeam3_end_sheet.png")
 
 var _base_y: float = 0.0
 var _time_offset: float = 0.0
@@ -26,6 +27,48 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	_time_offset += delta * 2.5
 	position.y = _base_y + sin(_time_offset) * 4.0
+
+
+## A puff of bubbles where the pearl was. Reparented to the pearl's container so
+## it outlives the pearl — the pearl frees itself a fraction of a second later.
+func _burst_bubbles() -> void:
+	var host := get_parent()
+	if host == null:
+		return
+
+	var puff := GPUParticles2D.new()
+	puff.texture = _pop_texture
+	puff.texture_filter = TEXTURE_FILTER_NEAREST
+	puff.amount = 10
+	puff.lifetime = 0.7
+	puff.one_shot = true
+	puff.explosiveness = 0.95
+	puff.global_position = global_position
+
+	var mat := CanvasItemMaterial.new()
+	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
+	mat.particles_animation = true
+	mat.particles_anim_h_frames = 3
+	mat.particles_anim_v_frames = 1
+	mat.particles_anim_loop = false
+	puff.material = mat
+
+	var pm := ParticleProcessMaterial.new()
+	pm.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	pm.emission_sphere_radius = 5.0
+	pm.direction = Vector3(0, -1, 0)
+	pm.spread = 55.0
+	pm.initial_velocity_min = 24.0
+	pm.initial_velocity_max = 62.0
+	pm.gravity = Vector3(0, -40, 0)
+	pm.scale_min = 0.35
+	pm.scale_max = 0.75
+	pm.color = data.color if data != null else Color.WHITE
+	puff.process_material = pm
+
+	host.add_child(puff)
+	puff.emitting = true
+	puff.finished.connect(puff.queue_free, CONNECT_ONE_SHOT)
 
 
 func setup(pearl_data: PearlData) -> void:
@@ -83,6 +126,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if col != null:
 		col.set_deferred("disabled", true)
 	set_process(false)
+	_burst_bubbles()
 
 	var tween := create_tween()
 	tween.set_parallel(true)
