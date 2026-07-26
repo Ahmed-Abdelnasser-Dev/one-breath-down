@@ -3,48 +3,88 @@ extends Control
 
 signal closed
 
+## Costs are set so the first sunlit dive (~60-120 pearls) buys exactly one
+## small upgrade, and the full board takes several successful deep runs. The
+## old prices totalled 180 for everything, which is roughly 6% of one full
+## column — a single golden pearl bought the entire shop twice over, and the
+## "the deep is unreachable until you upgrade" gate collapsed on dive one.
 const CATALOG: Array[Dictionary] = [
 	{
 		"id": &"lungs_1",
 		"name": "Bigger Lungs I",
 		"effect": "Increases base breath capacity from 50s to 75s.",
-		"cost": 15,
+		"cost": 60,
 		"prereq": &""
 	},
 	{
 		"id": &"lungs_2",
 		"name": "Bigger Lungs II",
 		"effect": "Increases base breath capacity to 100s.",
-		"cost": 40,
+		"cost": 165,
 		"prereq": &"lungs_1"
 	},
 	{
 		"id": &"fins_1",
 		"name": "Swift Fins I",
-		"effect": "Increases swim speed by 25% and reduces exertion oxygen drain.",
-		"cost": 20,
+		"effect": "Swim 20% faster, and hard swimming costs less air.",
+		"cost": 55,
 		"prereq": &""
 	},
 	{
 		"id": &"fins_2",
 		"name": "Swift Fins II",
-		"effect": "Increases swim speed by 50% total.",
-		"cost": 50,
+		"effect": "Swim 40% faster, and hard swimming costs less air still.",
+		"cost": 140,
 		"prereq": &"fins_1"
 	},
 	{
 		"id": &"basket_1",
 		"name": "Woven Pearl Basket",
-		"effect": "Reduces speed and oxygen penalties from carried pearl weight.",
-		"cost": 25,
+		"effect": "Carry 4.5kg before pearls start slowing you and burning air.",
+		"cost": 70,
 		"prereq": &""
+	},
+	{
+		"id": &"basket_2",
+		"name": "Reinforced Basket",
+		"effect": "Carry 6.0kg before the weight penalty begins.",
+		"cost": 155,
+		"prereq": &"basket_1"
 	},
 	{
 		"id": &"lantern_1",
 		"name": "Diver's Lantern",
-		"effect": "Provides bright illumination when descending into dark twilight and midnight depths.",
-		"cost": 30,
+		"effect": "A wide, bright lamp — the only way to see in the midnight zone.",
+		"cost": 95,
 		"prereq": &""
+	},
+	{
+		"id": &"wetsuit_1",
+		"name": "Padded Wetsuit",
+		"effect": "Raises health from 100 to 130.",
+		"cost": 80,
+		"prereq": &""
+	},
+	{
+		"id": &"wetsuit_2",
+		"name": "Plated Wetsuit",
+		"effect": "Raises health to 160.",
+		"cost": 175,
+		"prereq": &"wetsuit_1"
+	},
+	{
+		"id": &"vigor_1",
+		"name": "Diver's Vigor",
+		"effect": "Raises stamina to 130 — more swings before you tire.",
+		"cost": 75,
+		"prereq": &""
+	},
+	{
+		"id": &"vigor_2",
+		"name": "Deep Lungs Training",
+		"effect": "Raises stamina to 160.",
+		"cost": 160,
+		"prereq": &"vigor_1"
 	}
 ]
 

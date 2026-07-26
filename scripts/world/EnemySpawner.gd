@@ -18,10 +18,19 @@ const MIN_SEPARATION := 180.0
 const MIN_DIVER_CLEAR := 260.0
 const SPAWN_COOLDOWN := 1.2
 const PLACEMENT_TRIES := 8
-const PLAY_X_MIN := 80.0
-const PLAY_X_MAX := 1520.0
 const SEABED_Y := 6400.0
-const MIN_SPAWN_Y := 120.0    ## no ambushes right at the surface
+## 120px was 3.75m — about a diver and a half below the waterline, despite the
+## comment claiming it prevented surface ambushes.
+const MIN_SPAWN_Y := 400.0
+const WALL_MARGIN := 70.0     ## keep spawns off the cave walls
+
+## The GDD wants the ascent to be the dangerous half of the dive, but spawning
+## only ever looked *down*: everything appeared below the diver and was culled
+## 1200px above, so the water you climbed back through was guaranteed empty.
+## While carrying loot and heading up, some spawns now appear above instead.
+const ASCENT_SPAWN_CHANCE := 0.55
+const SPAWN_MIN_BEHIND := 420.0
+const SPAWN_MAX_BEHIND := 1000.0
 const DEFAULT_CAP := 3        ## used when ZoneManager.instance is unavailable (e.g. test runner)
 
 @export var enemy_types: Array[EnemyData] = []
@@ -32,6 +41,7 @@ var _live: Array[Enemy] = []
 var _cooldown: float = 0.0
 var _diver: Diver
 var _container: Node2D
+var _cave: CaveWallGenerator
 
 
 func _ready() -> void:
@@ -44,6 +54,20 @@ func _cache_container() -> void:
 	_container = get_node_or_null(enemies_container_path) as Node2D
 	if _container == null:
 		_container = self
+	_cave = get_parent().get_node_or_null("CaveWallGenerator") as CaveWallGenerator if get_parent() != null else null
+
+
+## Spawn X used to be hardcoded to 80..1520 regardless of the cave, so enemies
+## could be placed inside solid rock — and a Charger's home anchor would end up
+## embedded, leaving it hovering back toward a point it could never reach.
+## DiveSpawner already asked the generator for this; the enemy spawner didn't.
+func _playable_x_range(y: float) -> Vector2:
+	if _cave != null:
+		var lo := _cave.get_left_wall_x(y) + WALL_MARGIN
+		var hi := _cave.get_right_wall_x(y) - WALL_MARGIN
+		if hi > lo:
+			return Vector2(lo, hi)
+	return Vector2(80.0, 1520.0)
 
 
 func _physics_process(delta: float) -> void:
@@ -69,7 +93,12 @@ func _physics_process(delta: float) -> void:
 	if _live.size() >= cap:
 		return
 
-	var spawn_y := clampf(dy + rng.randf_range(SPAWN_MIN_AHEAD, SPAWN_MAX_AHEAD), MIN_SPAWN_Y, SEABED_Y - 80.0)
+	# Ascending with pearls in hand is the moment the run is worth threatening.
+	var ascending := _diver.velocity.y < -20.0 and _diver.carried_value > 0
+	var offset := rng.randf_range(SPAWN_MIN_AHEAD, SPAWN_MAX_AHEAD)
+	if ascending and rng.randf() < ASCENT_SPAWN_CHANCE:
+		offset = -rng.randf_range(SPAWN_MIN_BEHIND, SPAWN_MAX_BEHIND)
+	var spawn_y := clampf(dy + offset, MIN_SPAWN_Y, SEABED_Y - 80.0)
 	var depth_m := int(spawn_y / GameState.PIXELS_PER_METRE)
 	var player_depth_m := int(dy / GameState.PIXELS_PER_METRE)
 	var data := _pick_type_for_depth(depth_m, player_depth_m)
@@ -80,7 +109,9 @@ func _physics_process(delta: float) -> void:
 	var pos := Vector2.ZERO
 	var placed := false
 	for _try in range(PLACEMENT_TRIES):
-		var candidate := Vector2(rng.randf_range(PLAY_X_MIN, PLAY_X_MAX), spawn_y + rng.randf_range(-200.0, 200.0))
+		var candidate_y := spawn_y + rng.randf_range(-200.0, 200.0)
+		var x_range := _playable_x_range(candidate_y)
+		var candidate := Vector2(rng.randf_range(x_range.x, x_range.y), candidate_y)
 		if candidate.distance_to(_diver.global_position) < MIN_DIVER_CLEAR:
 			continue
 		var clear := true

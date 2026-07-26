@@ -249,4 +249,3 @@ func take_hit(amount: int, from: Vector2, knock: float) -> void:
 	# Drives screen shake / hitstop via the Juice autoload. This signal was
 	# declared on the Events bus but never actually emitted by anything.
 	Events.player_damaged.emit(amount, &"contact")
-

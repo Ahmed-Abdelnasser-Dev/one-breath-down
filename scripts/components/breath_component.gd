@@ -7,6 +7,7 @@ class_name BreathComponent
 @export var base_max_breath: float = 50.0    ## seconds of breath at rest
 @export var base_drain: float = 1.0         ## breath/sec while resting
 @export var exertion_bonus: float = 0.5     ## up to +50% drain at full speed
+@onready var base_exertion_bonus: float = exertion_bonus
 @export var weight_drain: float = 1.0       ## extra breath/sec per unit of carried weight
 
 var max_breath: float = 50.0
@@ -36,7 +37,14 @@ func _apply_upgrades() -> void:
 		max_breath = 100.0
 	else:
 		max_breath = base_max_breath
-		
+
+	# Fins are sold as "hard swimming costs less air". They only ever changed
+	# top speed, so the second half of that promise did nothing until now.
+	match GameState.get_upgrade_level("fins_"):
+		0: exertion_bonus = base_exertion_bonus
+		1: exertion_bonus = base_exertion_bonus * 0.72
+		_: exertion_bonus = base_exertion_bonus * 0.5
+
 	current_breath = max_breath
 	Events.breath_changed.emit(current_breath, max_breath)
 
@@ -66,7 +74,11 @@ func begin_refill(duration: float) -> void:
 	_refill_duration = max(duration, 0.001)
 
 
-const MAX_DRAIN_MULT := 2.5
+## Ceiling on the combined drain multiplier. At 2.5 this clamp was reached at
+## roughly 4 units over capacity, so past that point every additional pearl was
+## free in oxygen terms — greed stopped costing anything exactly where it should
+## have started biting hardest.
+const MAX_DRAIN_MULT := 4.0
 const DRAIN_PENALTY_PER_UNIT := 0.15
 
 

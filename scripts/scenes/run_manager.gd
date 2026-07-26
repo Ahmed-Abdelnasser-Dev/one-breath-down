@@ -113,15 +113,21 @@ func _enter_run_over(success: bool, cause: String = "drowned") -> void:
 		Events.player_surfaced.emit(diver.carried_value)
 		print("Surfaced — banked %d pearls (total %d)" % [diver.carried_value, GameState.pearls])
 		breath.begin_refill(RESET_DELAY)   # ticks up to full over the pause below
-		get_tree().create_timer(RESET_DELAY).timeout.connect(reset_run)
+		# Banking is not a respawn: the diver is already standing at the ship,
+		# so yanking them back to the spawn point just looked like a glitch.
+		get_tree().create_timer(RESET_DELAY).timeout.connect(func() -> void: reset_run(false))
 	else:
 		Events.player_died.emit(cause)   # carried pearls lost; GameOverScreen drives the reset
 		print("%s — %d pearls lost" % [cause.capitalize(), diver.carried_value])
 		GameState.save()   # best depth this dive reached is still worth keeping
 
 
-func reset_run() -> void:
-	diver.global_position = _diver_start_position
+## `reposition` is true when the run ended somewhere the diver can't continue
+## from — i.e. death, where they must be returned to the ship. After a
+## successful bank they're already docked, so leave them where they are.
+func reset_run(reposition: bool = true) -> void:
+	if reposition:
+		diver.global_position = _diver_start_position
 	diver.velocity = Vector2.ZERO
 	diver.clear_carry()
 	breath.refill()   # closes the tiny gap if the refill tween hasn't quite hit max yet

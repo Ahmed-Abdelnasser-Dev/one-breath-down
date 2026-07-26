@@ -37,12 +37,15 @@ A 2D side-view breath-holding dive game inspired by the Egyptian film *The Diver
 ### Depth & Pearl Value
 - Value scales with depth. Rough draft curve:
 
-| Pearl Type | Depth Band | Value | Special Trait |
-|---|---|---|---|
-| Seed pearl | Shallow (0-20m) | Low | Common, safe "sure thing" pickup |
-| Rose pearl | Mid (20-50m) | Medium | Adds slight weight, minor speed penalty while carried |
-| Black pearl | Deep (50m+) | High | Rare, often guarded (near hazards / tight spaces) |
-| Golden pearl | Very deep, rare spawn | Very high | Requires upgraded gear to reasonably reach |
+| Pearl Type | Depth Band | Value | Weight | Special Trait |
+|---|---|---|---|---|
+| Seed pearl | 0-40m | 10 | 0.2kg | Common, safe "sure thing" pickup |
+| Rose pearl | 30-90m | 35 | 0.5kg | Adds slight weight, minor speed penalty while carried |
+| Black pearl | 80-160m | 110 | 0.9kg | Rare, often guarded (near hazards / tight spaces) |
+| Golden pearl | 150-200m | 350 | 1.4kg | Requires upgraded gear to reasonably reach |
+
+<!-- Values above are the shipped data/pearls/*.tres. Keep this table in sync
+     with those resources; they are the source of truth, not this doc. -->
 
 ### Carrying Weight
 - Each pearl carried adds a small cumulative penalty (swim speed and/or oxygen drain).
@@ -73,16 +76,22 @@ A 2D side-view breath-holding dive game inspired by the Egyptian film *The Diver
 
 ### Equipment / Upgrades (spent between runs)
 
-| Item | Effect |
-|---|---|
-| Bigger lungs | Increases base breath/countdown duration |
-| Fins | Faster swim speed, less oxygen spent per meter |
-| Knife | Escape nets instantly instead of losing time |
-| Weighted belt (toggle) | Sink faster, harder to control ascent, risk-based item |
-| Lantern | Visibility in deep zones, helps avoid ambush hazards |
-| Bigger pearl bag / rope basket | Raises the weight threshold before speed penalty kicks in |
+Shipped catalogue (scripts/menus/shop_screen.gd `CATALOG` is the source of truth):
 
-Keep shop small (5-6 items) for balance and scope sanity.
+| Item | Cost | Effect |
+|---|---|---|
+| Bigger Lungs I / II | 60 / 165 | Base breath 50s -> 75s -> 100s |
+| Swift Fins I / II | 55 / 140 | +20% / +40% swim speed, and exertion drain cut 28% / 50% |
+| Woven / Reinforced Basket | 70 / 155 | Carry threshold 3.0kg -> 4.5kg -> 6.0kg before penalties |
+| Diver's Lantern | 95 | Wide bright lamp — the only way to see in the midnight zone |
+| Padded / Plated Wetsuit | 80 / 175 | Health 100 -> 130 -> 160 |
+| Diver's Vigor / Deep Lungs Training | 75 / 160 | Stamina 100 -> 130 -> 160 |
+
+Not implemented (kept here as future scope, not current content): Knife
+(escape nets) and Weighted belt — both depend on hazards that don't exist yet.
+
+Costs are set so a first sunlit dive (~60-120 pearls) buys exactly one small
+upgrade, and the full board takes several successful deep runs.
 
 ---
 

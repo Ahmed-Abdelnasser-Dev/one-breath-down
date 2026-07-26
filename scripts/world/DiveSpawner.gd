@@ -76,7 +76,13 @@ func spawn_column() -> void:
 	for band_top in range(0, MAX_DEPTH_M, BAND_M):
 		var t := float(band_top) / float(MAX_DEPTH_M)
 		var expected_count := lerpf(2.5, 0.8, t)
-		var count := rng.randi_range(floori(expected_count), ceili(expected_count))
+		# randi_range(floor, ceil) has a mean of floor+0.5 regardless of the
+		# fraction, which turned the intended smooth 2.5 -> 0.8 taper into a
+		# step function: a flat 2.5 for the first 60m, then a cliff. Taking the
+		# fractional part as a probability actually reproduces the curve.
+		var count := floori(expected_count)
+		if rng.randf() < expected_count - float(count):
+			count += 1
 
 		var band_placed_positions: Array[Vector2] = []
 

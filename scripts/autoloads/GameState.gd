@@ -8,13 +8,28 @@ const PIXELS_PER_METRE := 32.0
 var pearls: int = 0
 var owned_upgrades: Array[StringName] = []
 var best_depth_m: int = 0
-var weight_capacity: float = 3.0
+
+const BASE_WEIGHT_CAPACITY := 3.0
+
+## Kilograms of pearls carried before the speed/oxygen penalty starts. This used
+## to be a bare `var = 3.0` that nothing ever wrote, so the Woven Pearl Basket
+## was sold in the shop and did literally nothing.
+var weight_capacity: float = BASE_WEIGHT_CAPACITY
 
 const SAVE_PATH := "user://save.cfg"
 
 
 func _ready() -> void:
 	load_game()
+	_apply_capacity_upgrades()
+	Events.upgrade_purchased.connect(func(_id: StringName) -> void: _apply_capacity_upgrades())
+
+
+func _apply_capacity_upgrades() -> void:
+	match get_upgrade_level("basket_"):
+		0: weight_capacity = BASE_WEIGHT_CAPACITY
+		1: weight_capacity = 4.5
+		_: weight_capacity = 6.0
 
 
 func _notification(what: int) -> void:
@@ -82,6 +97,7 @@ func reset_progress() -> void:
 	pearls = 0
 	owned_upgrades = []
 	best_depth_m = 0
+	weight_capacity = BASE_WEIGHT_CAPACITY
 	if has_save():
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(SAVE_PATH))
 

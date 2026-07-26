@@ -12,8 +12,13 @@ class_name Hud
 @onready var money_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/MoneyRow/MoneyText
 @onready var weight_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/WeightRow/WeightText
 @onready var loot_text: Label = $TopRightSection/VBoxContainer/LootText
+@onready var value_text: Label = $TopRightSection/VBoxContainer/ValueText
+@onready var strain_text: Label = $TopRightSection/VBoxContainer/StrainText
 @onready var depth_text: Label = $DepthSection/DepthText
 @onready var best_depth_text: Label = $TopLeftSection/VBoxContainer/StatusSubRow/BestRow/BestDepthText
+@onready var bank_toast: VBoxContainer = $BankToast
+@onready var bank_title: Label = $BankToast/BankTitle
+@onready var bank_amount: Label = $BankToast/BankAmount
 @onready var prompt_bar_panel: PanelContainer = $PromptBarPanel
 @onready var prompt_bar: Label = $PromptBarPanel/PromptBar
 
@@ -49,7 +54,9 @@ func _ready() -> void:
 	Events.health_changed.connect(_on_health_changed)
 	Events.stamina_changed.connect(_on_stamina_changed)
 	Events.pearl_collected.connect(_on_pearl_collected)
+	Events.carry_weight_changed.connect(_on_carry_weight_changed)
 	Events.pearls_banked.connect(_on_pearls_banked)
+	Events.player_surfaced.connect(_show_bank_toast)
 	Events.player_surfaced.connect(_on_run_ended)
 	Events.player_died.connect(_on_run_ended)
 	Events.depth_changed.connect(_on_depth_changed)
@@ -136,7 +143,6 @@ func _on_stamina_changed(current: float, max_stamina: float) -> void:
 func _on_pearl_collected(data: PearlData) -> void:
 	carried_count += 1
 	carried_value += data.value
-	weight_text.text = "%.2f kg" % run_manager.diver.carried_weight
 	_refresh_loot()
 
 	# Punch the counter so the pickup lands on the HUD too, not just in world.
@@ -158,11 +164,46 @@ func _on_run_ended(_arg) -> void:
 	carried_count = 0
 	carried_value = 0
 	weight_text.text = "0.00 kg"
+	strain_text.hide()
 	_refresh_loot()
+
+
+## Docking silently emptied the basket and bumped a number in the corner. This
+## says out loud what just happened, since it's the payoff the whole dive is for.
+func _show_bank_toast(banked: int) -> void:
+	if banked <= 0:
+		return
+	bank_title.text = "CATCH SOLD"
+	bank_amount.text = "Basket emptied   +%d" % banked
+	bank_toast.modulate.a = 0.0
+	bank_toast.scale = Vector2(0.85, 0.85)
+	bank_toast.pivot_offset = bank_toast.size * 0.5
+
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(bank_toast, "modulate:a", 1.0, 0.18)
+	tween.tween_property(bank_toast, "scale", Vector2.ONE, 0.28) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.chain().tween_interval(1.15)
+	tween.chain().tween_property(bank_toast, "modulate:a", 0.0, 0.45)
 
 
 func _refresh_loot() -> void:
 	loot_text.text = "Pearls x%d" % carried_count
+	value_text.text = "%d" % carried_value
+
+
+## The greed meter. Going over capacity costs speed AND oxygen, and until now
+## the game never said so anywhere — the only overburden warning in the project
+## lived in an unused scene.
+func _on_carry_weight_changed(current: float, capacity: float) -> void:
+	weight_text.text = "%.2f kg" % current
+	var over := current > capacity
+	strain_text.visible = over
+	if over:
+		strain_text.text = "OVERBURDENED %.1f/%.1f" % [current, capacity]
+		var pulse := (sin(Time.get_ticks_msec() * 0.008) + 1.0) * 0.5
+		strain_text.modulate.a = 0.65 + 0.35 * pulse
 
 
 ## Above 10s: "M:SS". Below 10s: "S.s".
